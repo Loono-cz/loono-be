@@ -4,6 +4,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
     kotlin("jvm") version "1.5.10"
     kotlin("plugin.spring") version "1.5.10"
+    jacoco
 }
 
 group = "cz.loono"
@@ -33,4 +34,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    reports {
+        csv.required.set(true)
+    }
 }
