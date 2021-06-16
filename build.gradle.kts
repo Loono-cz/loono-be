@@ -1,12 +1,13 @@
 plugins {
     id("org.springframework.boot") version "2.4.7"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
     kotlin("jvm") version "1.5.10"
     kotlin("plugin.spring") version "1.5.10"
 }
 
-group "cz.loono"
-version "1.0-SNAPSHOT"
+group = "cz.loono"
+version = "1.0-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
