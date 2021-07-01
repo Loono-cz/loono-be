@@ -1,4 +1,4 @@
-package cz.loono.backend.controller
+package cz.loono.backend.api.controller
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

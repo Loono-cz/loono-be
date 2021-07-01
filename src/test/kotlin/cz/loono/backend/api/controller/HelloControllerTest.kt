@@ -1,6 +1,5 @@
-package cz.loono.backend
+package cz.loono.backend.api.controller
 
-import cz.loono.backend.controller.HelloController
 import org.junit.jupiter.api.Test
 
 class HelloControllerTest {
