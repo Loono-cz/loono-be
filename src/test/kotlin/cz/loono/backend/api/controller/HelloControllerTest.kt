@@ -6,7 +6,6 @@ class HelloControllerTest {
 
     @Test
     fun firstTest() {
-        val list = HelloController().index()
-        assert(list.size == 3)
+        assert(HelloController().index().equals("Welcome on the Loono Backend!"))
     }
 }

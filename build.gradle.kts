@@ -16,6 +16,8 @@ repositories {
     mavenCentral()
 }
 
+val googleApiVersion = "1.32.1"
+
 dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib-jdk8"))
@@ -23,6 +25,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    implementation("com.google.api-client:google-api-client:$googleApiVersion")
+    implementation("com.google.api-client:google-api-client-appengine:$googleApiVersion")
+    implementation("com.google.api-client:google-api-client-gson:$googleApiVersion")
 
     runtimeOnly("org.postgresql:postgresql")
 

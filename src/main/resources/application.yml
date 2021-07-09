@@ -3,7 +3,7 @@ spring:
   # Database
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/loono
+    url: jdbc:postgresql://${POSTGRE_URL}
     username: ${POSTGRE_USER}
     password: ${POSTGRE_PWD}
   # JPA properties
@@ -15,6 +15,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     open-in-view: false
     generate-ddl: true
+  # Spring security
+  security:
+    user:
+      name: monitor
+      password: fCwfHpjhDeV5s5jZ
+      roles: ACTUATOR
 # Logger configuration
 logging:
   pattern:
@@ -25,3 +31,8 @@ logging:
 # Server configuration
 server:
   port: 8080
+# Health indicators
+management.endpoint.health:
+  roles: ACTUATOR
+  show-details: always
+management.health.db.enabled: true
