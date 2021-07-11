@@ -22,6 +22,6 @@ data class Examination(
     val date: Date = Date(),
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     val user: User = User()
 )
