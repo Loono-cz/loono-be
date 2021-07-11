@@ -22,7 +22,8 @@ class OnboardService {
             salutation = user.salutation,
             notificationEmail = user.notificationEmail,
             sex = user.sex,
-            birthDate = user.birthDate
+            birthDate = user.birthDate,
+            type = user.type.id
         )
     }
 }

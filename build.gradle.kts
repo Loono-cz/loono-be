@@ -24,9 +24,15 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    compileOnly("io.springfox:springfox-boot-starter:3.0.0")
+    compileOnly("io.springfox:springfox-swagger-ui:3.0.0")
+    compileOnly("org.mapstruct:mapstruct-processor:1.0.0.Final")
+    compileOnly("org.mapstruct:mapstruct:1.0.0.Final")
 
     implementation("com.google.api-client:google-api-client:$googleApiVersion")
     implementation("com.google.api-client:google-api-client-appengine:$googleApiVersion")
@@ -35,6 +41,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
 
 val artifactFinalName = "$name.jar"

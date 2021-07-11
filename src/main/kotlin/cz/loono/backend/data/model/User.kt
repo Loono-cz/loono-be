@@ -6,6 +6,7 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
@@ -29,5 +30,11 @@ data class User(
     val sex: Char = '?',
 
     @Column(nullable = false)
-    val birthDate: Date = Date()
+    val birthDate: Date = Date(),
+
+    @Column(nullable = false)
+    val type: Int = 0,
+
+    @OneToMany(mappedBy = "user")
+    val examinations: Set<Examination> = emptySet()
 )

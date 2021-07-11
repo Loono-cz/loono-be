@@ -7,5 +7,6 @@ data class UserDTO(
     val email: String,
     val notificationEmail: String = "",
     val sex: Char,
-    val birthDate: Date
+    val birthDate: Date,
+    val type: TypeDTO
 )

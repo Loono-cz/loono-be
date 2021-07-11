@@ -1,15 +1,23 @@
 package cz.loono.backend.api.controller
 
 import cz.loono.backend.auth.GoogleAPIAuthentication
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import java.net.URI
 
-@RestController
-class HelloController {
+@Controller
+class RootController {
+
     @GetMapping
-    fun index(): String = "Welcome on the Loono Backend!"
+    fun index(): ResponseEntity<Void> {
+        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
+            .location(URI.create("https://www.loono.cz/"))
+            .build()
+    }
 
     // Testing Google Auth WIP
     @GetMapping(value = ["/auth"])
