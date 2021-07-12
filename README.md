@@ -57,6 +57,26 @@ gradlew jacocoTestReport
 To check code coverage we support jacoco plugin. The report is located on build/reports/jacoco/test.
 </p>
 <h2>Heath check</h2>
-TODO
+<p>
+The server uses Spring Actuator for the Health Check. The Health Check is hidden by basic authentication.
+</p>
+<h3>Basic health check endpoints</h3>
+<p>
+Activated only default and database checks. We can enable more if needed.
+</p>
+<ul>
+<li>Overall status: /actuator/health</li>
+<li>Disk space: /actuator/health/diskSpace</li>
+<li>Database status: /actuator/health/db</li>
+</ul>
+<h3>Account to access the check</h3>
+<ul>
+<li>User: monitor</li>
+<li>Password: fCwfHpjhDeV5s5jZ</li>
+</ul>
 <h2>API documentation</h2>
-TODO
+<ul>
+<li>Swagger documentation on <i>/v2/api-docs</i></li>
+<li>OpenAPI documentation on <i>/v3/api-docs</i></li>
+<li>Swagger UI on <i>/swagger-ui/</i></li>
+</ul>
