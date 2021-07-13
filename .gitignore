@@ -11,3 +11,8 @@ build/
 *.iml
 *.ipr
 out/
+
+# terraform
+.terraform
+.terraform.lock.hcl
+*.tfvars
