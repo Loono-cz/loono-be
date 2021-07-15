@@ -36,7 +36,7 @@ class FirebaseAuthService {
 
     private fun parseToken(token: String): String {
         val parsedToken = token.split(" ")
-        if (!parsedToken[0].equals("Bearer", ignoreCase = true)) {
+        if (!parsedToken[0].equals("Bearer", ignoreCase = true) || parsedToken.size < 2) {
             throw ParseException("Invalid format of Bearer token.", 0)
         }
         return token.split(" ")[1]

@@ -44,10 +44,11 @@ class OnboardController {
         onboard: OnboardDTO,
         @Parameter(
             description = "Bearer token",
-            allowEmptyValue = true
+            allowEmptyValue = true,
+            required = false
         )
         @RequestHeader(name = "Authorization")
-        token: String = "",
+        token: String?,
         response: HttpServletResponse
     ) {
 
@@ -57,11 +58,11 @@ class OnboardController {
         }
 
         var verifiedUser = false
-        if (token.isNotEmpty()) {
+        if (!token.isNullOrEmpty()) {
             verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
         }
 
-        if (!verifiedUser && token.isNotEmpty()) {
+        if (!verifiedUser && !token.isNullOrEmpty()) {
             response.status = 403
         }
 
