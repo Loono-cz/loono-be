@@ -189,6 +189,6 @@ resource "aws_lb_target_group" "backend-tg" {
   health_check {
     enabled = true
     port    = 8080
-    matcher = "200,404"
+    matcher = "200,308,404"
   }
 }
