@@ -16,15 +16,12 @@ repositories {
     mavenCentral()
 }
 
-val googleApiVersion = "1.32.1"
-
 dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib-jdk8"))
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -34,9 +31,11 @@ dependencies {
     compileOnly("org.mapstruct:mapstruct-processor:1.0.0.Final")
     compileOnly("org.mapstruct:mapstruct:1.0.0.Final")
 
-    implementation("com.google.api-client:google-api-client:$googleApiVersion")
-    implementation("com.google.api-client:google-api-client-appengine:$googleApiVersion")
-    implementation("com.google.api-client:google-api-client-gson:$googleApiVersion")
+    implementation("com.google.firebase:firebase-admin:8.0.0")
+
+    implementation("org.slf4j:slf4j-api:1.7.31")
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("ch.qos.logback:logback-core:1.2.3")
 
     runtimeOnly("org.postgresql:postgresql")
 

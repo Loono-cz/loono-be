@@ -1,6 +1,6 @@
 package cz.loono.backend.api.service
 
-import cz.loono.backend.api.dto.TypeDTO
+import cz.loono.backend.api.dto.SexDTO
 import cz.loono.backend.api.dto.UserDTO
 import cz.loono.backend.data.model.User
 import cz.loono.backend.data.repository.UserRepository
@@ -28,15 +28,15 @@ class OnboardServiceTest {
     }
 
     @Test
-    fun transformationTest() {
+    fun testFullTransformation() {
         val date = Date()
         val userDto = UserDTO(
-            birthDate = date,
-            sex = 'M',
-            email = "test@test.com",
+            uid = "userId",
+            birthdate = date,
+            sex = SexDTO.MALE,
+            email = "primary@test.com",
             notificationEmail = "notify@test.com",
-            salutation = "Shrek",
-            type = TypeDTO.LOONO
+            salutation = "Shrek"
         )
 
         val captor: ArgumentCaptor<User> = ArgumentCaptor.forClass(User::class.java)
@@ -48,12 +48,43 @@ class OnboardServiceTest {
         assert(
             user.equals(
                 User(
-                    birthDate = date,
-                    sex = userDto.sex,
+                    uid = userDto.uid,
+                    birthdate = date,
+                    sex = userDto.sex.id,
                     email = userDto.email,
                     notificationEmail = userDto.notificationEmail,
-                    salutation = userDto.salutation,
-                    type = userDto.type.id
+                    salutation = userDto.salutation
+                )
+            )
+        )
+    }
+
+    @Test
+    fun testTransformationWithoutNotificationEmail() {
+        val date = Date()
+        val userDto = UserDTO(
+            uid = "userId",
+            birthdate = date,
+            sex = SexDTO.MALE,
+            email = "primary@test.com",
+            salutation = "Shrek"
+        )
+
+        val captor: ArgumentCaptor<User> = ArgumentCaptor.forClass(User::class.java)
+
+        onboardService.onboard(userDto)
+        verify(userRepository, times(1)).save(captor.capture())
+
+        val user = captor.value
+        assert(
+            user.equals(
+                User(
+                    uid = userDto.uid,
+                    birthdate = date,
+                    sex = userDto.sex.id,
+                    email = userDto.email,
+                    notificationEmail = userDto.email,
+                    salutation = userDto.salutation
                 )
             )
         )

@@ -17,13 +17,17 @@ class OnboardService {
     }
 
     private fun toUser(user: UserDTO): User {
+        var notificationEmail = user.notificationEmail
+        if (user.notificationEmail.isNullOrEmpty()) {
+            notificationEmail = user.email
+        }
         return User(
-            email = user.email,
+            uid = user.uid,
             salutation = user.salutation,
-            notificationEmail = user.notificationEmail,
-            sex = user.sex,
-            birthDate = user.birthDate,
-            type = user.type.id
+            email = user.email,
+            notificationEmail = notificationEmail,
+            sex = user.sex.id,
+            birthdate = user.birthdate
         )
     }
 }

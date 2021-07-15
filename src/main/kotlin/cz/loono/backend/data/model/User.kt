@@ -18,22 +18,22 @@ data class User(
     val id: Long = 0,
 
     @Column(nullable = false)
+    val uid: String = "",
+
+    @Column(nullable = false)
     val salutation: String = "",
 
     @Column(nullable = false)
     val email: String = "",
 
-    @Column(nullable = false)
-    val notificationEmail: String = "",
+    @Column(nullable = true)
+    val notificationEmail: String? = null,
 
     @Column(nullable = false)
     val sex: Char = '?',
 
     @Column(nullable = false)
-    val birthDate: Date = Date(),
-
-    @Column(nullable = false)
-    val type: Int = 0,
+    val birthdate: Date = Date(),
 
     @OneToMany(mappedBy = "user")
     val examinations: Set<Examination> = emptySet()
