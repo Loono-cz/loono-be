@@ -59,7 +59,7 @@ class OnboardController {
 
         var verifiedUser = false
         if (!token.isNullOrEmpty()) {
-            verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
+//            verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
         }
 
         if (!verifiedUser && !token.isNullOrEmpty()) {
