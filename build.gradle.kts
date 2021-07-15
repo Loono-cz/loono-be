@@ -2,7 +2,6 @@ plugins {
     id("org.springframework.boot") version "2.4.7"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
-    id("com.palantir.docker") version "0.26.0"
     kotlin("jvm") version "1.5.10"
     kotlin("plugin.spring") version "1.5.10"
     jacoco
@@ -26,10 +25,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    compileOnly("io.springfox:springfox-boot-starter:3.0.0")
-    compileOnly("io.springfox:springfox-swagger-ui:3.0.0")
-    compileOnly("org.mapstruct:mapstruct-processor:1.0.0.Final")
-    compileOnly("org.mapstruct:mapstruct:1.0.0.Final")
+    implementation("io.springfox:springfox-boot-starter:3.0.0")
+    implementation("io.springfox:springfox-swagger-ui:3.0.0")
+    implementation("org.mapstruct:mapstruct-processor:1.0.0.Final")
+    implementation("org.mapstruct:mapstruct:1.0.0.Final")
 
     implementation("com.google.firebase:firebase-admin:8.0.0")
 
@@ -47,14 +46,6 @@ val artifactFinalName = "$name.jar"
 tasks.bootJar {
     archiveFileName.set(artifactFinalName)
     destinationDirectory.set(file("$buildDir/dists"))
-}
-
-docker {
-    name = "loono/loono-be"
-    setDockerfile(File(rootDir, "Dockerfile"))
-    files(tasks.bootJar)
-    copySpec.rename(artifactFinalName, "build/dists/$artifactFinalName")
-    noCache(true)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

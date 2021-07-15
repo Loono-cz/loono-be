@@ -40,14 +40,6 @@ Execute the Application.kt as the main executable Class, debug supported.
 The Jar file can be just executed.
 </p>
 </ul>
-<h4>Docker image</h4>
-
-```
-gradlew docker 
-```
-<p align="justify">
-To create a docker image you use the gradle task docker. The docker has to be installed locally.
-</p>
 <h4>Jacoco</h4>
 
 ```
