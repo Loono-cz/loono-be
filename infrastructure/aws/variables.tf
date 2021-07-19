@@ -27,3 +27,7 @@ variable "database-password" {
 variable "certificate-arn" {
   type = string
 }
+
+variable "google-app-credentials" {
+  type = string
+}

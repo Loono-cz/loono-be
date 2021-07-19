@@ -10,6 +10,7 @@ env:
   tf_working_dir: 'infrastructure/aws'
   TF_VAR_database-password: ${{ secrets.DATABASE_PASSWORD }}
   TF_VAR_certificate-arn: ${{ secrets.CERTIFICATE_ARN }}
+  TF_VAR_google-app-credentials: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 jobs:
   terraform:
     name: 'Terraform'
