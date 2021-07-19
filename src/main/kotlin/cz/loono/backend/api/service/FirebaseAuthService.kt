@@ -1,6 +1,8 @@
 package cz.loono.backend.api.service
 
+import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
@@ -17,7 +19,7 @@ class FirebaseAuthService {
     fun verifyUser(user: UserDTO, token: String): Boolean {
 
         if (FirebaseApp.getApps().size == 0) {
-            FirebaseApp.initializeApp()
+            FirebaseApp.initializeApp(loadFirebaseCredentials())
         }
 
         val decodedToken: FirebaseToken
@@ -32,6 +34,14 @@ class FirebaseAuthService {
             return true
         }
         return false
+    }
+
+    private fun loadFirebaseCredentials(): FirebaseOptions {
+        val credentialsContent = System.getenv("GOOGLE_APP_CREDENTIALS_CONTENT")
+        val stream = credentialsContent.byteInputStream()
+        return FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(stream))
+            .build()
     }
 
     private fun parseToken(token: String): String {

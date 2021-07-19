@@ -52,14 +52,9 @@ class OnboardController {
         response: HttpServletResponse
     ) {
 
-        // Temporary code for Hack day purposes
-        if (onboard.user.email.contains("error")) {
-            throw Exception("Hack day error thrown!")
-        }
-
         var verifiedUser = false
         if (!token.isNullOrEmpty()) {
-//            verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
+            verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
         }
 
         if (!verifiedUser && !token.isNullOrEmpty()) {
