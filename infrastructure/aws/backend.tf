@@ -91,12 +91,13 @@ resource "aws_ecs_cluster" "backend" {
 resource "aws_ecs_task_definition" "backend" {
   family                = "${var.codename}-backend"
   container_definitions = templatefile("ecs/backend.tmpl", {
-    aws-region     = var.aws-region,
-    aws-repository = aws_ecr_repository.backend.repository_url,
-    postgre-url    = "${aws_route53_record.database.fqdn}:5432/${aws_db_instance.database.name}",
-    postgre-user   = var.database-username,
-    postgre-pwd    = var.database-password,
-    container-name = "${var.codename}-backend",
+    aws-region             = var.aws-region,
+    aws-repository         = aws_ecr_repository.backend.repository_url,
+    postgre-url            = "${aws_route53_record.database.fqdn}:5432/${aws_db_instance.database.name}",
+    postgre-user           = var.database-username,
+    postgre-pwd            = var.database-password,
+    google-app-credentials = var.google-app-credentials,
+    container-name         = "${var.codename}-backend",
   })
   network_mode          = "awsvpc"
   execution_role_arn    = aws_iam_role.ecs-task-execution-role.arn
