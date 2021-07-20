@@ -24,9 +24,9 @@ jobs:
           url: "https://loono.ceskodigital.net/actuator/health"
       - name: Show Response
         run: echo ${{ steps.healthcheck.outputs.response }}
-      - name: ValidateJSON
+      - name: Healthcheck validation
         uses: TobiasOlofsson88/github-action-validate-json-request-result@v1.0.5
         with:
           request-method: "GET"
           request-url: "https://loono.ceskodigital.net/actuator/health"
-          validate-expression: "response[0].status == 'UP' && response[0].components.db.status == 'UP' && response[0].components.ping.status = 'UP'"
+          validate-expression: "response[0].status == 'UP' && response[0].components.db.status == 'UP' && response[0].components.ping.status = 'X'"
