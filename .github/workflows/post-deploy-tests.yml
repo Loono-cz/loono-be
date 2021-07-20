@@ -17,10 +17,16 @@ jobs:
         run: sleep 30s
         shell: bash
       - name: Health check
-        id: check
+        id: healthcheck
         uses: fjogeleit/http-request-action@master
         with:
           method: 'GET'
           url: "https://loono.ceskodigital.net/actuator/health"
       - name: Show Response
-        run: echo ${{ steps.check.outputs.response }}
+        run: echo ${{ steps.healthcheck.outputs.response }}
+      - name: ValidateJSON
+        uses: TobiasOlofsson88/github-action-validate-json-request-result@v1.0.5
+        with:
+          request-method: "GET"
+          request-url: "https://loono.ceskodigital.net/actuator/health"
+          validate-expression: "response[0].status == 'UP'"
