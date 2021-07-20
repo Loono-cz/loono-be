@@ -1,0 +1,22 @@
+name: 'Post deploy tests'
+
+on:
+  workflow_run:
+    workflows: ["Deploy backend to ECS"]
+    types:
+      - completed
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make Request
+        id: myRequest
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://loono.ceskodigital.net/actuator/health"
+      - name: Show Response
+        run: echo ${{ steps.myRequest.outputs.response }}
