@@ -21,7 +21,7 @@ jobs:
         with:
           request-method: "GET"
           request-url: "https://loono.ceskodigital.net/actuator/health"
-          validate-json: '{"status":"UP","components":{"db":{"status":"UP","details":{"database":"PostgreSQL","validationQuery":"isValid()"}},"ping":{"status":"UP"}}}'
+          validate-json: '{"status":"UP","components":{"db":{"status":"XX","details":{"database":"PostgreSQL","validationQuery":"isValid()"}},"ping":{"status":"UP"}}}'
       - name: OpenAPI validation
         id: doc
         uses: TobiasOlofsson88/github-action-validate-json-request-result@v1.0.5
