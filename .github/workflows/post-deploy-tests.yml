@@ -29,4 +29,4 @@ jobs:
         with:
           request-method: "GET"
           request-url: "https://loono.ceskodigital.net/actuator/health"
-          validate-expression: "response[0].status == 'UP'"
+          validate-expression: "response[0].status == 'UP' && response[0].components.db.status == 'UP' && response[0].components.ping.status = 'UP'"
