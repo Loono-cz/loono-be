@@ -23,8 +23,11 @@ jobs:
           request-url: "https://loono.ceskodigital.net/actuator/health"
           validate-json: '{"status":"UP","components":{"db":{"status":"UP","details":{"database":"PostgreSQL","validationQuery":"isValid()"}},"ping":{"status":"UP"}}}'
       - name: OpenAPI validation
+        id: doc
         uses: TobiasOlofsson88/github-action-validate-json-request-result@v1.0.5
         with:
           request-method: "GET"
           request-url: "https://loono.ceskodigital.net/v3/api-docs"
-          validate-expression: "response[0].info.title == 'The Loono API'"
+          validate-expression: "response[0].info.title == 'The Loono API   XXX'"
+      - name: Show Response
+        run: echo ${{ steps.doc.outputs.valid }}
