@@ -29,7 +29,7 @@ jobs:
         with:
           request-method: "GET"
           request-url: "https://loono.ceskodigital.net/v3/api-docs"
-          validate-expression: "response[0].info.title == 'The Loono API   XXX'"
+          validate-expression: "response.info.title == 'The Loono API   XXX'"
       - name: Show Response
         run: echo ${{ steps.check.outputs.valid }}
       - name: Show Response
