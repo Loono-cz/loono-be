@@ -19,7 +19,8 @@ class FirebaseAuthService {
     fun verifyUser(user: UserDTO, token: String): Boolean {
 
         if (FirebaseApp.getApps().size == 0) {
-            FirebaseApp.initializeApp(loadFirebaseCredentials())
+            val firebaseOptions = loadFirebaseCredentials() ?: return false
+            FirebaseApp.initializeApp(firebaseOptions)
         }
 
         val decodedToken: FirebaseToken
@@ -36,8 +37,12 @@ class FirebaseAuthService {
         return false
     }
 
-    private fun loadFirebaseCredentials(): FirebaseOptions {
+    private fun loadFirebaseCredentials(): FirebaseOptions? {
         val credentialsContent = System.getenv("GOOGLE_APP_CREDENTIALS_CONTENT")
+        if (credentialsContent.isNullOrEmpty()) {
+            logger.warn("GOOGLE_APP_CREDENTIALS_CONTENT ENV variable is not set.")
+            return null
+        }
         val stream = credentialsContent.byteInputStream()
         return FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(stream))
