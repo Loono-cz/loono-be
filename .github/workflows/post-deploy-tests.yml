@@ -32,3 +32,6 @@ jobs:
           ping: "components.ping.status"
       - name: Show Response
         run: echo "${{ steps.checkval.outputs.status }} ${{ steps.checkval.outputs.db }} ${{ steps.checkval.outputs.ping }}"
+      - name: Healthcheck evaluation
+        if: ${{ steps.checkval.outputs.status }} == "UP" && ${{ steps.checkval.outputs.db }} == "UP" && ${{ steps.checkval.outputs.ping }} == "UP"
+        run: exit 1
