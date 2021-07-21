@@ -16,7 +16,8 @@ The application provides REST API and a Swagger / Open API documentation.
 </ul>
 <h3>Firebase Admin SDK</h3>
 <p>
-  We use Firebase fot the authentication. There is the Firebase Admin SDK on the server side. To initialize the client you need a system account for the mobile application. You have to download the service account credentials as a json file in the Admin console. More information [HERE](https://firebase.google.com/docs/admin/setup#initialize-sdk).
+  We use Firebase fot the authentication. There is the Firebase Admin SDK on the server side. To initialize the client you need a system account for the mobile application. You have to download the service account credentials as a json file in the Admin console. 
+More information <a href="https://firebase.google.com/docs/admin/setup#initialize-sdk">HERE</a>.
 </p>
 <h3>System environment variables</h3>
 <ul>
