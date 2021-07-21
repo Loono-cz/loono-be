@@ -33,7 +33,7 @@ jobs:
           db: "components.db.status"
           ping: "components.ping.status"
       - name: Healthcheck evaluation
-        if: ${{ steps.checkval.outputs.status }} != "UP" || ${{ steps.checkval.outputs.db }} != "UP" || ${{ steps.checkval.outputs.ping }} != "UP"
+        if: ${{ (steps.checkval.outputs.status != "UP") || (steps.checkval.outputs.db != "UP") || (steps.checkval.outputs.ping != "UP") }}
         run: |
           echo "Healthcheck status is not UP!"
           exit 1
