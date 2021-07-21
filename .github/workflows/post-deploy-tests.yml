@@ -52,7 +52,7 @@ jobs:
           json: ${{ steps.doc.outputs.response }}
           title: "info.title"
       - name: OpenAPI documentation evaluation
-        if: steps.docval.outputs.status != 'The Loono API'
+        if: steps.docval.outputs.title != 'The Loono API'
         run: |
           echo "API documentation is not available!"
           exit 1
