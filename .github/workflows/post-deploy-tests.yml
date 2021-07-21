@@ -32,10 +32,11 @@ jobs:
           status: "status"
           db: "components.db.status"
           ping: "components.ping.status"
+          uptime: "components.uptimeMetric.details.Server uptime"
       - name: Healthcheck evaluation
-        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP'
+        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 120
         run: |
-          echo "Healthcheck status is not UP!"
+          echo "Healthcheck status is not UP or the version is the old one!"
           exit 1
 
       # OpenAPI documentation
