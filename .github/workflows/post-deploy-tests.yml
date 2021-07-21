@@ -37,3 +37,22 @@ jobs:
         run: |
           echo "Healthcheck status is not UP!"
           exit 1
+
+      # OpenAPI documentation
+      - name: OpenAPI documentation request
+        id: doc
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://loono.ceskodigital.net/v3/api-docs"
+          method: 'GET'
+      - name: OpenAPI documentation values
+        id: docval
+        uses: gr2m/get-json-paths-action@v1.x
+        with:
+          json: ${{ steps.doc.outputs.response }}
+          title: "info.title"
+      - name: OpenAPI documentation evaluation
+        if: steps.docval.outputs.status != 'The Loono API'
+        run: |
+          echo "API documentation is not available!"
+          exit 1
