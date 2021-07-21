@@ -9,11 +9,15 @@ import org.springframework.stereotype.Component
 @Component
 class UptimeMetric : HealthIndicator {
 
+    private var metricsEndpoint: MetricsEndpoint? = null
+
     @Autowired
-    private lateinit var metricsEndpoint: MetricsEndpoint
+    private fun setMetricsEndpoint(metricsEndpoint: MetricsEndpoint) {
+        this.metricsEndpoint = metricsEndpoint
+    }
 
     override fun health(): Health {
-        val uptime = metricsEndpoint.metric("process.uptime", null).measurements
-        return Health.up().withDetail("Server uptime", uptime[0].value).build()
+        val uptime = metricsEndpoint?.metric("process.uptime", null)?.measurements
+        return Health.up().withDetail("Server uptime", uptime!![0].value).build()
     }
 }
