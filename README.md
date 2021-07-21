@@ -61,11 +61,6 @@ Activated only default and database checks. We can enable more if needed.
 <li>Disk space: /actuator/health/diskSpace</li>
 <li>Database status: /actuator/health/db</li>
 </ul>
-<h3>Account to access the check</h3>
-<ul>
-<li>User: monitor</li>
-<li>Password: fCwfHpjhDeV5s5jZ</li>
-</ul>
 <h2>API documentation</h2>
 <ul>
 <li>Swagger documentation on <i>/v2/api-docs</i></li>
