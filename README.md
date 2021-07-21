@@ -12,12 +12,18 @@ The application provides REST API and a Swagger / Open API documentation.
 <li>PostgreSQL database (version 12.5 or later)</li>
 <li>JDK 11+</li>
 <li>IDE with git and gradle (or installed separately)</li>
+<li>Service account credentials to the Firebase</li>
 </ul>
+<h3>Firebase Admin SDK</h3>
+<p>
+  We use Firebase fot the authentication. There is the Firebase Admin SDK on the server side. To initialize the client you need a system account for the mobile application. You have to download the service account credentials as a json file in the Admin console. More information [https://firebase.google.com/docs/admin/setup#initialize-sdk](HERE).
+</p>
 <h3>System environment variables</h3>
 <ul>
-<li>${POSTGRE_URL}: host:port/db (i.e. localhost:5432/loono</li>
-<li>${POSTGRE_USER}: database owner</li>
-<li>${POSTGRE_PWD}: database password</li>
+<li>POSTGRE_URL: host:port/db (i.e. localhost:5432/loono</li>
+<li>POSTGRE_USER: database owner</li>
+<li>POSTGRE_PWD: database password</li>
+<li>GOOGLE_APPLICATION_CREDENTIALS: path to the file with service account credentials to the Firebase</li>
 </ul>
 <h3>Gradle plugins and tasks</h3>
 <h4>Building bootable Jar file</h4>
