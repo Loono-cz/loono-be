@@ -16,11 +16,19 @@ jobs:
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash
-      - name: Healthcheck validation
+      - name: Healthcheck request
         id: check
         uses: fjogeleit/http-request-action@master
         with:
           url: "https://loono.ceskodigital.net/actuator/health"
           method: 'GET'
+      - name: Healthcheck values
+        id: checkval
+        uses: gr2m/get-json-paths-action@v1.x
+        with:
+          json: ${{ steps.check.outputs.response }}
+          status: "status"
+          db: "components.db.status"
+          ping: "components.ping.status"
       - name: Show Response
-        run: echo ${{ steps.check.outputs.response }}
+        run: echo "${{ steps.checkval.outputs.status }} ${{ steps.checkval.outputs.db }} ${{ steps.checkval.outputs.ping }}"
