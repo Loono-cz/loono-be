@@ -58,7 +58,6 @@ Activated only default and database checks. We can enable more if needed.
 </p>
 <ul>
 <li>Overall status: /actuator/health</li>
-<li>Disk space: /actuator/health/diskSpace</li>
 <li>Database status: /actuator/health/db</li>
 </ul>
 <h2>API documentation</h2>
