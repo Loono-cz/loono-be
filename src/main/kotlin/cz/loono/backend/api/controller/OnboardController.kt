@@ -30,8 +30,7 @@ class OnboardController {
     @ApiOperation(
         value = "Onboards a new user",
         notes = "A creation of a new account with all information needed for the onboarding.",
-        consumes = MimeTypeUtils.APPLICATION_JSON_VALUE,
-        produces = MimeTypeUtils.APPLICATION_JSON_VALUE
+        consumes = MimeTypeUtils.APPLICATION_JSON_VALUE
     )
     @PostMapping(value = ["/onboard"])
     fun onboard(
@@ -48,19 +47,16 @@ class OnboardController {
             required = false
         )
         @RequestHeader(name = "Authorization")
-        token: String?,
+        token: String,
         response: HttpServletResponse
     ) {
 
-        var verifiedUser = false
-        if (!token.isNullOrEmpty()) {
-            verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
-        }
-
-        if (!verifiedUser && !token.isNullOrEmpty()) {
+        val verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
+        if (!verifiedUser) {
             response.status = 403
+            return
         }
 
-//        onboardService.onboard(user)
+        onboardService.onboard(onboard)
     }
 }
