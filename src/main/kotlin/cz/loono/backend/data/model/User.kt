@@ -1,6 +1,6 @@
 package cz.loono.backend.data.model
 
-import java.util.Date
+import java.time.LocalDate
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -33,7 +33,7 @@ data class User(
     val sex: Char = '?',
 
     @Column(nullable = false)
-    val birthdate: Date = Date(),
+    val birthdate: LocalDate = LocalDate.EPOCH,
 
     @OneToMany(mappedBy = "user")
     val examinations: Set<Examination> = emptySet()

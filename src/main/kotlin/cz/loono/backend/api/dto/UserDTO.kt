@@ -2,7 +2,7 @@ package cz.loono.backend.api.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import java.util.Date
+import java.time.LocalDate
 
 @ApiModel(value = "user", description = "Onboarded user data")
 data class UserDTO(
@@ -26,5 +26,5 @@ data class UserDTO(
     val sex: SexDTO,
 
     @ApiModelProperty(notes = "birthdate of user")
-    val birthdate: Date,
+    val birthdate: LocalDate,
 )

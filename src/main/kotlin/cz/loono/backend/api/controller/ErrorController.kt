@@ -12,10 +12,6 @@ import javax.servlet.http.HttpServletRequest
 @Controller
 class ErrorController : ErrorController {
 
-    override fun getErrorPath(): String {
-        return "/error"
-    }
-
     @RequestMapping("/error", produces = [MediaType.APPLICATION_JSON_VALUE])
     @ResponseBody
     fun handleError(request: HttpServletRequest): ErrorDTO {

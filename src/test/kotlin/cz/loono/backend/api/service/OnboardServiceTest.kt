@@ -14,8 +14,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDate
 
 class OnboardServiceTest : ApiTest() {
 
@@ -54,7 +53,7 @@ class OnboardServiceTest : ApiTest() {
         assert(
             exam == Examination(
                 user = user,
-                date = Date.from(Instant.EPOCH)
+                date = LocalDate.EPOCH
             )
         )
 

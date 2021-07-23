@@ -5,8 +5,7 @@ import cz.loono.backend.api.dto.MedicalTypeDTO
 import cz.loono.backend.api.dto.OnboardDTO
 import cz.loono.backend.api.dto.SexDTO
 import cz.loono.backend.api.dto.UserDTO
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDate
 
 abstract class ApiTest {
 
@@ -22,7 +21,7 @@ abstract class ApiTest {
         for (i in 1..count) {
             list.add(
                 ExaminationDTO(
-                    date = Date.from(Instant.EPOCH),
+                    date = LocalDate.EPOCH,
                     medicalType = MedicalTypeDTO.values()[(i - 1) % 5]
                 )
             )
@@ -33,7 +32,7 @@ abstract class ApiTest {
     fun createUserDTO(): UserDTO {
         return UserDTO(
             uid = "userId",
-            birthdate = Date.from(Instant.EPOCH),
+            birthdate = LocalDate.EPOCH,
             sex = SexDTO.MALE,
             email = "primary@test.com",
             notificationEmail = "notify@test.com",
@@ -44,7 +43,7 @@ abstract class ApiTest {
     fun createMinimalUserDTO(): UserDTO {
         return UserDTO(
             uid = "userId",
-            birthdate = Date.from(Instant.EPOCH),
+            birthdate = LocalDate.EPOCH,
             sex = SexDTO.MALE,
             email = "primary@test.com",
             salutation = "Shrek"

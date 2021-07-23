@@ -1,6 +1,6 @@
 package cz.loono.backend.data.model
 
-import java.util.Date
+import java.time.LocalDate
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -19,7 +19,7 @@ data class Examination(
     val id: Long = 0,
 
     @Column(nullable = false)
-    val date: Date = Date(),
+    val date: LocalDate = LocalDate.EPOCH,
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

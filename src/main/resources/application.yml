@@ -27,6 +27,7 @@ logging:
 # Server configuration
 server:
   port: 8080
+  error.path: "/error"
 # Health indicators
 management.endpoint.health.show-details: always
 management.health:
