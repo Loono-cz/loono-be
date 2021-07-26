@@ -17,16 +17,16 @@ data class User(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     val uid: String = "",
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     val salutation: String = "",
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     val email: String = "",
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     val notificationEmail: String? = null,
 
     @Column(nullable = false)
