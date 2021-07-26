@@ -36,6 +36,7 @@ jobs:
       - name: Healthcheck evaluation
         if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 120000
         run: |
+          echo ${{ steps.checkval.outputs.uptime }} | ${{ steps.checkval.outputs.uptime > 120000 }}
           echo "Healthcheck status is not UP or the version is the old one!"
           exit 1
 
