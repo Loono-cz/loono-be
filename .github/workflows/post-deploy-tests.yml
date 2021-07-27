@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Sleep for 30 seconds to waiting for the server start
-        run: sleep 30s
+        run: sleep 120s
         shell: bash
         
       # Healthcheck
@@ -34,9 +34,9 @@ jobs:
           ping: "components.ping.status"
           uptime: "components.uptimeMetric.details.Server uptime"
       - name: Healthcheck evaluation
-        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 120000
+        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 300000
         run: |
-          echo ${{ steps.checkval.outputs.uptime }} | ${{ steps.checkval.outputs.uptime > 120000 }}
+          echo ${{ steps.checkval.outputs.uptime }} | ${{ steps.checkval.outputs.uptime > 300000 }}
           echo "Healthcheck status is not UP or the version is the old one!"
           exit 1
 
