@@ -9,6 +9,7 @@ import cz.loono.backend.data.repository.ExaminationRepository
 import cz.loono.backend.data.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OnboardService {
@@ -35,7 +36,9 @@ class OnboardService {
 
     private fun toExamination(user: User, examination: ExaminationDTO): Examination {
         return Examination(
-            date = examination.date,
+            date = LocalDate.of(examination.lastVisitYear, examination.lastVisitMonth, 1),
+            examinationType = examination.examinationType.name,
+            lastVisit = examination.lastVisitInterval.name,
             user = user
         )
     }
@@ -50,8 +53,8 @@ class OnboardService {
             salutation = user.salutation,
             email = user.email,
             notificationEmail = notificationEmail,
-            sex = user.sex.id,
-            birthdate = user.birthdate
+            sex = user.sex.name,
+            birthdate = LocalDate.of(user.birthdateYear, user.birthdateMonth, 1)
         )
     }
 }

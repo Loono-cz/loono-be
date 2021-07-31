@@ -2,14 +2,19 @@ package cz.loono.backend.api.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import java.time.LocalDate
 
 @ApiModel(value = "examination", description = "Undergone examination data")
 data class ExaminationDTO(
 
-    @ApiModelProperty(notes = "date of undergone medical examination")
-    val date: LocalDate,
+    @ApiModelProperty(notes = "last visit interval")
+    val lastVisitInterval: LastVisitDTO,
 
-    @ApiModelProperty(notes = "medical type or department")
-    val medicalType: MedicalTypeDTO
+    @ApiModelProperty(notes = "last visit month")
+    val lastVisitMonth: Int,
+
+    @ApiModelProperty(notes = "last visit yaer")
+    val lastVisitYear: Int,
+
+    @ApiModelProperty(notes = "examination type")
+    val examinationType: ExaminationTypeDTO
 )

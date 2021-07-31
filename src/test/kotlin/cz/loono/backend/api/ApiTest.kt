@@ -1,11 +1,11 @@
 package cz.loono.backend.api
 
 import cz.loono.backend.api.dto.ExaminationDTO
-import cz.loono.backend.api.dto.MedicalTypeDTO
+import cz.loono.backend.api.dto.ExaminationTypeDTO
+import cz.loono.backend.api.dto.LastVisitDTO
 import cz.loono.backend.api.dto.OnboardDTO
 import cz.loono.backend.api.dto.SexDTO
 import cz.loono.backend.api.dto.UserDTO
-import java.time.LocalDate
 
 abstract class ApiTest {
 
@@ -21,8 +21,10 @@ abstract class ApiTest {
         for (i in 1..count) {
             list.add(
                 ExaminationDTO(
-                    date = LocalDate.EPOCH,
-                    medicalType = MedicalTypeDTO.values()[(i - 1) % 5]
+                    lastVisitInterval = LastVisitDTO.LAST_TWO_YEARS,
+                    lastVisitYear = 1956,
+                    lastVisitMonth = 8,
+                    examinationType = ExaminationTypeDTO.values()[(i - 1) % 5]
                 )
             )
         }
@@ -32,7 +34,8 @@ abstract class ApiTest {
     fun createUserDTO(): UserDTO {
         return UserDTO(
             uid = "userId",
-            birthdate = LocalDate.EPOCH,
+            birthdateMonth = 3,
+            birthdateYear = 1982,
             sex = SexDTO.MALE,
             email = "primary@test.com",
             notificationEmail = "notify@test.com",
@@ -43,7 +46,8 @@ abstract class ApiTest {
     fun createMinimalUserDTO(): UserDTO {
         return UserDTO(
             uid = "userId",
-            birthdate = LocalDate.EPOCH,
+            birthdateMonth = 12,
+            birthdateYear = 2002,
             sex = SexDTO.MALE,
             email = "primary@test.com",
             salutation = "Shrek"

@@ -1,6 +1,8 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.ApiTest
+import cz.loono.backend.api.dto.ExaminationTypeDTO
+import cz.loono.backend.api.dto.LastVisitDTO
 import cz.loono.backend.api.dto.OnboardDTO
 import cz.loono.backend.data.model.Examination
 import cz.loono.backend.data.model.User
@@ -53,15 +55,17 @@ class OnboardServiceTest : ApiTest() {
         assert(
             exam == Examination(
                 user = user,
-                date = LocalDate.EPOCH
+                examinationType = ExaminationTypeDTO.GENERAL_PRACTITIONER.name,
+                lastVisit = LastVisitDTO.LAST_TWO_YEARS.name,
+                date = LocalDate.of(1956, 8, 1)
             )
         )
 
         assert(
             user == User(
                 uid = userDto.uid,
-                birthdate = userDto.birthdate,
-                sex = userDto.sex.id,
+                birthdate = LocalDate.of(userDto.birthdateYear, userDto.birthdateMonth, 1),
+                sex = userDto.sex.name,
                 email = userDto.email,
                 notificationEmail = userDto.notificationEmail,
                 salutation = userDto.salutation
@@ -82,8 +86,8 @@ class OnboardServiceTest : ApiTest() {
         assert(
             user == User(
                 uid = userDto.uid,
-                birthdate = userDto.birthdate,
-                sex = userDto.sex.id,
+                birthdate = LocalDate.of(userDto.birthdateYear, userDto.birthdateMonth, 1),
+                sex = userDto.sex.name,
                 email = userDto.email,
                 notificationEmail = userDto.email,
                 salutation = userDto.salutation

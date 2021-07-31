@@ -18,8 +18,14 @@ data class Examination(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val lastVisit: String = "",
+
     @Column(nullable = false)
     val date: LocalDate = LocalDate.EPOCH,
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val examinationType: String = "",
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

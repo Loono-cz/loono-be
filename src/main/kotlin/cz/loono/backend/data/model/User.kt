@@ -29,8 +29,8 @@ data class User(
     @Column(nullable = true, columnDefinition = "TEXT")
     val notificationEmail: String? = null,
 
-    @Column(nullable = false)
-    val sex: Char = '?',
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val sex: String = "",
 
     @Column(nullable = false)
     val birthdate: LocalDate = LocalDate.EPOCH,
