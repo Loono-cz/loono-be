@@ -10,10 +10,10 @@ data class ExaminationDTO(
     val lastVisitInterval: LastVisitDTO,
 
     @ApiModelProperty(notes = "last visit month")
-    val lastVisitMonth: Int,
+    val lastVisitMonth: Int? = null,
 
-    @ApiModelProperty(notes = "last visit yaer")
-    val lastVisitYear: Int,
+    @ApiModelProperty(notes = "last visit year")
+    val lastVisitYear: Int? = null,
 
     @ApiModelProperty(notes = "examination type")
     val examinationType: ExaminationTypeDTO

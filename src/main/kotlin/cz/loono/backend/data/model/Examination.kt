@@ -21,8 +21,8 @@ data class Examination(
     @Column(nullable = false, columnDefinition = "TEXT")
     val lastVisit: String = "",
 
-    @Column(nullable = false)
-    val date: LocalDate = LocalDate.EPOCH,
+    @Column(nullable = true)
+    val date: LocalDate? = null,
 
     @Column(nullable = false, columnDefinition = "TEXT")
     val examinationType: String = "",

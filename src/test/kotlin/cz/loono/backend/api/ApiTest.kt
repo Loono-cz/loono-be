@@ -21,9 +21,22 @@ abstract class ApiTest {
         for (i in 1..count) {
             list.add(
                 ExaminationDTO(
-                    lastVisitInterval = LastVisitDTO.LAST_TWO_YEARS,
+                    lastVisitInterval = LastVisitDTO.values()[(i - 1) % 3],
                     lastVisitYear = 1956,
                     lastVisitMonth = 8,
+                    examinationType = ExaminationTypeDTO.values()[(i - 1) % 5]
+                )
+            )
+        }
+        return list
+    }
+
+    fun createListOfExaminationsWithoutDate(count: Int): List<ExaminationDTO> {
+        val list = mutableListOf<ExaminationDTO>()
+        for (i in 1..count) {
+            list.add(
+                ExaminationDTO(
+                    lastVisitInterval = LastVisitDTO.values()[(i - 1) % 3],
                     examinationType = ExaminationTypeDTO.values()[(i - 1) % 5]
                 )
             )

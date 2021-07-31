@@ -35,8 +35,12 @@ class OnboardService {
     }
 
     private fun toExamination(user: User, examination: ExaminationDTO): Examination {
+        var date: LocalDate? = null
+        if (examination.lastVisitYear != null && examination.lastVisitMonth != null) {
+            date = LocalDate.of(examination.lastVisitYear, examination.lastVisitMonth, 1)
+        }
         return Examination(
-            date = LocalDate.of(examination.lastVisitYear, examination.lastVisitMonth, 1),
+            date = date,
             examinationType = examination.examinationType.name,
             lastVisit = examination.lastVisitInterval.name,
             user = user

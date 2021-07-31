@@ -56,7 +56,7 @@ class OnboardServiceTest : ApiTest() {
             exam == Examination(
                 user = user,
                 examinationType = ExaminationTypeDTO.GENERAL_PRACTITIONER.name,
-                lastVisit = LastVisitDTO.LAST_TWO_YEARS.name,
+                lastVisit = LastVisitDTO.LAST_YEAR.name,
                 date = LocalDate.of(1956, 8, 1)
             )
         )
@@ -106,5 +106,32 @@ class OnboardServiceTest : ApiTest() {
 
         val exams = examsCaptor.firstValue
         assert(exams.isEmpty())
+    }
+
+    @Test
+    fun testTransformationExaminationWithoutDate() {
+
+        val userDto = createUserDTO()
+        val examsList = createListOfExaminationsWithoutDate(1)
+        val examsCaptor = argumentCaptor<List<Examination>>()
+        val userCaptor = argumentCaptor<User>()
+
+        onboardService.onboard(OnboardDTO(userDto, examsList))
+        verify(userRepository, times(1)).save(userCaptor.capture())
+        verify(examinationRepository, times(1)).saveAll(examsCaptor.capture())
+
+        val user = userCaptor.firstValue
+        val exams = examsCaptor.firstValue
+        assert(exams.size == 1)
+
+        val exam = exams[0]
+        assert(
+            exam == Examination(
+                user = user,
+                examinationType = ExaminationTypeDTO.GENERAL_PRACTITIONER.name,
+                lastVisit = LastVisitDTO.LAST_YEAR.name,
+                date = null
+            )
+        )
     }
 }
