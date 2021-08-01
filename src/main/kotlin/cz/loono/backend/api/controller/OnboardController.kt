@@ -53,7 +53,12 @@ class OnboardController {
 
         val verifiedUser = firebaseAuthService.verifyUser(onboard.user, token)
         if (!verifiedUser) {
-            response.status = 403
+            response.sendError(403)
+            return
+        }
+
+        if (onboardService.userUidExists(onboard.user.uid)) {
+            response.sendError(400, "The user already exists.")
             return
         }
 

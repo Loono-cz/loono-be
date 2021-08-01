@@ -17,7 +17,7 @@ data class User(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT", unique = true)
     val uid: String = "",
 
     @Column(nullable = false, columnDefinition = "TEXT")

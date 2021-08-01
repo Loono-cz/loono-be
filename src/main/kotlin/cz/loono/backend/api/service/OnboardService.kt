@@ -20,6 +20,10 @@ class OnboardService {
     @Autowired
     private lateinit var examinationRepository: ExaminationRepository
 
+    fun userUidExists(uid: String): Boolean {
+        return userRepository.findByUidIn(listOf(uid)).isNotEmpty()
+    }
+
     fun onboard(onboard: OnboardDTO) {
         val user = toUser(onboard.user)
         userRepository.save(user)

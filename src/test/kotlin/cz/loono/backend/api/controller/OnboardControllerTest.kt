@@ -39,7 +39,7 @@ class OnboardControllerTest : ApiTest() {
 
         onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
 
-        verify(httpServletResponse, times(1)).status = 403
+        verify(httpServletResponse, times(1)).sendError(403)
         verify(onboardService, times(0)).onboard(any())
     }
 
@@ -48,10 +48,23 @@ class OnboardControllerTest : ApiTest() {
 
         val httpServletResponse = mock<HttpServletResponse>()
         whenever(firebaseAuthService.verifyUser(any(), any())).thenReturn(true)
+        whenever(onboardService.userUidExists(any())).thenReturn(false)
 
         onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
 
-        verify(httpServletResponse, times(0)).status = any()
         verify(onboardService, times(1)).onboard(any())
+    }
+
+    @Test
+    fun uuidExists() {
+
+        val httpServletResponse = mock<HttpServletResponse>()
+        whenever(firebaseAuthService.verifyUser(any(), any())).thenReturn(true)
+        whenever(onboardService.userUidExists(any())).thenReturn(true)
+
+        onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
+
+        verify(httpServletResponse, times(1)).sendError(400, "The user already exists.")
+        verify(onboardService, times(0)).onboard(any())
     }
 }
