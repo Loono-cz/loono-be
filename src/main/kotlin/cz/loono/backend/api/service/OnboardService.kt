@@ -9,6 +9,7 @@ import cz.loono.backend.data.repository.ExaminationRepository
 import cz.loono.backend.data.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -24,6 +25,7 @@ class OnboardService {
         return userRepository.findByUidIn(listOf(uid)).isNotEmpty()
     }
 
+    @Transactional(rollbackFor = [Exception::class])
     fun onboard(onboard: OnboardDTO) {
         val user = toUser(onboard.user)
         userRepository.save(user)
