@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Sleep for 30 seconds to waiting for the server start
-        run: sleep 120s
+      - name: Sleep for 10 minutes to waiting for the server start
+        run: sleep 600s
         shell: bash
         
       # Healthcheck
@@ -34,7 +34,7 @@ jobs:
           ping: "components.ping.status"
           uptime: "components.uptimeMetric.details.Server uptime"
       - name: Healthcheck evaluation
-        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 300000
+        if: steps.checkval.outputs.status != 'UP' || steps.checkval.outputs.db != 'UP' || steps.checkval.outputs.ping != 'UP' || steps.checkval.outputs.uptime > 900000
         run: |
           echo ${{ steps.checkval.outputs.uptime }} | ${{ steps.checkval.outputs.uptime > 300000 }}
           echo "Healthcheck status is not UP or the version is the old one!"
