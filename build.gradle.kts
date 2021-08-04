@@ -24,11 +24,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    implementation("io.springfox:springfox-boot-starter:3.0.0")
-    implementation("io.springfox:springfox-swagger-ui:3.0.0")
-    implementation("org.mapstruct:mapstruct-processor:1.0.0.Final")
-    implementation("org.mapstruct:mapstruct:1.0.0.Final")
-
     implementation("com.google.firebase:firebase-admin:8.0.0")
 
     implementation("org.slf4j:slf4j-api:1.7.31")
