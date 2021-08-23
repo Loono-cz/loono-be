@@ -6,35 +6,29 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
-import cz.loono.backend.api.dto.UserDTO
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.text.ParseException
 
 @Service
-class FirebaseAuthService {
+class FirebaseAuthService : JwtAuthService {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun verifyUser(user: UserDTO, token: String): Boolean {
-
+    override fun verifyToken(jwt: String): JwtAuthService.VerificationResult {
         if (FirebaseApp.getApps().size == 0) {
-            val firebaseOptions = loadFirebaseCredentials() ?: return false
+            val firebaseOptions = loadFirebaseCredentials()
+                ?: return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
             FirebaseApp.initializeApp(firebaseOptions)
         }
 
-        val decodedToken: FirebaseToken
-        try {
-            decodedToken = FirebaseAuth.getInstance().verifyIdToken(parseToken(token))
+        val decodedToken: FirebaseToken = try {
+            FirebaseAuth.getInstance().verifyIdToken(jwt)
         } catch (e: FirebaseAuthException) {
-            logger.warn("Used expired token.")
-            return false
+            logger.warn("Firebase verification failed: ${e.authErrorCode.name}")
+            return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
         }
 
-        if (user.uid == decodedToken.uid) {
-            return true
-        }
-        return false
+        return JwtAuthService.VerificationResult.Success(decodedToken.uid)
     }
 
     private fun loadFirebaseCredentials(): FirebaseOptions? {
@@ -47,13 +41,5 @@ class FirebaseAuthService {
         return FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(stream))
             .build()
-    }
-
-    private fun parseToken(token: String): String {
-        val parsedToken = token.split(" ")
-        if (!parsedToken[0].equals("Bearer", ignoreCase = true) || parsedToken.size < 2) {
-            throw ParseException("Invalid format of Bearer token.", 0)
-        }
-        return token.split(" ")[1]
     }
 }

@@ -1,27 +1,21 @@
 package cz.loono.backend.api.controller
 
 import cz.loono.backend.api.ApiTest
-import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.api.service.OnboardService
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import javax.servlet.http.HttpServletResponse
+import org.mockito.kotlin.*
+import org.springframework.mock.web.MockHttpServletResponse
 
 class OnboardControllerTest : ApiTest() {
 
     @InjectMocks
     private lateinit var onboardController: OnboardController
-
-    @Mock
-    private lateinit var firebaseAuthService: FirebaseAuthService
 
     @Mock
     private lateinit var onboardService: OnboardService
@@ -32,39 +26,39 @@ class OnboardControllerTest : ApiTest() {
     }
 
     @Test
-    fun onboardRejected403() {
+    fun `different authenticated uid from dto uid returns 403`() {
+        val response = MockHttpServletResponse()
+        val onboardDto = createOnboardDTO()
+        onboardController.onboard(onboardDto, onboardDto.user.uid + "randomuid", response)
 
-        val httpServletResponse = mock<HttpServletResponse>()
-        whenever(firebaseAuthService.verifyUser(any(), any())).thenReturn(false)
+        assertTrue { response.isCommitted }
+        assertEquals(403, response.status)
 
-        onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
-
-        verify(httpServletResponse, times(1)).sendError(403)
         verify(onboardService, times(0)).onboard(any())
     }
 
     @Test
     fun completeOnboard() {
-
-        val httpServletResponse = mock<HttpServletResponse>()
-        whenever(firebaseAuthService.verifyUser(any(), any())).thenReturn(true)
         whenever(onboardService.userUidExists(any())).thenReturn(false)
+        val onboardDto = createOnboardDTO()
 
-        onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
+        onboardController.onboard(onboardDto, onboardDto.user.uid, MockHttpServletResponse())
 
         verify(onboardService, times(1)).onboard(any())
     }
 
     @Test
-    fun uuidExists() {
-
-        val httpServletResponse = mock<HttpServletResponse>()
-        whenever(firebaseAuthService.verifyUser(any(), any())).thenReturn(true)
+    fun `existing uid returns 400`() {
         whenever(onboardService.userUidExists(any())).thenReturn(true)
+        val response = MockHttpServletResponse()
+        val onboardDto = createOnboardDTO()
 
-        onboardController.onboard(createOnboardDTO(), "token", httpServletResponse)
+        onboardController.onboard(onboardDto, onboardDto.user.uid, response)
 
-        verify(httpServletResponse, times(1)).sendError(400, "The user already exists.")
+        assertTrue { response.isCommitted }
+        assertEquals(400, response.status)
+        assertEquals("The user already exists.", response.errorMessage)
+
         verify(onboardService, times(0)).onboard(any())
     }
 }
