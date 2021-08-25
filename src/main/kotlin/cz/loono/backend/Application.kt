@@ -22,12 +22,13 @@ fun main(args: Array<String>) {
 
 @Configuration
 class Config(private val authenticator: BearerTokenAuthenticator) : WebMvcConfigurer {
-    val publicEndpoints = listOf(
+    val unauthenticatedEndpoints = listOf(
         "/v3/api-docs",
+        "/error",
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(authenticator).excludePathPatterns(publicEndpoints)
+        registry.addInterceptor(authenticator).excludePathPatterns(unauthenticatedEndpoints)
     }
 
 }

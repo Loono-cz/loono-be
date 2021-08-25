@@ -1,23 +1,27 @@
 package cz.loono.backend.api.controller
 
 import cz.loono.backend.api.dto.ErrorDTO
+import org.slf4j.LoggerFactory
 import org.springframework.boot.web.servlet.error.ErrorController
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 import javax.servlet.RequestDispatcher
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
-@Controller
+/**
+ * Fallback error controller when something or somebody calls [HttpServletResponse.sendError] instead of throwing.
+ */
+@RestController
 class ErrorController : ErrorController {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @RequestMapping("/error", produces = [MediaType.APPLICATION_JSON_VALUE])
-    @ResponseBody
     fun handleError(request: HttpServletRequest): ErrorDTO {
-        return ErrorDTO(
-            status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE).toString(),
-            message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE).toString()
-        )
+        logger.warn("Error should have been handled by throwing LoonoException. Message: ${request.getAttribute(RequestDispatcher.ERROR_MESSAGE)}")
+
+        return ErrorDTO(code = null, message = null)
     }
 }

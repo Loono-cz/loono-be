@@ -1,16 +1,21 @@
 package cz.loono.backend.api.controller
 
 import cz.loono.backend.api.ApiTest
+import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.OnboardService
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
-import org.springframework.mock.web.MockHttpServletResponse
+import org.mockito.kotlin.any
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import org.springframework.http.HttpStatus
 
 class OnboardControllerTest : ApiTest() {
 
@@ -27,12 +32,15 @@ class OnboardControllerTest : ApiTest() {
 
     @Test
     fun `different authenticated uid from dto uid returns 403`() {
-        val response = MockHttpServletResponse()
         val onboardDto = createOnboardDTO()
-        onboardController.onboard(onboardDto, onboardDto.user.uid + "randomuid", response)
 
-        assertTrue { response.isCommitted }
-        assertEquals(403, response.status)
+        val error = assertThrows<LoonoBackendException> {
+            onboardController.onboard(onboardDto, onboardDto.user.uid + "randomuid")
+        }
+
+        assertEquals(HttpStatus.FORBIDDEN, error.status)
+        assertNull(error.errorCode)
+        assertNull(error.errorMessage)
 
         verify(onboardService, times(0)).onboard(any())
     }
@@ -42,22 +50,23 @@ class OnboardControllerTest : ApiTest() {
         whenever(onboardService.userUidExists(any())).thenReturn(false)
         val onboardDto = createOnboardDTO()
 
-        onboardController.onboard(onboardDto, onboardDto.user.uid, MockHttpServletResponse())
+        onboardController.onboard(onboardDto, onboardDto.user.uid)
 
         verify(onboardService, times(1)).onboard(any())
     }
 
     @Test
-    fun `existing uid returns 400`() {
+    fun `existing uid returns 403`() {
         whenever(onboardService.userUidExists(any())).thenReturn(true)
-        val response = MockHttpServletResponse()
         val onboardDto = createOnboardDTO()
 
-        onboardController.onboard(onboardDto, onboardDto.user.uid, response)
+        val error = assertThrows<AccountAlreadyExistsException> {
+            onboardController.onboard(onboardDto, onboardDto.user.uid)
+        }
 
-        assertTrue { response.isCommitted }
-        assertEquals(400, response.status)
-        assertEquals("The user already exists.", response.errorMessage)
+        assertEquals(HttpStatus.FORBIDDEN, error.status)
+        assertEquals(OnboardController.ACCOUNT_ALREADY_EXISTS_CODE, error.errorCode)
+        assertEquals(OnboardController.ACCOUNT_ALREADY_EXISTS_MSG, error.errorMessage)
 
         verify(onboardService, times(0)).onboard(any())
     }

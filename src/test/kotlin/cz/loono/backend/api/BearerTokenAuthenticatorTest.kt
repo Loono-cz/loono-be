@@ -1,27 +1,33 @@
 package cz.loono.backend.api
 
+import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.mock
+import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
+import javax.servlet.http.HttpServletResponse
 
 internal class BearerTokenAuthenticatorTest {
 
     @Test
-    fun `missing authorization returns 401`() {
+    fun `missing authorization throws 401`() {
+        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
         val authenticator = BearerTokenAuthenticator { fail("Auth service must not be called with missing auth header.") }
         val request = MockHttpServletRequest()
-        val response = MockHttpServletResponse()
 
-        val shouldContinue = authenticator.preHandle(request, response, Any())
+        val error = assertThrows<LoonoBackendException> {
+            authenticator.preHandle(request, response, Any())
+        }
 
-        assertFalse { shouldContinue }
-        assertTrue { response.isCommitted }
-        assertEquals(401, response.status)
-        assertEquals("Missing Authorization header.", response.errorMessage)
+        assertEquals(HttpStatus.UNAUTHORIZED, error.status)
+        assertNull(error.errorCode)
+        assertEquals("Missing Authorization header.", error.errorMessage)
     }
 
     @ParameterizedTest
@@ -38,35 +44,37 @@ internal class BearerTokenAuthenticatorTest {
         ]
     )
     fun `invalid token format returns 400`(header: String) {
+        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
         val authenticator = BearerTokenAuthenticator { fail("Auth service must not be called with invalid token format.") }
         val request = MockHttpServletRequest().apply {
             addHeader("Authorization", header)
         }
-        val response = MockHttpServletResponse()
 
-        val shouldContinue = authenticator.preHandle(request, response, Any())
+        val error = assertThrows<LoonoBackendException> {
+            authenticator.preHandle(request, response, Any())
+        }
 
-        assertFalse { shouldContinue }
-        assertTrue { response.isCommitted }
-        assertEquals(400, response.status)
-        assertEquals("Invalid format of Bearer token.", response.errorMessage)
+        assertEquals(HttpStatus.BAD_REQUEST, error.status)
+        assertNull(error.errorCode)
+        assertEquals("Invalid format of Bearer token.", error.errorMessage)
     }
 
     @Test
     fun `AuthService error reason is reported back with 401`() {
+        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
         val expectedReason = "Failure reason"
         val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.Error(expectedReason) }
         val request = MockHttpServletRequest().apply {
             addHeader("Authorization", "Bearer token")
         }
-        val response = MockHttpServletResponse()
 
-        val shouldContinue = authenticator.preHandle(request, response, Any())
+        val error = assertThrows<LoonoBackendException> {
+            authenticator.preHandle(request, response, Any())
+        }
 
-        assertFalse { shouldContinue }
-        assertTrue { response.isCommitted }
-        assertEquals(401, response.status)
-        assertEquals(expectedReason, response.errorMessage)
+        assertEquals(HttpStatus.UNAUTHORIZED, error.status)
+        assertNull(error.errorCode)
+        assertEquals(expectedReason, error.errorMessage)
     }
 
     @Test

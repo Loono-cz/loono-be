@@ -1,5 +1,6 @@
 package cz.loono.backend.api.controller
 
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -17,7 +18,7 @@ class ErrorControllerTest {
         val errorController = ErrorController()
         val response = errorController.handleError(httpServletRequest)
 
-        assert(response.status == "404")
-        assert(response.message == "Not found.")
+        assertNull(response.code)
+        assertNull(response.message)
     }
 }

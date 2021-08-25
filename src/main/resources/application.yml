@@ -15,6 +15,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     open-in-view: false
     generate-ddl: true
+  # Throw 404 when no request handler can be found
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
 # Logger configuration
 logging:
   pattern:

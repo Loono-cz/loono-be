@@ -1,7 +1,9 @@
 package cz.loono.backend.api
 
+import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 import javax.servlet.http.HttpServletRequest
@@ -14,30 +16,30 @@ class BearerTokenAuthenticator @Autowired constructor(
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         val authorizationHeader = request.getHeader("Authorization")
-        if (authorizationHeader == null) {
-            response.sendError(401, "Missing Authorization header.")
-            return false
-        }
+            ?: throw LoonoBackendException(
+                HttpStatus.UNAUTHORIZED,
+                errorCode = null,
+                errorMessage = "Missing Authorization header."
+            )
 
         val token = parseToken(authorizationHeader)
-        if (token == null) {
-            response.sendError(400, "Invalid format of Bearer token.")
-            return false
-        }
 
-        return when (val result = authService.verifyToken(token)) {
+        when (val result = authService.verifyToken(token)) {
             is JwtAuthService.VerificationResult.Success -> {
                 request.setAttribute(Attributes.ATTR_UID, result.uid)
-                true
+                return true
             }
             is JwtAuthService.VerificationResult.Error -> {
-                response.sendError(401, result.reason)
-                false
+                throw LoonoBackendException(
+                    HttpStatus.UNAUTHORIZED,
+                    errorCode = null,
+                    errorMessage = result.reason
+                )
             }
         }
     }
 
-    private fun parseToken(authHeader: String): String? {
+    private fun parseToken(authHeader: String): String {
         val tokenParts = authHeader.split(" ")
         if (tokenParts.size == 2 &&
             tokenParts[0].equals("Bearer", ignoreCase = true) &&
@@ -45,6 +47,10 @@ class BearerTokenAuthenticator @Autowired constructor(
         ) {
             return tokenParts[1]
         }
-        return null
+        throw LoonoBackendException(
+            HttpStatus.BAD_REQUEST,
+            errorCode = null,
+            errorMessage = "Invalid format of Bearer token."
+        )
     }
 }
