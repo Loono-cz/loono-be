@@ -3,6 +3,7 @@ package cz.loono.backend.api.controller
 import cz.loono.backend.api.ApiTest
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.OnboardService
+import cz.loono.backend.data.repository.UserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -24,6 +25,9 @@ class OnboardControllerTest : ApiTest() {
 
     @Mock
     private lateinit var onboardService: OnboardService
+
+    @Mock
+    private lateinit var userRepository: UserRepository
 
     @BeforeEach
     fun initMocks() {
@@ -47,7 +51,7 @@ class OnboardControllerTest : ApiTest() {
 
     @Test
     fun completeOnboard() {
-        whenever(onboardService.userUidExists(any())).thenReturn(false)
+        whenever(userRepository.existsByUid(any())).thenReturn(false)
         val onboardDto = createOnboardDTO()
 
         onboardController.onboard(onboardDto, onboardDto.user.uid)
@@ -57,7 +61,7 @@ class OnboardControllerTest : ApiTest() {
 
     @Test
     fun `existing uid returns 403`() {
-        whenever(onboardService.userUidExists(any())).thenReturn(true)
+        whenever(userRepository.existsByUid(any())).thenReturn(true)
         val onboardDto = createOnboardDTO()
 
         val error = assertThrows<AccountAlreadyExistsException> {

@@ -4,6 +4,7 @@ import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.dto.OnboardDTO
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.OnboardService
+import cz.loono.backend.data.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
@@ -12,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class OnboardController {
+class OnboardController @Autowired constructor(
+    private val userRepository: UserRepository,
+    private val onboardService: OnboardService
+) {
 
-    @Autowired
-    private lateinit var onboardService: OnboardService
-
-    @PostMapping(value = ["/onboard"])
+    @PostMapping(value = [PATH])
     fun onboard(
         @RequestBody onboard: OnboardDTO,
         @RequestAttribute(name = Attributes.ATTR_UID) uid: String,
@@ -26,7 +27,7 @@ class OnboardController {
             throw LoonoBackendException(HttpStatus.FORBIDDEN, null, null)
         }
 
-        if (onboardService.userUidExists(onboard.user.uid)) {
+        if (userRepository.existsByUid(onboard.user.uid)) {
            throw AccountAlreadyExistsException()
         }
 
@@ -34,6 +35,7 @@ class OnboardController {
     }
 
     companion object {
+        const val PATH = "/onboard"
         const val ACCOUNT_ALREADY_EXISTS_CODE = "ACCOUNT_ALREADY_EXISTS"
         const val ACCOUNT_ALREADY_EXISTS_MSG = "Onboard can only be performed once per account."
     }

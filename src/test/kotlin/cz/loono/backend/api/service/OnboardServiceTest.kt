@@ -4,7 +4,6 @@ import cz.loono.backend.api.ApiTest
 import cz.loono.backend.api.dto.ExaminationTypeDTO
 import cz.loono.backend.api.dto.LastVisitDTO
 import cz.loono.backend.api.dto.OnboardDTO
-import cz.loono.backend.api.dto.SexDTO
 import cz.loono.backend.data.model.Examination
 import cz.loono.backend.data.model.User
 import cz.loono.backend.data.repository.ExaminationRepository
@@ -14,11 +13,9 @@ import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import java.time.LocalDate
 
 class OnboardServiceTest : ApiTest() {
@@ -136,32 +133,5 @@ class OnboardServiceTest : ApiTest() {
                 date = null
             )
         )
-    }
-
-    @Test
-    fun userUidExists() {
-
-        val user = User(
-            uid = "uid",
-            birthdate = LocalDate.of(1, 1, 1),
-            sex = SexDTO.FEMALE.name,
-            email = "email@email.com",
-            salutation = "hey"
-        )
-        whenever(userRepository.findByUidIn(any())).thenReturn(listOf(user))
-
-        val validation = onboardService.userUidExists("uid")
-
-        assert(validation)
-    }
-
-    @Test
-    fun userUidNotExists() {
-
-        whenever(userRepository.findByUidIn(any())).thenReturn(emptyList())
-
-        val validation = onboardService.userUidExists("different")
-
-        assert(!validation)
     }
 }

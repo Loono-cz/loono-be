@@ -21,10 +21,6 @@ class OnboardService {
     @Autowired
     private lateinit var examinationRepository: ExaminationRepository
 
-    fun userUidExists(uid: String): Boolean {
-        return userRepository.findByUidIn(listOf(uid)).isNotEmpty()
-    }
-
     @Transactional(rollbackFor = [Exception::class])
     fun onboard(onboard: OnboardDTO) {
         val user = toUser(onboard.user)
