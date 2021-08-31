@@ -1,0 +1,599 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Loono API",
+        "description": "Loono API for the mobile application. The whole API is JSON based.\n\nFailed API operations return [Error](https://okarmazin.stoplight.io/docs/loono/c2NoOjI2ODI2OA-error-response).\n\nGeneral error codes:\n|HTTP Status|code |description|\n|--- |--- | --- |\n|403|ONBOARD_REQUIRED| The application created a user account with the Firebase SDK but hasn't gone through `/onboard` yet. A well formed client application shouldn't encounter this error. It is expected that client applications create the Firebase account and then call `/onboard` as a single atomic operation before querying account data. |",
+        "contact": {
+            "name": "Loono",
+            "url": "https://www.loono.cz/"
+        },
+        "license": {
+            "name": "MIT license",
+            "url": "http://www.opensource.org/licenses/mit-license.html"
+        },
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "https://loono.ceskodigital.net:443",
+            "description": "Inferred Url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Account"
+        },
+        {
+            "name": "Leaderboard"
+        },
+        {
+            "name": "Onboarding",
+            "externalDocs": {
+                "url": "https://docs.google.com/document/d/1btjnZTfRJ5VQMvmTMv4Za5UCf8qBC2jo6tXKNjPMqVc/edit"
+            }
+        }
+    ],
+    "paths": {
+        "/account": {
+            "summary": "Retrieve Account information of the current user.",
+            "description": "Contains all the information needed to display the root Account (TODO name) screen. This isncludes",
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "GET Account",
+                "operationId": "getAccount",
+                "description": "GET the account information of the current user.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "parameters": []
+            }
+        },
+        "/account/delete": {
+            "get": {
+                "summary": "Delete Account",
+                "tags": [
+                    "Account"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account successfully Deleted. Returns an empty JSON object.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account already deleted.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "deleteAccount",
+                "description": "Deletes the user account and all associated data. This action is irreversible.\n\nIf it is necessary to keep certain pieces of information, for instance to comply with legal requirements, that data is anonymized to the maximum possible extent.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ]
+            }
+        },
+        "/leaderboard": {
+            "get": {
+                "summary": "GET Leaderboard",
+                "tags": [
+                    "Leaderboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Leaderboard"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getLeaderboard",
+                "description": "Returns the leaderboard rendering.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ]
+            }
+        },
+        "/onboard": {
+            "post": {
+                "summary": "Onboard a new user",
+                "description": "Creates a new user account. It is expected that this endpoint be called right after the user is created with the Firebase SDK as a single atomic unit of work.\n\nSpecific error codes:\n\n|HTTP Status|code |description|\n|--- |--- | --- |\n|403|`ACCOUNT_ALREADY_EXISTS`| The account, as identified by its `uid`, already exists and is available at `/account`. It is an error to call `/onboard` multiple times. Account creation is generally not considered an idempotent operation, therefore we return an error instead of the preexisting account. TODO: Do we want to make this operation idempotent, returning the existing data for repeated requests? Review. |\n",
+                "operationId": "onboardUsingPOST",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Onboard"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Account created. Returns the newly created Account.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "tags": [
+                    "Onboarding"
+                ]
+            }
+        },
+        "/account/user": {
+            "patch": {
+                "summary": "PATCH User",
+                "operationId": "patchUser",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Change the auxiliary account information. Successful operation returns the whole updated **Account**\n\n(TODO!) Probrat semantiku `null` - tato hodnota by mela smazat prislusny zaznam z databaze. Pokud si uzivatel nepreje hodnotu menit, tak ji ve strukture vynecha uplne.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserPatch"
+                            }
+                        }
+                    },
+                    "description": ""
+                },
+                "tags": [
+                    "Account"
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Account": {
+                "type": "object",
+                "title": "Account",
+                "description": "Account information of the current user. Includes the user profile, account settings and points.",
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "settings": {
+                        "$ref": "#/components/schemas/Settings"
+                    },
+                    "pointsEarned": {
+                        "type": "integer",
+                        "description": "The total amount of points earned by the user from gamification features.",
+                        "format": "int32",
+                        "minimum": 0,
+                        "readOnly": true
+                    },
+                    "missingCheckups": {
+                        "type": "array",
+                        "description": "The list of checkups that the user skipped during onboarding. Mobile Application can use this list to filter out the irrelevant screens when presenting the checkup flow at a later date.",
+                        "items": {
+                            "$ref": "#/components/schemas/ExaminationTypeEnum"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "user",
+                    "settings",
+                    "pointsEarned",
+                    "missingCheckups"
+                ],
+                "readOnly": true
+            },
+            "Error": {
+                "title": "Error response",
+                "description": "When an API operation fails, API returns this error which may contain a specific error code pertaining to the failed operation.\n\nAll fields are optional and nullable.",
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "description": "Machine readable error code. Error codes are defined by the individual API operations. Error code may be used by the client application for UX tailoring.",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "message": {
+                        "description": "Human readable error message. These messages are only rarely shown to users and are more often used as a debugging tool for API clients. ",
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "Examination": {
+                "title": "examination",
+                "type": "object",
+                "properties": {
+                    "examinationType": {
+                        "type": "string",
+                        "description": "examination type",
+                        "enum": [
+                            "BREAST_SELF",
+                            "COLONOSCOPY",
+                            "DENTIST",
+                            "DERMATOLOGIST",
+                            "GENERAL_PRACTITIONER",
+                            "GYNECOLOGIST",
+                            "MAMMOGRAM",
+                            "OPHTHALMOLOGIST",
+                            "TESTICULAR_SELF",
+                            "TOKS",
+                            "ULTRASOUND_BREAST",
+                            "UROLOGIST",
+                            "VENEREAL_DISEASES"
+                        ]
+                    },
+                    "lastVisitInterval": {
+                        "type": "string",
+                        "description": "last visit interval",
+                        "enum": [
+                            "LAST_FIVE_YEARS",
+                            "LAST_TWO_YEARS",
+                            "LAST_YEAR"
+                        ]
+                    },
+                    "lastVisitMonth": {
+                        "type": "integer",
+                        "description": "last visit month",
+                        "format": "int32"
+                    },
+                    "lastVisitYear": {
+                        "type": "integer",
+                        "description": "last visit year",
+                        "format": "int32"
+                    }
+                },
+                "description": "Undergone examination data"
+            },
+            "Onboard": {
+                "title": "Onboard data",
+                "description": "All the necessary data for the onboarding process",
+                "type": "object",
+                "properties": {
+                    "checkups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Examination"
+                        }
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserPatch"
+                    }
+                }
+            },
+            "User": {
+                "title": "User",
+                "description": "Encapsulates basic user information: `uid, email, name` etc.\n\nReturned as part of Account.",
+                "type": "object",
+                "properties": {
+                    "uid": {
+                        "type": "string",
+                        "description": "unique user identifier"
+                    },
+                    "birthdateMonth": {
+                        "type": "integer",
+                        "description": "birthdate month of user",
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 12
+                    },
+                    "birthdateYear": {
+                        "type": "integer",
+                        "description": "birthdate year of user",
+                        "format": "int32"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "The primary registration email."
+                    },
+                    "preferredCommunicationEmail": {
+                        "$ref": "#/components/schemas/PreferredCommunicationEmail"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "user salutation"
+                    },
+                    "sex": {
+                        "$ref": "#/components/schemas/GenderEnum"
+                    }
+                },
+                "required": [
+                    "uid",
+                    "email",
+                    "sex"
+                ]
+            },
+            "Settings": {
+                "title": "Account Settings",
+                "description": "Various account-related settings. Newsletter opt in, leaderboard visibility opt in etc.",
+                "type": "object",
+                "properties": {
+                    "leaderboardAnonymization": {
+                        "description": "Whether the name and profile picture is anonymous when displayed on the leaderboard.",
+                        "type": "boolean"
+                    }
+                }
+            },
+            "LeaderboardUser": {
+                "title": "Leaderboard user",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "User nickname. Anonymized if the user opted in to leaderboard anonymization.",
+                        "readOnly": true
+                    },
+                    "profileImageUrl": {
+                        "type": "string",
+                        "description": "Profile image of the user.",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "points": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "readOnly": true
+                    },
+                    "isThisMe": {
+                        "type": "boolean",
+                        "description": "If `true`, this is the profile of the current user. Not required, default `false`",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "name",
+                    "points"
+                ]
+            },
+            "Leaderboard": {
+                "title": "Leaderboard",
+                "description": "Rendered leaderboard from the POV of the authenticated user. Contains the top profiles and peers.",
+                "type": "object",
+                "properties": {
+                    "top": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LeaderboardUser"
+                        }
+                    },
+                    "peers": {
+                        "description": "The users immediately adjacent to the authenticated user. One of the items is the current user.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LeaderboardUser"
+                        }
+                    }
+                }
+            },
+            "UserPatch": {
+                "type": "object",
+                "title": "UserPatch",
+                "description": "Used for onboarding and for PATCH requests to change user information.\n\nAll fields are nullable and optional to allow fine grained account updates.\n\nSpecial case: The onboarding process may declare certain fields to be required for the initial account creation.",
+                "properties": {
+                    "sex": {
+                        "$ref": "#/components/schemas/GenderEnum"
+                    },
+                    "birthdateMonth": {
+                        "type": "integer",
+                        "description": "birthdate month of user",
+                        "format": "int32",
+                        "minimum": 1,
+                        "maximum": 12,
+                        "writeOnly": true
+                    },
+                    "birthdateYear": {
+                        "type": "integer",
+                        "description": "birthdate year of user",
+                        "format": "int32",
+                        "writeOnly": true
+                    },
+                    "preferredCommunicationEmail": {
+                        "$ref": "#/components/schemas/PreferredCommunicationEmail"
+                    }
+                },
+                "writeOnly": true
+            },
+            "GenderEnum": {
+                "type": "string",
+                "title": "Gender",
+                "description": "Gender enum",
+                "enum": [
+                    "MALE",
+                    "FEMALE",
+                    "NON_BINARY"
+                ]
+            },
+            "ExaminationTypeEnum": {
+                "type": "string",
+                "title": "ExaminationTypeEnum",
+                "description": "",
+                "enum": [
+                    "BREAST_SELF",
+                    "COLONOSCOPY",
+                    "DENTIST",
+                    "DERMATOLOGIST",
+                    "GENERAL_PRACTITIONER",
+                    "GYNECOLOGIST",
+                    "MAMMOGRAM",
+                    "OPHTHALMOLOGIST",
+                    "TESTICULAR_SELF",
+                    "TOKS",
+                    "ULTRASOUND_BREAST",
+                    "UROLOGIST",
+                    "VENEREAL_DISEASES"
+                ]
+            },
+            "PreferredCommunicationEmail": {
+                "title": "PreferredCommunicationEmail",
+                "type": "string",
+                "nullable": true,
+                "description": "Users can choose to have their communication email address be different from their main Firebase account email.\n\noptional and nullable\n"
+            }
+        },
+        "securitySchemes": {
+            "Bearer_Auth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
