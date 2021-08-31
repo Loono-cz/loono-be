@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class OnboardRequiredInterceptor @Autowired constructor(
     private val userRepository: UserRepository
-): HandlerInterceptor {
+) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         val isUserOnboarded = userRepository.existsByUid(request.getAttribute(Attributes.ATTR_UID) as String)

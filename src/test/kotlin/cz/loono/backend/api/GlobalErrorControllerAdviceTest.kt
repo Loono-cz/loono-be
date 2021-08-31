@@ -2,7 +2,8 @@ package cz.loono.backend.api
 
 import cz.loono.backend.api.dto.ErrorDTO
 import cz.loono.backend.api.exception.LoonoBackendException
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpServletRequest

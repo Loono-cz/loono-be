@@ -2,9 +2,13 @@ package cz.loono.backend.api
 
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.fail
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
@@ -92,5 +96,4 @@ internal class BearerTokenAuthenticatorTest {
         assertFalse { response.isCommitted }
         assertEquals(decodedUid, request.getAttribute(Attributes.ATTR_UID))
     }
-
 }

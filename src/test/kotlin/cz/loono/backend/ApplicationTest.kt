@@ -8,7 +8,5 @@ internal class ApplicationTest {
 
     @Test
     fun `application starts`() {
-
     }
-
 }

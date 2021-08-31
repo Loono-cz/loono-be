@@ -42,5 +42,4 @@ class Config(
             .excludePathPatterns(OnboardController.PATH)
             .order(1)
     }
-
 }

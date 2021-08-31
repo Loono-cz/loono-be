@@ -61,5 +61,4 @@ class GlobalErrorControllerAdvice : ResponseEntityExceptionHandler() {
 
         return super.handleExceptionInternal(ex, response, headers, status, request)
     }
-
 }

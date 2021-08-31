@@ -28,7 +28,7 @@ class OnboardController @Autowired constructor(
         }
 
         if (userRepository.existsByUid(onboard.user.uid)) {
-           throw AccountAlreadyExistsException()
+            throw AccountAlreadyExistsException()
         }
 
         onboardService.onboard(onboard)
