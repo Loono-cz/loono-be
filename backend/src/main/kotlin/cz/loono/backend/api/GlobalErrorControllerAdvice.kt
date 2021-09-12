@@ -1,6 +1,6 @@
 package cz.loono.backend.api
 
-import cz.loono.backend.api.dto.ErrorDTO
+import cz.loono.backend.api.dto.ErrorDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -26,22 +26,22 @@ class GlobalErrorControllerAdvice : ResponseEntityExceptionHandler() {
     @ExceptionHandler(Exception::class)
     fun handleApplicationException(ex: Exception): ResponseEntity<Any> {
         val status: HttpStatus
-        val responseBody: ErrorDTO
+        val responseBody: ErrorDto
 
         when (ex) {
             is LoonoBackendException -> {
                 status = ex.status
-                responseBody = ErrorDTO(ex.errorCode, ex.errorMessage)
+                responseBody = ErrorDto(ex.errorCode, ex.errorMessage)
             }
             else -> {
                 errorLogger.error("handleApplicationException unexpected error: " + ex.message, ex)
                 status = HttpStatus.INTERNAL_SERVER_ERROR
-                responseBody = ErrorDTO(code = null, message = null)
+                responseBody = ErrorDto(code = null, message = null)
             }
         }
 
         // We return a ResponseEntity, because we need to be able to set the response status code.
-        // If we returned just the ErrorDTO alone, it would have status 200.
+        // If we returned just the ErrorDto alone, it would have status 200.
         // Keep this method's return type as ResponseEntity.
         return ResponseEntity
             .status(status)
@@ -57,7 +57,7 @@ class GlobalErrorControllerAdvice : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any> {
         errorLogger.error("handleExceptionInternal: " + ex.message, ex)
-        val response = ErrorDTO(code = null, message = null)
+        val response = ErrorDto(code = null, message = null)
 
         return super.handleExceptionInternal(ex, response, headers, status, request)
     }

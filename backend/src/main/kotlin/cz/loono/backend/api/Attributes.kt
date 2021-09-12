@@ -1,5 +1,5 @@
 package cz.loono.backend.api
 
 object Attributes {
-    const val ATTR_UID = "cz.loono.backend.user.uid"
+    const val ATTR_BASIC_USER = "cz.loono.backend.auth.basic_user"
 }

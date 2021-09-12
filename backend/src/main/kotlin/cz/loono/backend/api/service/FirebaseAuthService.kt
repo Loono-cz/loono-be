@@ -6,8 +6,10 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
+import cz.loono.backend.api.BasicUser
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.net.URL
 
 @Service
 class FirebaseAuthService : JwtAuthService {
@@ -28,7 +30,28 @@ class FirebaseAuthService : JwtAuthService {
             return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
         }
 
-        return JwtAuthService.VerificationResult.Success(decodedToken.uid)
+        if (decodedToken.email == null) {
+            val error = "Firebase accounts without email are not permitted.\n" +
+                "UID: ${decodedToken.uid}\n" +
+                "Probable reason: Client application may have allowed a login method " +
+                "which doesn't provide user email. Loono only permits login methods which provide user email."
+            logger.error(error)
+
+            return JwtAuthService.VerificationResult.MissingPrimaryEmail
+        }
+
+        if (decodedToken.name == null) {
+            val error = "Firebase accounts without name are not permitted.\n" +
+                "UID: ${decodedToken.uid}\n" +
+                "Probable reason: Client application may have allowed a login method " +
+                "which doesn't provide account name. Loono only permits login methods which provide user name."
+            logger.error(error)
+
+            return JwtAuthService.VerificationResult.MissingUserName
+        }
+
+        val user = BasicUser(decodedToken.uid, decodedToken.email, decodedToken.name, URL(decodedToken.picture))
+        return JwtAuthService.VerificationResult.Success(user)
     }
 
     private fun loadFirebaseCredentials(): FirebaseOptions? {

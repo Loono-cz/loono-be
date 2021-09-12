@@ -15,6 +15,7 @@ import org.mockito.kotlin.mock
 import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
+import java.net.URL
 import javax.servlet.http.HttpServletResponse
 
 internal class BearerTokenAuthenticatorTest {
@@ -32,6 +33,32 @@ internal class BearerTokenAuthenticatorTest {
         assertEquals(HttpStatus.UNAUTHORIZED, error.status)
         assertNull(error.errorCode)
         assertEquals("Missing Authorization header.", error.errorMessage)
+    }
+
+    @Test
+    fun `missing primary email throws`() {
+        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
+        val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.MissingPrimaryEmail }
+        val request = MockHttpServletRequest().apply {
+            addHeader("Authorization", "Bearer token")
+        }
+
+        assertThrows<MissingPrimaryEmailException> {
+            authenticator.preHandle(request, response, Any())
+        }
+    }
+
+    @Test
+    fun `missing username throws`() {
+        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
+        val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.MissingUserName }
+        val request = MockHttpServletRequest().apply {
+            addHeader("Authorization", "Bearer token")
+        }
+
+        assertThrows<MissingUserNameException> {
+            authenticator.preHandle(request, response, Any())
+        }
     }
 
     @ParameterizedTest
@@ -82,9 +109,11 @@ internal class BearerTokenAuthenticatorTest {
     }
 
     @Test
-    fun `valid token is saved to attributes`() {
-        val decodedUid = "decodedUid"
-        val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.Success(decodedUid) }
+    fun `valid token saves basic user data to attributes`() {
+        val decodedUser = BasicUser("uid", "email@example.com", "Zilvar z chudobince", URL("https://example.com/"))
+        val authenticator = BearerTokenAuthenticator {
+            JwtAuthService.VerificationResult.Success(decodedUser)
+        }
         val request = MockHttpServletRequest().apply {
             addHeader("Authorization", "Bearer token")
         }
@@ -94,6 +123,6 @@ internal class BearerTokenAuthenticatorTest {
 
         assertTrue { shouldContinue }
         assertFalse { response.isCommitted }
-        assertEquals(decodedUid, request.getAttribute(Attributes.ATTR_UID))
+        assertEquals(decodedUser, request.getAttribute(Attributes.ATTR_BASIC_USER))
     }
 }

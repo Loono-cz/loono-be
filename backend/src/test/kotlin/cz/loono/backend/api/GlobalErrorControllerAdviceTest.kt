@@ -1,6 +1,6 @@
 package cz.loono.backend.api
 
-import cz.loono.backend.api.dto.ErrorDTO
+import cz.loono.backend.api.dto.ErrorDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -22,7 +22,7 @@ internal class GlobalErrorControllerAdviceTest {
         val response = handler.handleApplicationException(ex)
 
         assertEquals(ex.status, response.statusCode)
-        assertEquals(ErrorDTO(errorCode, errorMessage), response.body)
+        assertEquals(ErrorDto(errorCode, errorMessage), response.body)
     }
 
     @Test
@@ -34,7 +34,7 @@ internal class GlobalErrorControllerAdviceTest {
         val response = handler.handleApplicationException(ex)
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode)
-        assertEquals(ErrorDTO(code = null, message = null), response.body)
+        assertEquals(ErrorDto(code = null, message = null), response.body)
     }
 
     @Test
@@ -46,6 +46,6 @@ internal class GlobalErrorControllerAdviceTest {
 
         assertNotNull(response)
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response!!.statusCode)
-        assertEquals(ErrorDTO(code = null, message = null), response.body)
+        assertEquals(ErrorDto(code = null, message = null), response.body)
     }
 }

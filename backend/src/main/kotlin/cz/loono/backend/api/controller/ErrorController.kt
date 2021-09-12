@@ -1,6 +1,6 @@
 package cz.loono.backend.api.controller
 
-import cz.loono.backend.api.dto.ErrorDTO
+import cz.loono.backend.api.dto.ErrorDto
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.servlet.error.ErrorController
 import org.springframework.http.MediaType
@@ -19,9 +19,9 @@ class ErrorController : ErrorController {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @RequestMapping("/error", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun handleError(request: HttpServletRequest): ErrorDTO {
+    fun handleError(request: HttpServletRequest): ErrorDto {
         logger.warn("Error should have been handled by throwing LoonoException. Message: ${request.getAttribute(RequestDispatcher.ERROR_MESSAGE)}")
 
-        return ErrorDTO(code = null, message = null)
+        return ErrorDto(code = null, message = null)
     }
 }

@@ -1,5 +1,7 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.BasicUser
+
 fun interface JwtAuthService {
 
     /**
@@ -8,7 +10,9 @@ fun interface JwtAuthService {
     fun verifyToken(jwt: String): VerificationResult
 
     sealed class VerificationResult {
-        data class Success(val uid: String) : VerificationResult()
+        data class Success(val basicUser: BasicUser) : VerificationResult()
         data class Error(val reason: String) : VerificationResult()
+        object MissingPrimaryEmail : VerificationResult()
+        object MissingUserName : VerificationResult()
     }
 }

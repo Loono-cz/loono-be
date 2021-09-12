@@ -1,7 +1,7 @@
 package cz.loono.backend.api.data
 
-import cz.loono.backend.data.model.User
-import cz.loono.backend.data.repository.UserRepository
+import cz.loono.backend.data.model.Account
+import cz.loono.backend.data.repository.AccountRepository
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -15,20 +15,20 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class UserRepositoryTest {
+class AccountRepositoryTest {
 
     @Autowired
-    private lateinit var userRepo: UserRepository
+    private lateinit var accountRepo: AccountRepository
 
     @Test
     fun `existsByUid with existing user`() {
-        userRepo.save(User(uid = "uid"))
+        accountRepo.save(Account(uid = "uid"))
 
-        assertTrue(userRepo.existsByUid("uid"))
+        assertTrue(accountRepo.existsByUid("uid"))
     }
 
     @Test
     fun `existsByUid with missing user`() {
-        assertFalse(userRepo.existsByUid("uid"))
+        assertFalse(accountRepo.existsByUid("uid"))
     }
 }

@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Loono API",
-        "description": "Loono API for the mobile application. The whole API is JSON based.\n\nFailed API operations return [Error](https://okarmazin.stoplight.io/docs/loono/c2NoOjI2ODI2OA-error-response).\n\nGeneral error codes:\n|HTTP Status|code |description|\n|--- |--- | --- |\n|403|ONBOARD_REQUIRED| The application created a user account with the Firebase SDK but hasn't gone through `/onboard` yet. A well formed client application shouldn't encounter this error. It is expected that client applications create the Firebase account and then call `/onboard` as a single atomic operation before querying account data. |",
+        "description": "Loono API for the mobile application. The whole API is JSON based.\n\nFailed API operations return [Error](https://okarmazin.stoplight.io/docs/loono/c2NoOjI2ODI2OA-error-response).\n\nGeneral error codes:\n|HTTP Status|code |description|\n|--- |--- | --- |\n|400|MISSING_PRIMARY_EMAIL| The Firebase login method did not include user email. Email is required and must be saved in Firebase before any API access. |\n|400|MISSING_USER_NAME| The Firebase login method did not include user name. Name is required and must be saved in Firebase before any API access. |",
         "contact": {
             "name": "Loono",
             "url": "https://www.loono.cz/"
@@ -31,6 +31,9 @@
             "externalDocs": {
                 "url": "https://docs.google.com/document/d/1btjnZTfRJ5VQMvmTMv4Za5UCf8qBC2jo6tXKNjPMqVc/edit"
             }
+        },
+        {
+            "name": "Examinations"
         }
     ],
     "paths": {
@@ -94,66 +97,9 @@
                 "parameters": []
             }
         },
-        "/account/delete": {
-            "get": {
-                "summary": "Delete Account",
-                "tags": [
-                    "Account"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Account successfully Deleted. Returns an empty JSON object.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Account already deleted.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Error Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                },
-                "operationId": "deleteAccount",
-                "description": "Deletes the user account and all associated data. This action is irreversible.\n\nIf it is necessary to keep certain pieces of information, for instance to comply with legal requirements, that data is anonymized to the maximum possible extent.",
-                "security": [
-                    {
-                        "Bearer_Auth": []
-                    }
-                ]
-            }
-        },
         "/leaderboard": {
             "get": {
-                "summary": "GET Leaderboard",
+                "summary": "[Draft] Get Leaderboard",
                 "tags": [
                     "Leaderboard"
                 ],
@@ -190,7 +136,7 @@
                     }
                 },
                 "operationId": "getLeaderboard",
-                "description": "Returns the leaderboard rendering.",
+                "description": "TODO: This is a mock.\n\nReturns the leaderboard rendering.",
                 "security": [
                     {
                         "Bearer_Auth": []
@@ -198,24 +144,13 @@
                 ]
             }
         },
-        "/onboard": {
+        "/account/user/update": {
             "post": {
-                "summary": "Onboard a new user",
-                "description": "Creates a new user account. It is expected that this endpoint be called right after the user is created with the Firebase SDK as a single atomic unit of work.\n\nSpecific error codes:\n\n|HTTP Status|code |description|\n|--- |--- | --- |\n|403|`ACCOUNT_ALREADY_EXISTS`| The account, as identified by its `uid`, already exists and is available at `/account`. It is an error to call `/onboard` multiple times. Account creation is generally not considered an idempotent operation, therefore we return an error instead of the preexisting account. TODO: Do we want to make this operation idempotent, returning the existing data for repeated requests? Review. |\n",
-                "operationId": "onboardUsingPOST",
-                "parameters": [],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Onboard"
-                            }
-                        }
-                    }
-                },
+                "summary": "Update Account User",
+                "operationId": "updateAccountUser",
                 "responses": {
-                    "201": {
-                        "description": "Account created. Returns the newly created Account.",
+                    "200": {
+                        "description": "Returns the updated Account",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -224,8 +159,8 @@
                             }
                         }
                     },
-                    "default": {
-                        "description": "Error Response",
+                    "401": {
+                        "description": "Unauthorized",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -235,20 +170,31 @@
                         }
                     }
                 },
+                "description": "Change the auxiliary account information. Successful operation returns the whole updated **Account**\n\n**ALL FIELDS ARE ALWAYS UPDATED. BEWARE OF DEFAULT PARAMETERS**",
+                "tags": [
+                    "Account"
+                ],
                 "security": [
                     {
                         "Bearer_Auth": []
                     }
                 ],
-                "tags": [
-                    "Onboarding"
-                ]
-            }
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserPatch"
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": []
         },
-        "/account/user": {
-            "patch": {
-                "summary": "PATCH User",
-                "operationId": "patchUser",
+        "/account/settings/update": {
+            "post": {
+                "summary": "Update Account Settings",
+                "operationId": "updateAccountSettings",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -269,19 +215,9 @@
                                 }
                             }
                         }
-                    },
-                    "default": {
-                        "description": "Error Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
                     }
                 },
-                "description": "Change the auxiliary account information. Successful operation returns the whole updated **Account**\n\n(TODO!) Probrat semantiku `null` - tato hodnota by mela smazat prislusny zaznam z databaze. Pokud si uzivatel nepreje hodnotu menit, tak ji ve strukture vynecha uplne.",
+                "description": "Change the settings. Successful operation returns the whole updated **Account**\n\n**ALL FIELDS ARE ALWAYS UPDATED. BEWARE OF DEFAULT PARAMETERS**",
                 "security": [
                     {
                         "Bearer_Auth": []
@@ -291,16 +227,217 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UserPatch"
+                                "$ref": "#/components/schemas/Settings"
                             }
                         }
                     },
-                    "description": ""
+                    "description": "The whole new settings object. "
                 },
                 "tags": [
                     "Account"
                 ]
             }
+        },
+        "/account/delete": {
+            "post": {
+                "summary": "[Draft] Delete Account",
+                "operationId": "deleteAccount",
+                "responses": {
+                    "200": {
+                        "description": "Account successfully Deleted. Returns an empty JSON object.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden, likely needs a more recent recent login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Account"
+                ],
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "description": "Deletes the user account and all associated data. This action is irreversible.\n\n\nIf it is necessary to keep certain pieces of information, for instance to comply with legal requirements, that data is anonymized to the maximum possible extent.\n\nSpecific error codes:\n\n|HTTP Status| code |description|\n|--- |--- | --- |\n|403|RECENT_LOGIN_REQUIRED| User must reauthenticate. Equivalent to the [FirebaseAuthRecentLoginRequiredException](https://firebase.google.com/docs/reference/android/com/google/firebase/auth/FirebaseAuthRecentLoginRequiredException)(Android) |",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    },
+                    "description": "Empty object"
+                }
+            }
+        },
+        "/examinations": {
+            "get": {
+                "summary": "Get Examination Records",
+                "tags": [
+                    "Examinations"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ExaminationRecord"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getExaminations",
+                "description": "Returns the examination records of the current user.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ]
+            }
+        },
+        "/examinations/{type}/complete": {
+            "post": {
+                "summary": "Complete Examination",
+                "operationId": "completeExamination",
+                "responses": {
+                    "200": {
+                        "description": "Returns the updated list of examination records.\n\nTODO: Co vracet?  Account? All the records? Just the one record?",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ExaminationRecord"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Examinations"
+                ],
+                "description": "Notify the API that an examination has been performed.\n\nThe date of the completion must not be in the future.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExaminationCompletion"
+                            }
+                        }
+                    },
+                    "description": ""
+                }
+            },
+            "parameters": [
+                {
+                    "schema": {
+                        "type": "string"
+                    },
+                    "name": "type",
+                    "in": "path",
+                    "required": true,
+                    "description": "One of the `ExaminationTypeEnum` values"
+                }
+            ]
+        },
+        "/examinations/reset": {
+            "post": {
+                "summary": "[Draft] Reset Examination Record",
+                "operationId": "deleteExamination",
+                "responses": {
+                    "201": {
+                        "description": "Returns the updated list of examination records.\n\nTODO: Co vracet?  Account? All the records? Just the one record?",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ExaminationRecord"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Examinations",
+                    "Account"
+                ],
+                "description": "Delete the aggregate examination record for this examination type.\n\nSpecial consideration: How to prevent abuse and point cheating? SOME information about the history of point entitlement will have to be retained so that people don't spam create/delete to farm points.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "description": "Empty object"
+                }
+            },
+            "parameters": []
         }
     },
     "components": {
@@ -316,27 +453,17 @@
                     "settings": {
                         "$ref": "#/components/schemas/Settings"
                     },
-                    "pointsEarned": {
+                    "points": {
                         "type": "integer",
                         "description": "The total amount of points earned by the user from gamification features.",
                         "format": "int32",
-                        "minimum": 0,
-                        "readOnly": true
-                    },
-                    "missingCheckups": {
-                        "type": "array",
-                        "description": "The list of checkups that the user skipped during onboarding. Mobile Application can use this list to filter out the irrelevant screens when presenting the checkup flow at a later date.",
-                        "items": {
-                            "$ref": "#/components/schemas/ExaminationTypeEnum"
-                        },
-                        "readOnly": true
+                        "minimum": 0
                     }
                 },
                 "required": [
                     "user",
                     "settings",
-                    "pointsEarned",
-                    "missingCheckups"
+                    "points"
                 ],
                 "readOnly": true
             },
@@ -357,75 +484,46 @@
                     }
                 }
             },
-            "Examination": {
-                "title": "examination",
+            "ExaminationCompletion": {
+                "title": "ExaminationCompletion",
                 "type": "object",
+                "description": "A completed medical examination.\n\n`month` and `year` are optional and nullable. If any of them is missing or `null`, API defaults to `LocalDate.now()` - the current year and month.",
                 "properties": {
-                    "examinationType": {
-                        "type": "string",
-                        "description": "examination type",
-                        "enum": [
-                            "BREAST_SELF",
-                            "COLONOSCOPY",
-                            "DENTIST",
-                            "DERMATOLOGIST",
-                            "GENERAL_PRACTITIONER",
-                            "GYNECOLOGIST",
-                            "MAMMOGRAM",
-                            "OPHTHALMOLOGIST",
-                            "TESTICULAR_SELF",
-                            "TOKS",
-                            "ULTRASOUND_BREAST",
-                            "UROLOGIST",
-                            "VENEREAL_DISEASES"
-                        ]
-                    },
-                    "lastVisitInterval": {
-                        "type": "string",
-                        "description": "last visit interval",
-                        "enum": [
-                            "LAST_FIVE_YEARS",
-                            "LAST_TWO_YEARS",
-                            "LAST_YEAR"
-                        ]
-                    },
-                    "lastVisitMonth": {
+                    "month": {
                         "type": "integer",
-                        "description": "last visit month",
-                        "format": "int32"
+                        "description": "",
+                        "format": "int32",
+                        "default": null,
+                        "nullable": true
                     },
-                    "lastVisitYear": {
+                    "year": {
                         "type": "integer",
-                        "description": "last visit year",
-                        "format": "int32"
-                    }
-                },
-                "description": "Undergone examination data"
-            },
-            "Onboard": {
-                "title": "Onboard data",
-                "description": "All the necessary data for the onboarding process",
-                "type": "object",
-                "properties": {
-                    "checkups": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Examination"
-                        }
-                    },
-                    "user": {
-                        "$ref": "#/components/schemas/UserPatch"
+                        "description": "Must not be in the future",
+                        "format": "int32",
+                        "default": null,
+                        "nullable": true
                     }
                 }
             },
             "User": {
                 "title": "User",
-                "description": "Encapsulates basic user information: `uid, email, name` etc.\n\nReturned as part of Account.",
+                "description": "Encapsulates basic user profile information: `uid, email, name` etc.\n\nReturned as part of Account.",
                 "type": "object",
                 "properties": {
                     "uid": {
                         "type": "string",
                         "description": "unique user identifier"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "The primary registration email."
+                    },
+                    "nickname": {
+                        "type": "string",
+                        "description": ""
+                    },
+                    "sex": {
+                        "$ref": "#/components/schemas/Sex"
                     },
                     "birthdateMonth": {
                         "type": "integer",
@@ -439,37 +537,16 @@
                         "description": "birthdate year of user",
                         "format": "int32"
                     },
-                    "email": {
+                    "preferredEmail": {
                         "type": "string",
-                        "description": "The primary registration email."
-                    },
-                    "preferredCommunicationEmail": {
-                        "$ref": "#/components/schemas/PreferredCommunicationEmail"
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "user salutation"
-                    },
-                    "sex": {
-                        "$ref": "#/components/schemas/GenderEnum"
+                        "format": "email"
                     }
                 },
                 "required": [
                     "uid",
                     "email",
-                    "sex"
+                    "nickname"
                 ]
-            },
-            "Settings": {
-                "title": "Account Settings",
-                "description": "Various account-related settings. Newsletter opt in, leaderboard visibility opt in etc.",
-                "type": "object",
-                "properties": {
-                    "leaderboardAnonymization": {
-                        "description": "Whether the name and profile picture is anonymous when displayed on the leaderboard.",
-                        "type": "boolean"
-                    }
-                }
             },
             "LeaderboardUser": {
                 "title": "Leaderboard user",
@@ -526,39 +603,41 @@
             "UserPatch": {
                 "type": "object",
                 "title": "UserPatch",
-                "description": "Used for onboarding and for PATCH requests to change user information.\n\nAll fields are nullable and optional to allow fine grained account updates.\n\nSpecial case: The onboarding process may declare certain fields to be required for the initial account creation.",
+                "description": "All fields are always updated, so beware of defaults.",
                 "properties": {
                     "sex": {
-                        "$ref": "#/components/schemas/GenderEnum"
+                        "$ref": "#/components/schemas/Sex"
                     },
                     "birthdateMonth": {
                         "type": "integer",
                         "description": "birthdate month of user",
                         "format": "int32",
-                        "minimum": 1,
-                        "maximum": 12,
+                        "nullable": true,
                         "writeOnly": true
                     },
                     "birthdateYear": {
                         "type": "integer",
                         "description": "birthdate year of user",
                         "format": "int32",
+                        "nullable": true,
                         "writeOnly": true
                     },
-                    "preferredCommunicationEmail": {
-                        "$ref": "#/components/schemas/PreferredCommunicationEmail"
+                    "preferredEmail": {
+                        "type": "string",
+                        "format": "email",
+                        "nullable": true,
+                        "writeOnly": true
                     }
                 },
                 "writeOnly": true
             },
-            "GenderEnum": {
+            "Sex": {
                 "type": "string",
-                "title": "Gender",
-                "description": "Gender enum",
+                "title": "Sex",
+                "description": "Sex enum",
                 "enum": [
                     "MALE",
-                    "FEMALE",
-                    "NON_BINARY"
+                    "FEMALE"
                 ]
             },
             "ExaminationTypeEnum": {
@@ -581,11 +660,116 @@
                     "VENEREAL_DISEASES"
                 ]
             },
-            "PreferredCommunicationEmail": {
-                "title": "PreferredCommunicationEmail",
+            "PreferredEmail": {
                 "type": "string",
-                "nullable": true,
-                "description": "Users can choose to have their communication email address be different from their main Firebase account email.\n\noptional and nullable\n"
+                "title": "PreferredEmail",
+                "description": "Users can choose to have their communication email address be different from their main Firebase account email.\n\noptional and nullable\n",
+                "format": "email",
+                "nullable": true
+            },
+            "ExaminationRecord": {
+                "type": "object",
+                "title": "ExaminationRecord",
+                "description": "An aggregate record of a single examination type.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/ExaminationTypeEnum"
+                    },
+                    "worth": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "description": "How many points will be awarded upon completing this examination if the user is eligible."
+                    },
+                    "streak": {
+                        "$ref": "#/components/schemas/Streak"
+                    },
+                    "lastVisitYear": {
+                        "type": "integer",
+                        "format": "date"
+                    },
+                    "lastVisitMonth": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "type",
+                    "worth"
+                ],
+                "readOnly": true
+            },
+            "Streak": {
+                "title": "Streak",
+                "type": "object",
+                "description": "Examination completion streak.",
+                "properties": {
+                    "currentStreak": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "format": "int32"
+                    },
+                    "downtimeRemainingDays": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                    },
+                    "gracePeriodRemainingDays": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                    }
+                }
+            },
+            "Appointment": {
+                "title": "Appointment",
+                "type": "object",
+                "description": "A planned visit to the doctor.",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "provider": {
+                        "$ref": "#/components/schemas/SimpleHealthcareProvider"
+                    },
+                    "datetime": {
+                        "type": "string",
+                        "description": "**ZONED** Datetime.\nTODO: Can be split into separate datetime + timezene fields\n"
+                    }
+                }
+            },
+            "SimpleHealthcareProvider": {
+                "title": "SimpleHealthcareProvider",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "description": "Simplified healthcare provider record."
+            },
+            "Settings": {
+                "title": "Settings",
+                "type": "object",
+                "description": "Account Settings",
+                "properties": {
+                    "leaderboardAnonymizationOptIn": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "appointmentReminderEmailsOptIn": {
+                        "type": "boolean",
+                        "description": "",
+                        "default": false
+                    },
+                    "newsletterOptIn": {
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "required": [
+                    "leaderboardAnonymizationOptIn",
+                    "appointmentReminderEmailsOptIn",
+                    "newsletterOptIn"
+                ]
             }
         },
         "securitySchemes": {

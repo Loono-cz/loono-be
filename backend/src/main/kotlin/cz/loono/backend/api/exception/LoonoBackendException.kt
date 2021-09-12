@@ -1,6 +1,6 @@
 package cz.loono.backend.api.exception
 
-import cz.loono.backend.api.dto.ErrorDTO
+import cz.loono.backend.api.dto.ErrorDto
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 
@@ -10,11 +10,11 @@ import org.springframework.web.server.ResponseStatusException
 open class LoonoBackendException(
     status: HttpStatus,
     /**
-     * Error code for [ErrorDTO]
+     * Error code for [ErrorDto]
      */
     val errorCode: String? = null,
     /**
-     * Error message for [ErrorDTO]
+     * Error message for [ErrorDto]
      */
     val errorMessage: String? = null,
     cause: Throwable? = null
