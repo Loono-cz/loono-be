@@ -22,7 +22,7 @@ jobs:
           distribution: 'adopt'
       
       - name: Build with Gradle
-        run: ./gradlew build jacocoTestReport
+        run: ./gradlew build jacocoTestReport --stacktrace
         
       - name: Generate JaCoCo Badge
         uses: cicirello/jacoco-badge-generator@v2
