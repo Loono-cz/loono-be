@@ -11,16 +11,13 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDate
 
-/**
- * TODO configure in-memory database
- *  LOON-191
- */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 internal class ExaminationRecordServiceTest {
 
     @Autowired
@@ -42,7 +39,9 @@ internal class ExaminationRecordServiceTest {
 
     @Test
     fun getOrCreateRecords() {
-        val account = createAccount().let {
+        val account = createAccount()
+        accountRepository.save(account)
+        val account2 = account.let {
             val records = listOf(
                 ExaminationRecord(
                     type = ExaminationTypeEnumDto.DENTIST.name,
@@ -57,7 +56,7 @@ internal class ExaminationRecordServiceTest {
             )
             it.copy(examinationRecords = records)
         }
-        accountRepository.save(account)
+        accountRepository.save(account2)
         val service = ExaminationRecordService(accountRepository, recordRepository)
 
         val records = service.getOrCreateRecords(account.uid)
@@ -120,7 +119,7 @@ internal class ExaminationRecordServiceTest {
         val service = ExaminationRecordService(accountRepository, recordRepository)
         // Sanity precondition check!
         assertNull(
-            accountRepository.findById("uid").get().examinationRecords
+            accountRepository.findByUid("uid")!!.examinationRecords
                 .firstOrNull { it.type == ExaminationTypeEnumDto.MAMMOGRAM.name }
         )
 
@@ -130,7 +129,7 @@ internal class ExaminationRecordServiceTest {
             LocalDate.of(2000, 1, 1)
         ).first { it.type == ExaminationTypeEnumDto.MAMMOGRAM.name }
 
-        val persistedUpdatedRecord = accountRepository.findById("uid").get().examinationRecords
+        val persistedUpdatedRecord = accountRepository.findByUid("uid")!!.examinationRecords
             .first { it.type == ExaminationTypeEnumDto.MAMMOGRAM.name }
 
         assertEquals(LocalDate.of(2000, 1, 1), updatedRecord.lastVisit)
@@ -139,17 +138,7 @@ internal class ExaminationRecordServiceTest {
 
     @Test
     fun `completeExamination with date before lastVisit does not update lastVisit`() {
-        val account = createAccount().let {
-            val records = listOf(
-                ExaminationRecord(
-                    type = ExaminationTypeEnumDto.DENTIST.name,
-                    lastVisit = LocalDate.of(2000, 1, 1),
-                    account = it
-                )
-            )
-            it.copy(examinationRecords = records)
-        }
-        accountRepository.save(account)
+        saveAccountWithDentist(LocalDate.of(2000, 1, 1))
         val service = ExaminationRecordService(accountRepository, recordRepository)
 
         val updatedRecord = service.completeExamination(
@@ -158,7 +147,7 @@ internal class ExaminationRecordServiceTest {
             LocalDate.of(1999, 1, 1)
         ).first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
-        val persistedUpdatedRecord = accountRepository.findById("uid").get().examinationRecords
+        val persistedUpdatedRecord = accountRepository.findByUid("uid")!!.examinationRecords
             .first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
         assertEquals(LocalDate.of(2000, 1, 1), updatedRecord.lastVisit)
@@ -167,17 +156,7 @@ internal class ExaminationRecordServiceTest {
 
     @Test
     fun `completeExamination with date after lastVisit updates lastVisit`() {
-        val account = createAccount().let {
-            val records = listOf(
-                ExaminationRecord(
-                    type = ExaminationTypeEnumDto.DENTIST.name,
-                    lastVisit = LocalDate.of(1999, 1, 1),
-                    account = it
-                )
-            )
-            it.copy(examinationRecords = records)
-        }
-        accountRepository.save(account)
+        saveAccountWithDentist()
         val service = ExaminationRecordService(accountRepository, recordRepository)
 
         val updatedRecord = service.completeExamination(
@@ -186,7 +165,7 @@ internal class ExaminationRecordServiceTest {
             LocalDate.of(2000, 1, 1)
         ).first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
-        val persistedUpdatedRecord = accountRepository.findById("uid").get().examinationRecords
+        val persistedUpdatedRecord = accountRepository.findByUid("uid")!!.examinationRecords
             .first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
         assertEquals(LocalDate.of(2000, 1, 1), updatedRecord.lastVisit)
@@ -195,17 +174,7 @@ internal class ExaminationRecordServiceTest {
 
     @Test
     fun `completeExamination with null date sets the current date`() {
-        val account = createAccount().let {
-            val records = listOf(
-                ExaminationRecord(
-                    type = ExaminationTypeEnumDto.DENTIST.name,
-                    lastVisit = LocalDate.of(1999, 1, 1),
-                    account = it
-                )
-            )
-            it.copy(examinationRecords = records)
-        }
-        accountRepository.save(account)
+        saveAccountWithDentist()
         val service = ExaminationRecordService(accountRepository, recordRepository)
 
         val updatedRecord = service.completeExamination(
@@ -214,11 +183,27 @@ internal class ExaminationRecordServiceTest {
             null, // <-- This is under test
         ).first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
-        val persistedUpdatedRecord = accountRepository.findById("uid").get().examinationRecords
+        val persistedUpdatedRecord = accountRepository.findByUid("uid")!!.examinationRecords
             .first { it.type == ExaminationTypeEnumDto.DENTIST.name }
 
         val expectedDate = LocalDate.now().withDayOfMonth(1)
         assertEquals(expectedDate, updatedRecord.lastVisit)
         assertEquals(expectedDate, persistedUpdatedRecord.lastVisit)
+    }
+
+    private fun saveAccountWithDentist(lastVisit: LocalDate = LocalDate.of(1999, 1, 1)) {
+        val account = createAccount()
+        accountRepository.save(account)
+        val account2 = account.let {
+            val records = listOf(
+                ExaminationRecord(
+                    type = ExaminationTypeEnumDto.DENTIST.name,
+                    lastVisit = lastVisit,
+                    account = it
+                )
+            )
+            it.copy(examinationRecords = records)
+        }
+        accountRepository.save(account2)
     }
 }

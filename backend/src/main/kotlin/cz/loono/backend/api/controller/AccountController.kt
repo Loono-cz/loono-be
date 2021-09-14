@@ -16,7 +16,6 @@ import cz.loono.backend.data.repository.AccountRepository
 import cz.loono.backend.let3
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,7 +40,7 @@ class AccountController @Autowired constructor(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ): AccountDto {
-        val account = accountRepository.findByIdOrNull(basicUser.uid)
+        val account = accountRepository.findByUid(basicUser.uid)
         if (account == null) {
             logger.error(
                 "Tried to load account with uid: ${basicUser.uid} but no such account exists. " +

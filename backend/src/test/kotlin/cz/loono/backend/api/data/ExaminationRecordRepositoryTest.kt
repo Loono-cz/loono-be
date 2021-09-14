@@ -8,16 +8,13 @@ import cz.loono.backend.data.repository.ExaminationRecordRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDate
 
-/**
- * TODO configure in-memory database
- *  LOON-191
- */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class ExaminationRecordRepositoryTest {
 
     @Autowired
@@ -27,7 +24,9 @@ class ExaminationRecordRepositoryTest {
 
     @Test
     fun `findAllByAccount ignores other accounts`() {
-        val account1 = createAccount("uid1").let {
+        var account1 = createAccount("uid1")
+        account1 = accountRepo.save(account1)
+        account1 = account1.let {
             val records = listOf(
                 ExaminationRecord(
                     type = ExaminationTypeEnumDto.DENTIST.name,
@@ -37,7 +36,11 @@ class ExaminationRecordRepositoryTest {
             )
             it.copy(examinationRecords = records)
         }
-        val account2 = createAccount("uid2").let {
+        account1 = accountRepo.save(account1)
+
+        var account2 = createAccount("uid2")
+        account2 = accountRepo.save(account2)
+        account2 = account2.let {
             val records = listOf(
                 ExaminationRecord(
                     type = ExaminationTypeEnumDto.MAMMOGRAM.name,
@@ -47,7 +50,6 @@ class ExaminationRecordRepositoryTest {
             )
             it.copy(examinationRecords = records)
         }
-        accountRepo.save(account1)
         accountRepo.save(account2)
 
         val allRecords = recordRepo.findAll()

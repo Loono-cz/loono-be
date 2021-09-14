@@ -8,6 +8,8 @@ import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
 import javax.persistence.Table
@@ -15,8 +17,12 @@ import javax.persistence.Table
 @Entity
 @Table(name = "\"account\"")
 data class Account(
+
     @Id
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Long = 0,
+
+    @Column(nullable = false, columnDefinition = "TEXT", unique = true)
     val uid: String = "",
 
     @Embedded

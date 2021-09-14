@@ -6,10 +6,8 @@ import cz.loono.backend.data.model.UserAuxiliary
 import cz.loono.backend.data.repository.AccountRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.Exception
 
 @Service
 class AccountService @Autowired constructor(
@@ -26,7 +24,7 @@ class AccountService @Autowired constructor(
 
     @Transactional(rollbackFor = [Exception::class])
     fun updateSettings(uid: String, settings: Settings): Account {
-        val account = accountRepository.findByIdOrNull(uid)
+        val account = accountRepository.findByUid(uid)
         if (account == null) {
             logger.error(
                 "Tried to update Account Settings for uid: $uid but no such account exists. " +
@@ -40,7 +38,7 @@ class AccountService @Autowired constructor(
 
     @Transactional(rollbackFor = [Exception::class])
     fun updateUserAuxiliary(uid: String, aux: UserAuxiliary): Account {
-        val account = accountRepository.findByIdOrNull(uid)
+        val account = accountRepository.findByUid(uid)
         if (account == null) {
             logger.error(
                 "Tried to update User Auxiliary for uid: $uid but no such account exists. " +

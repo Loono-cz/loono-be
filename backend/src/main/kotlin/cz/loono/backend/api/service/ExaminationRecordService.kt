@@ -7,7 +7,6 @@ import cz.loono.backend.data.repository.AccountRepository
 import cz.loono.backend.data.repository.ExaminationRecordRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -32,7 +31,7 @@ class ExaminationRecordService @Autowired constructor(
      */
     @Transactional(rollbackFor = [Exception::class])
     fun getOrCreateRecords(uid: String): List<ExaminationRecord> {
-        val account = accountRepository.findByIdOrNull(uid)
+        val account = accountRepository.findByUid(uid)
         if (account == null) {
             logger.error("Account does not exist, it should have been created by the account interceptor.")
             throw IllegalStateException(
@@ -105,7 +104,7 @@ class ExaminationRecordService @Autowired constructor(
             throw IllegalArgumentException("Examination Completion must not be in the future.")
         }
 
-        val account = accountRepository.findByIdOrNull(uid)
+        val account = accountRepository.findByUid(uid)
         if (account == null) {
             logger.error("Account does not exist, it should have been created by the account interceptor.")
             throw IllegalStateException("Tried to complete an examination for uid: $uid but no such account exists.")

@@ -13,17 +13,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 
-/**
- * TODO configure in-memory database
- *  LOON-191
- */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 internal class AccountServiceTest {
 
     @Autowired
@@ -42,7 +38,7 @@ internal class AccountServiceTest {
 
     @Test
     fun `ensureAccountExists with existing account`() {
-        val initialAccount = Account("uid", points = 1000)
+        val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
 
         val service = AccountService(repo)
@@ -51,7 +47,7 @@ internal class AccountServiceTest {
 
         // WTF is this check.
         // We could check some of the Account content against the initial Account to make sure content didn't change.
-        checkNotNull(repo.findByIdOrNull("uid"))
+        checkNotNull(repo.findByUid("uid"))
     }
 
     @Test
@@ -71,7 +67,7 @@ internal class AccountServiceTest {
 
     @Test
     fun `updateSettings with existing account`() {
-        val initialAccount = Account("uid", points = 1000)
+        val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
         val service = AccountService(repo)
 
@@ -84,7 +80,7 @@ internal class AccountServiceTest {
         assertNotEquals(initialAccount.settings, newSettings)
 
         val updatedAccount = service.updateSettings("uid", newSettings)
-        val persistedUpdatedAccount = repo.findByIdOrNull("uid") ?: fail("Account should be persisted.")
+        val persistedUpdatedAccount = repo.findByUid("uid") ?: fail("Account should be persisted.")
 
         assertEquals(newSettings, updatedAccount.settings)
         assertEquals(newSettings, persistedUpdatedAccount.settings)
@@ -107,7 +103,7 @@ internal class AccountServiceTest {
 
     @Test
     fun `updateUserAuxiliary with existing account`() {
-        val initialAccount = Account("uid", points = 1000)
+        val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
         val service = AccountService(repo)
 
@@ -120,7 +116,7 @@ internal class AccountServiceTest {
         assertNotEquals(initialAccount.userAuxiliary, newAux)
 
         val updatedAccount = service.updateUserAuxiliary("uid", newAux)
-        val persistedUpdatedAccount = repo.findByIdOrNull("uid") ?: fail("Account should be persisted.")
+        val persistedUpdatedAccount = repo.findByUid("uid") ?: fail("Account should be persisted.")
 
         assertEquals(newAux, updatedAccount.userAuxiliary)
         assertEquals(newAux, persistedUpdatedAccount.userAuxiliary)
