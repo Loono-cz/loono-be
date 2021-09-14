@@ -12,7 +12,7 @@ spring:
       ddl-auto: update
     show-sql: true
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    # database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     open-in-view: false
     generate-ddl: true
   # Throw 404 when no request handler can be found
