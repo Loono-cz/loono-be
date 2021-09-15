@@ -28,6 +28,7 @@ class Config(
 ) : WebMvcConfigurer {
     val unauthenticatedEndpoints = listOf(
         "/v3/api-docs",
+        "/actuator/health",
         "/error",
     )
 
