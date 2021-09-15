@@ -7,7 +7,7 @@ RUN gradle build --no-daemon
 
 FROM gcr.io/distroless/java:11
 
-COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/build/dists/loono-be.jar /app/loono-be.jar
+COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/dists/loono-be.jar /app/loono-be.jar
 
 WORKDIR "/app"
 USER nonroot
