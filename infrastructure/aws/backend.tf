@@ -188,9 +188,10 @@ resource "aws_lb_target_group" "backend-tg" {
   vpc_id      = aws_vpc.vpc.id
   target_type = "ip"
   health_check {
+    path                = "/actuator/health"
     unhealthy_threshold = 10
-    enabled = true
-    port    = 8080
-    matcher = "200,308,404"
+    enabled             = true
+    port                = 8080
+    matcher             = "200"
   }
 }
