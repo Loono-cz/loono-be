@@ -20,18 +20,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
 
-/**
- * TODO configure in-memory database
- *  LOON-191
- */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 internal class AccountControllerTest {
 
     @Autowired
@@ -117,7 +113,7 @@ internal class AccountControllerTest {
             appointmentReminderEmailsOptIn = newSettings.appointmentReminderEmailsOptIn,
             newsletterOptIn = newSettings.newsletterOptIn
         )
-        val actualDomainSettings = repo.findByIdOrNull(existingAccount.uid)!!.settings
+        val actualDomainSettings = repo.findByUid(existingAccount.uid)!!.settings
 
         assertEquals(expectedDomainSettings, actualDomainSettings)
     }
@@ -162,7 +158,7 @@ internal class AccountControllerTest {
             sex = userPatch.sex?.name,
             birthdate = let3(userPatch.birthdateYear, userPatch.birthdateMonth, 1, LocalDate::of)
         )
-        val actualDomainUser = repo.findByIdOrNull(basicUser.uid)!!.userAuxiliary
+        val actualDomainUser = repo.findByUid(basicUser.uid)!!.userAuxiliary
 
         assertEquals(expectedDomainUser, actualDomainUser)
     }
