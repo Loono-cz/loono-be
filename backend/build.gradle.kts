@@ -42,7 +42,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 }
 
-val artifactFinalName = "$name.jar"
+val artifactFinalName = "loono-be.jar"
 tasks.bootJar {
     archiveFileName.set(artifactFinalName)
     destinationDirectory.set(file("$buildDir/dists"))
