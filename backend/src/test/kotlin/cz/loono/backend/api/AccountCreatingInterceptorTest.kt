@@ -3,7 +3,8 @@ package cz.loono.backend.api
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.createBasicUser
-import cz.loono.backend.data.repository.AccountRepository
+import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.security.AccountCreatingInterceptor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull

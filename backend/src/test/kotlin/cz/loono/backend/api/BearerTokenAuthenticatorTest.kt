@@ -2,13 +2,16 @@ package cz.loono.backend.api
 
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
+import cz.loono.backend.security.BearerTokenAuthenticator
+import cz.loono.backend.security.MissingPrimaryEmailException
+import cz.loono.backend.security.MissingUserNameException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.fail
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
@@ -23,7 +26,8 @@ internal class BearerTokenAuthenticatorTest {
     @Test
     fun `missing authorization throws 401`() {
         val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
-        val authenticator = BearerTokenAuthenticator { fail("Auth service must not be called with missing auth header.") }
+        val authenticator =
+            BearerTokenAuthenticator { fail("Auth service must not be called with missing auth header.") }
         val request = MockHttpServletRequest()
 
         val error = assertThrows<LoonoBackendException> {
@@ -76,7 +80,8 @@ internal class BearerTokenAuthenticatorTest {
     )
     fun `invalid token format returns 400`(header: String) {
         val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
-        val authenticator = BearerTokenAuthenticator { fail("Auth service must not be called with invalid token format.") }
+        val authenticator =
+            BearerTokenAuthenticator { fail("Auth service must not be called with invalid token format.") }
         val request = MockHttpServletRequest().apply {
             addHeader("Authorization", header)
         }

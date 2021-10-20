@@ -9,9 +9,9 @@ import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.createAccount
 import cz.loono.backend.createBasicUser
-import cz.loono.backend.data.model.Settings
-import cz.loono.backend.data.model.UserAuxiliary
-import cz.loono.backend.data.repository.AccountRepository
+import cz.loono.backend.db.model.Settings
+import cz.loono.backend.db.model.UserAuxiliary
+import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.let3
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals

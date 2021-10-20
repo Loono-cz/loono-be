@@ -7,7 +7,7 @@ import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.ExaminationRecordService
-import cz.loono.backend.data.model.ExaminationRecord
+import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.let3
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

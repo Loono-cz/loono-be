@@ -1,10 +1,10 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
-import cz.loono.backend.data.model.Account
-import cz.loono.backend.data.model.ExaminationRecord
-import cz.loono.backend.data.repository.AccountRepository
-import cz.loono.backend.data.repository.ExaminationRecordRepository
+import cz.loono.backend.db.model.Account
+import cz.loono.backend.db.model.ExaminationRecord
+import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

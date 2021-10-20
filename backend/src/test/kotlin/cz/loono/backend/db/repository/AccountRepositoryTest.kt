@@ -1,8 +1,7 @@
-package cz.loono.backend.api.data
+package cz.loono.backend.db.repository
 
 import cz.loono.backend.createAccount
-import cz.loono.backend.data.model.Account
-import cz.loono.backend.data.repository.AccountRepository
+import cz.loono.backend.db.model.Account
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull

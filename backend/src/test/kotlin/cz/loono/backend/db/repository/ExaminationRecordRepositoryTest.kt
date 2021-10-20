@@ -1,10 +1,8 @@
-package cz.loono.backend.api.data
+package cz.loono.backend.db.repository
 
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
 import cz.loono.backend.createAccount
-import cz.loono.backend.data.model.ExaminationRecord
-import cz.loono.backend.data.repository.AccountRepository
-import cz.loono.backend.data.repository.ExaminationRecordRepository
+import cz.loono.backend.db.model.ExaminationRecord
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

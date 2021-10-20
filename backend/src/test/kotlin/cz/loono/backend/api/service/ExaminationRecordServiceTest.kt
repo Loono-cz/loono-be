@@ -2,9 +2,9 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
 import cz.loono.backend.createAccount
-import cz.loono.backend.data.model.ExaminationRecord
-import cz.loono.backend.data.repository.AccountRepository
-import cz.loono.backend.data.repository.ExaminationRecordRepository
+import cz.loono.backend.db.model.ExaminationRecord
+import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue

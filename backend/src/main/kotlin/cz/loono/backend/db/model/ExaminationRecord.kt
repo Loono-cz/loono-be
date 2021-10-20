@@ -1,4 +1,4 @@
-package cz.loono.backend.data.model
+package cz.loono.backend.db.model
 
 import org.hibernate.Hibernate
 import java.time.LocalDate

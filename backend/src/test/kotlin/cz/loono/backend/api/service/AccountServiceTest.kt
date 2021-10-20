@@ -1,10 +1,10 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.SexDto
-import cz.loono.backend.data.model.Account
-import cz.loono.backend.data.model.Settings
-import cz.loono.backend.data.model.UserAuxiliary
-import cz.loono.backend.data.repository.AccountRepository
+import cz.loono.backend.db.model.Account
+import cz.loono.backend.db.model.Settings
+import cz.loono.backend.db.model.UserAuxiliary
+import cz.loono.backend.db.repository.AccountRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
