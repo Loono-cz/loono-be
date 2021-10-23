@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
@@ -58,7 +58,7 @@ internal class AccountCreatingInterceptorTest {
             interceptor.preHandle(request, response, Any())
         }
 
-        verifyZeroInteractions(repo)
+        verifyNoInteractions(repo)
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.status)
         assertNull(ex.errorCode)
         assertNull(ex.errorMessage)
@@ -77,7 +77,7 @@ internal class AccountCreatingInterceptorTest {
             interceptor.preHandle(request, response, Any())
         }
 
-        verifyZeroInteractions(repo)
+        verifyNoInteractions(repo)
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.status)
         assertNull(ex.errorCode)
         assertNull(ex.errorMessage)

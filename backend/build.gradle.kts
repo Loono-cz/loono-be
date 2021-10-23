@@ -1,11 +1,11 @@
 plugins {
-    id("org.springframework.boot") version "2.5.3"
+    id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     id("org.openapi.generator") version "5.2.1"
     id("de.undercouch.download") version "4.1.2"
-    kotlin("jvm") version "1.5.20"
-    kotlin("plugin.spring") version "1.5.20"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.spring") version "1.5.31"
     jacoco
 }
 
@@ -28,19 +28,19 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    implementation("com.google.firebase:firebase-admin:8.0.0")
+    implementation("com.google.firebase:firebase-admin:8.1.0")
 
-    implementation("org.slf4j:slf4j-api:1.7.31")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("ch.qos.logback:logback-core:1.2.3")
+    implementation("org.slf4j:slf4j-api:1.7.32")
+    implementation("ch.qos.logback:logback-classic:1.2.6")
+    implementation("ch.qos.logback:logback-core:1.2.6")
 
     runtimeOnly("org.postgresql:postgresql")
 
     testRuntimeOnly("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
 val artifactFinalName = "loono-be.jar"

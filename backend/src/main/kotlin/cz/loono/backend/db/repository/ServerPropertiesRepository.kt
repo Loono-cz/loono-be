@@ -17,7 +17,6 @@ interface ServerPropertiesRepository : CrudRepository<ServerProperties, Long> {
     fun getUpdateInterval(): List<OpenDataProperties>
 }
 
-
 interface SuperUser {
     var superUserName: String
     var superUserPassword: String
