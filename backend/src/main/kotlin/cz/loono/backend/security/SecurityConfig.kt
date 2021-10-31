@@ -53,7 +53,7 @@ class SecurityConfig @Autowired constructor(
             .httpBasic()
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
-            .csrf()
+            .csrf().disable()
     }
 
     @Bean

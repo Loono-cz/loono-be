@@ -15,7 +15,8 @@ class SuperUserDetailsService @Autowired constructor(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        val superUser: SuperUser = serverPropertiesRepository.getSuperUserNameAndPassword()[0]
+        val superUser: SuperUser = serverPropertiesRepository.getSuperUserNameAndPassword().firstOrNull()
+            ?: throw NullPointerException("Superuser $username not found.")
         return SuperUserDetails(
             username = superUser.superUserName,
             password = superUser.superUserPassword

@@ -8,20 +8,13 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ServerPropertiesRepository : CrudRepository<ServerProperties, Long> {
 
-    override fun findAll(): List<ServerProperties>
+    override fun findAll(): Set<ServerProperties>
 
     @Query("SELECT sp.superUserName as superUserName, sp.superUserPassword as superUserPassword FROM ServerProperties AS sp")
-    fun getSuperUserNameAndPassword(): List<SuperUser>
-
-    @Query("SELECT sp.updateInterval as updateInterval FROM ServerProperties AS sp")
-    fun getUpdateInterval(): List<OpenDataProperties>
+    fun getSuperUserNameAndPassword(): Set<SuperUser>
 }
 
 interface SuperUser {
     var superUserName: String
     var superUserPassword: String
-}
-
-interface OpenDataProperties {
-    var updateInterval: String
 }

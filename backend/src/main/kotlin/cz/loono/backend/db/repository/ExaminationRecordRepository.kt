@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ExaminationRecordRepository : CrudRepository<ExaminationRecord, Long> {
-    fun findAllByAccount(account: Account): List<ExaminationRecord>
+    fun findAllByAccount(account: Account): Set<ExaminationRecord>
 }

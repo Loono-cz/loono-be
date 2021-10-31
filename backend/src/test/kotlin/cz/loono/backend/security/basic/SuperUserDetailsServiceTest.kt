@@ -35,6 +35,6 @@ class SuperUserDetailsServiceTest {
     fun `server properties not set`() {
         val superUserDetailsService = SuperUserDetailsService(serverPropertiesRepository)
 
-        assertThrows<IndexOutOfBoundsException> { superUserDetailsService.loadUserByUsername("loonoAdmin") }
+        assertThrows<NullPointerException> { superUserDetailsService.loadUserByUsername("loonoAdmin") }
     }
 }

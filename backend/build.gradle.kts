@@ -29,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.google.firebase:firebase-admin:8.1.0")
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.3.0")
 
     implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("ch.qos.logback:logback-classic:1.2.6")
@@ -58,6 +59,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    minHeapSize = "256m"
+    maxHeapSize = "1024m"
 }
 
 tasks.jacocoTestReport {

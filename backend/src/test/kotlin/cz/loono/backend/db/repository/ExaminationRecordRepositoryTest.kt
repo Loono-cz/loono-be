@@ -55,6 +55,6 @@ class ExaminationRecordRepositoryTest {
 
         val a1Records = recordRepo.findAllByAccount(account1)
         assertEquals(1, a1Records.size)
-        assertEquals(ExaminationTypeEnumDto.DENTIST.name, a1Records[0].type)
+        assertEquals(ExaminationTypeEnumDto.DENTIST.name, a1Records.first().type)
     }
 }

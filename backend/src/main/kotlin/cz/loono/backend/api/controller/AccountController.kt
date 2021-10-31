@@ -59,7 +59,7 @@ class AccountController @Autowired constructor(
 
         @RequestBody
         @Valid
-        patch: UserPatchDto,
+        patch: UserPatchDto
     ): AccountDto {
         val aux = UserAuxiliary(
             preferredEmail = patch.preferredEmail,

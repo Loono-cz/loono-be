@@ -19,21 +19,10 @@ internal class ServerPropertiesRepositoryTest {
         val serverProperties = ServerProperties()
         serverPropsRepo.save(serverProperties)
 
-        val superUsers: List<SuperUser> = serverPropsRepo.getSuperUserNameAndPassword()
+        val superUsers: Set<SuperUser> = serverPropsRepo.getSuperUserNameAndPassword()
 
         assert(superUsers.size == 1)
-        assert(superUsers[0].superUserName == serverProperties.superUserName)
-        assert(superUsers[0].superUserPassword == serverProperties.superUserPassword)
-    }
-
-    @Test
-    fun `findAllUpdateInterval gets just OpenDataProperties`() {
-        val serverProperties = ServerProperties()
-        serverPropsRepo.save(serverProperties)
-
-        val openDataProperties: List<OpenDataProperties> = serverPropsRepo.getUpdateInterval()
-
-        assert(openDataProperties.size == 1)
-        assert(openDataProperties[0].updateInterval == serverProperties.updateInterval)
+        assert(superUsers.first().superUserName == serverProperties.superUserName)
+        assert(superUsers.first().superUserPassword == serverProperties.superUserPassword)
     }
 }

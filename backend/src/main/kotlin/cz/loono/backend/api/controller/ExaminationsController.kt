@@ -55,7 +55,7 @@ class ExaminationsController @Autowired constructor(
 
         @Valid
         @RequestBody
-        completionDto: ExaminationCompletionDto,
+        completionDto: ExaminationCompletionDto
     ): List<ExaminationRecordDto> {
         if (type !in ExaminationTypeEnumDto.values().map { it.name }) {
             throw LoonoBackendException(HttpStatus.NOT_FOUND)

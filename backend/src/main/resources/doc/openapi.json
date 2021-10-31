@@ -49,7 +49,7 @@
                 "description": "GET the account information of the current user.",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -438,6 +438,96 @@
                 }
             },
             "parameters": []
+        },
+        "/providers/all": {
+            "get": {
+                "summary": "Your GET endpoint",
+                "tags": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthcareProviderList"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {}
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "get-providers-all",
+                "description": "Getting all healthcare providers.\n\nList of all healthcare providers in the simple form. The file format is JSON and it is zipped.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ]
+            }
+        },
+        "/providers/detail": {
+            "post": {
+                "summary": "",
+                "operationId": "post-providers-detail",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthcareProviderDetails"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HealthcareProviderId"
+                            }
+                        }
+                    },
+                    "description": "Healthcare provider ID"
+                },
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "description": "Returns complete detail of a healthcare provider"
+            }
+        },
+        "/providers/update": {
+            "get": {
+                "summary": "Your GET endpoint",
+                "tags": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateStatusMessage"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "get-providers-update"
+            }
         }
     },
     "components": {
@@ -728,7 +818,7 @@
                         "type": "string"
                     },
                     "provider": {
-                        "$ref": "#/components/schemas/SimpleHealthcareProvider"
+                        "$ref": "#/components/schemas/HealthcareProviderId"
                     },
                     "datetime": {
                         "type": "string",
@@ -739,12 +829,47 @@
             "SimpleHealthcareProvider": {
                 "title": "SimpleHealthcareProvider",
                 "type": "object",
+                "description": "Simplified healthcare provider record.",
                 "properties": {
-                    "id": {
+                    "locationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "institutionId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "houseNumber": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "specialization": {
+                        "type": "string"
+                    },
+                    "lat": {
+                        "type": "string"
+                    },
+                    "lng": {
                         "type": "string"
                     }
-                },
-                "description": "Simplified healthcare provider record."
+                }
             },
             "Settings": {
                 "title": "Settings",
@@ -770,6 +895,116 @@
                     "appointmentReminderEmailsOptIn",
                     "newsletterOptIn"
                 ]
+            },
+            "UpdateStatusMessage": {
+                "title": "UpdateStatusMessage",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "description": "Update status of the update of healthcare providers"
+            },
+            "HealthcareProviderId": {
+                "title": "HealthcareProviderId",
+                "type": "object",
+                "description": "Composite key of the healthcare provider",
+                "properties": {
+                    "locationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "institutionId": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            },
+            "HealthcareProviderDetails": {
+                "title": "HealthcareProviderDetails",
+                "type": "object",
+                "description": "The details of a single healthcare provider record.",
+                "properties": {
+                    "locationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "institutionId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "institutionType": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "houseNumber": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "type": "string"
+                    },
+                    "fax": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "website": {
+                        "type": "string"
+                    },
+                    "ico": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "specialization": {
+                        "type": "string"
+                    },
+                    "careForm": {
+                        "type": "string"
+                    },
+                    "careType": {
+                        "type": "string"
+                    },
+                    "substitute": {
+                        "type": "string"
+                    },
+                    "lat": {
+                        "type": "string"
+                    },
+                    "lng": {
+                        "type": "string"
+                    }
+                }
+            },
+            "HealthcareProviderList": {
+                "title": "HealthcareProviderList",
+                "type": "object",
+                "description": "Simplified list of healthcare providers",
+                "properties": {
+                    "healthcareProviders": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SimpleHealthcareProvider"
+                        }
+                    }
+                }
             }
         },
         "securitySchemes": {

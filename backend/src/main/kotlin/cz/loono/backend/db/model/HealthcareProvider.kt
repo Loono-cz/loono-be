@@ -120,7 +120,7 @@ data class HealthcareProvider(
             JoinColumn(name = "location_id", referencedColumnName = "location_id"),
             JoinColumn(name = "institution_id", referencedColumnName = "institution_id")
         ],
-        inverseJoinColumns = [JoinColumn(name = "category", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "id")]
     )
     val category: Set<HealthcareCategory> = mutableSetOf(),
 
