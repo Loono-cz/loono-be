@@ -23,8 +23,8 @@ class HealthcareCSVParser {
             reader.forEachLine { line ->
                 val columns = parseColumns(line)
 
-                if (line.startsWith("MistoPoskytovaniId") && !verifyColumns(columns)) {
-                    logger.warn("The structure of the file has changed.")
+                if (line.startsWith("MistoPoskytovaniId")) {
+                    verifyColumns(columns)
                     return@forEachLine
                 }
                 if (columns.size != Constants.healthcareProvidersCSVHeader.size) {
@@ -64,7 +64,9 @@ class HealthcareCSVParser {
         return result.replace("\"\"", "_Q_")
     }
 
-    private fun verifyColumns(columns: List<String>): Boolean {
-        return Constants.healthcareProvidersCSVHeader != columns
+    private fun verifyColumns(columns: List<String>) {
+        if (Constants.healthcareProvidersCSVHeader != columns) {
+            logger.warn("The structure of the file has changed.")
+        }
     }
 }

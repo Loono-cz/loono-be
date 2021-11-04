@@ -16,8 +16,9 @@ import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
-import io.github.reactivecircus.cache4k.Cache
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -35,22 +36,20 @@ class HealthcareProvidersService @Autowired constructor(
     private val healthcareCategoryRepository: HealthcareCategoryRepository,
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val providersCache = Cache.Builder().build<HealthcareProviderIdDto, HealthcareProvider>()
-    private val fileCache = Cache.Builder().build<String, ByteArray>()
+    private var providersCache = LinkedHashSet<HealthcareProvider>()
+    private var fileCache: ByteArray? = null
 
     var lastUpdate = ""
 
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
     @Synchronized
-    @Transactional(rollbackFor = [Exception::class])
     fun updateData(): UpdateStatusMessageDto {
         val input = URL(OPEN_DATA_URL).openStream()
         val providers = HealthcareCSVParser().parse(input)
         if (providers.isNotEmpty()) {
-            val categoryValues = CategoryValues.values().map { HealthcareCategory(value = it.value) }
-            healthcareCategoryRepository.saveAll(categoryValues)
-            healthcareProviderRepository.saveAll(providers)
+            saveData(providers)
             updateCache()
             setLastUpdate()
         } else {
@@ -60,10 +59,30 @@ class HealthcareProvidersService @Autowired constructor(
                 errorMessage = "Data update failed."
             )
         }
+        logger.info("Update finished.")
         return UpdateStatusMessageDto("Data successfully updated.")
     }
 
-    private fun setLastUpdate() {
+    @Synchronized
+    @Transactional(rollbackFor = [Exception::class])
+    fun saveData(providers: List<HealthcareProvider>) {
+        val categoryValues = CategoryValues.values().map { HealthcareCategory(value = it.value) }
+        healthcareCategoryRepository.saveAll(categoryValues)
+        val cycles = providers.size.div(1000)
+        val rest = providers.size % 1000 - 1
+        for (i in 0..cycles) {
+            val start = i * 1000
+            var end = start + 999
+            if (i == cycles) {
+                end = start + rest
+            }
+            healthcareProviderRepository.saveAll(providers.subList(start, end))
+        }
+    }
+
+    @Synchronized
+    @Transactional(rollbackFor = [Exception::class])
+    fun setLastUpdate() {
         val serverProperties = serverPropertiesRepository.findAll()
         val updateDate = LocalDate.now()
         lastUpdate = "${updateDate.year}-${updateDate.monthValue}"
@@ -76,19 +95,22 @@ class HealthcareProvidersService @Autowired constructor(
         serverPropertiesRepository.save(firstProperties)
     }
 
-    private fun updateCache() {
-        providersCache.invalidateAll()
-        fileCache.invalidateAll()
-        val providers = healthcareProviderRepository.findAll()
-        providers.forEach { provider ->
-            val id = HealthcareProviderIdDto(locationId = provider.locationId, institutionId = provider.institutionId)
-            providersCache.put(id, provider)
+    @Synchronized
+    fun updateCache() {
+        providersCache.clear()
+        fileCache = null
+        val count = healthcareProviderRepository.count().toInt()
+        providersCache = LinkedHashSet(count)
+        val cycles = count.div(1000)
+        for (i in 0..cycles) {
+            val page = PageRequest.of(i, 1000)
+            providersCache.addAll(healthcareProviderRepository.findAll(page))
         }
-        fileCache.put("providers", zipProviders())
+        fileCache = zipProviders()
     }
 
     private fun zipProviders(): ByteArray {
-        val simplifyProviders = providersCache.asMap().values.map { it.simplify() }
+        val simplifyProviders = providersCache.map { it.simplify() }
         val list = HealthcareProviderListDto(
             healthcareProviders = simplifyProviders
         )
@@ -108,16 +130,18 @@ class HealthcareProvidersService @Autowired constructor(
     }
 
     fun getAllSimpleData(): ByteArray {
-        return fileCache.get("providers")!!
+        return fileCache ?: throw NullPointerException("File cache is not set.")
     }
 
     fun getHealthcareProviderDetail(healthcareProviderId: HealthcareProviderIdDto): HealthcareProviderDetailsDto {
-        val provider = providersCache.get(healthcareProviderId) ?: throw LoonoBackendException(
+        val provider = providersCache.find {
+            it.institutionId == healthcareProviderId.institutionId && it.locationId == healthcareProviderId.locationId
+        }
+        return provider?.getDetails() ?: throw LoonoBackendException(
             status = HttpStatus.NOT_FOUND,
             errorCode = "404",
             errorMessage = "The healthcare provider with this ID not found."
         )
-        return provider.getDetails()
     }
 
     fun HealthcareProvider.simplify(): SimpleHealthcareProviderDto {

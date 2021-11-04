@@ -10,8 +10,8 @@ class SpecializationMapper {
 
     fun defineCategory(specialization: String): Set<HealthcareCategory> {
 
-        val categories = mutableSetOf<HealthcareCategory>()
         val specializations = specialization.split(", ")
+        val categories = LinkedHashSet<HealthcareCategory>(specializations.size)
 
         specializations.forEach {
             when (it.lowercase()) {
