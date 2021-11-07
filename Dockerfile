@@ -12,5 +12,4 @@ COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/di
 WORKDIR "/app"
 USER nonroot
 
-ENV JAVA_OPTS="-Xmx1024M"
-CMD ["java", "$JAVA_OPTS", "-jar", "loono-be.jar"]
+CMD java -Xmx1024M -jar loono-be.jar
