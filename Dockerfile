@@ -12,4 +12,4 @@ COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/di
 WORKDIR "/app"
 USER nonroot
 
-CMD java -Xmx1024M -jar ./loono-be.jar
+CMD ["loono-be.jar"]
