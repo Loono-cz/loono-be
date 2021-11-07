@@ -13,4 +13,4 @@ WORKDIR "/app"
 USER nonroot
 
 ENV JAVA_OPTS="-Xmx1024M"
-CMD ["loono-be.jar", "$JAVA_OPTS"]
+CMD ["java", "$JAVA_OPTS", "-jar", "loono-be.jar"]
