@@ -7,6 +7,7 @@ import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,6 +55,7 @@ class HealthcareProvidersServiceTest {
     }
 
     @Test
+    @Disabled
     fun `get provider detail`() {
         `init data`()
         val response = healthcareProvidersService.getHealthcareProviderDetail(
