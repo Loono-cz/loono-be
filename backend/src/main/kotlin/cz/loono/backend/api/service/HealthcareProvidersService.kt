@@ -48,7 +48,8 @@ class HealthcareProvidersService @Autowired constructor(
         val input = URL(OPEN_DATA_URL).openStream()
         val providers = HealthcareCSVParser().parse(input)
         if (providers.isNotEmpty()) {
-            saveData(providers)
+            saveCategories()
+            saveProviders(providers)
             updateCache()
             setLastUpdate()
         } else {
@@ -64,9 +65,7 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     @Transactional(rollbackFor = [Exception::class])
-    fun saveData(providers: List<HealthcareProvider>) {
-        val categoryValues = CategoryValues.values().map { HealthcareCategory(value = it.value) }
-        healthcareCategoryRepository.saveAll(categoryValues)
+    fun saveProviders(providers: List<HealthcareProvider>) {
         val cycles = providers.size.div(1000)
         val rest = providers.size % 1000 - 1
         for (i in 0..cycles) {
@@ -77,6 +76,13 @@ class HealthcareProvidersService @Autowired constructor(
             }
             healthcareProviderRepository.saveAll(providers.subList(start, end))
         }
+    }
+
+    @Synchronized
+    @Transactional
+    fun saveCategories() {
+        val categoryValues = CategoryValues.values().map { HealthcareCategory(value = it.value) }
+        healthcareCategoryRepository.saveAll(categoryValues)
     }
 
     @Synchronized
