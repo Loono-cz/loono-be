@@ -38,7 +38,7 @@ class HealthcareProvidersService @Autowired constructor(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val providersCache = LinkedHashSet<HealthcareProvider>()
+    private var providersCache = LinkedHashSet<HealthcareProvider>()
     private var zipFile: ByteArray? = null
     var lastUpdate = ""
 
@@ -107,7 +107,6 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     fun updateCache() {
-        providersCache.clear()
         zipFile = null
         val count = healthcareProviderRepository.count().toInt()
         val providers = LinkedHashSet<HealthcareProvider>(count)
@@ -116,6 +115,7 @@ class HealthcareProvidersService @Autowired constructor(
             val page = PageRequest.of(i, 1000)
             providers.addAll(healthcareProviderRepository.findAll(page))
         }
+        providersCache = providers
         zipFile = zipProviders()
     }
 
