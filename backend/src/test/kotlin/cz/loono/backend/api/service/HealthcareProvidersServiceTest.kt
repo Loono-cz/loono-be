@@ -18,6 +18,7 @@ import java.time.LocalDate
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@Disabled
 class HealthcareProvidersServiceTest {
 
     @Autowired
