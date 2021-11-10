@@ -41,6 +41,7 @@ class HealthcareProvidersService @Autowired constructor(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private var zipFile: ByteArray? = null
+    private val batchSize = 500
     var lastUpdate = ""
 
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
@@ -66,11 +67,11 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     fun saveProviders(providers: List<HealthcareProvider>) {
-        val cycles = providers.size.div(1000)
-        val rest = providers.size % 1000 - 1
+        val cycles = providers.size.div(batchSize)
+        val rest = providers.size % batchSize - 1
         for (i in 0..cycles) {
-            val start = i * 1000
-            var end = start + 999
+            val start = i * batchSize
+            var end = start + 99
             if (i == cycles) {
                 end = start + rest
             }
