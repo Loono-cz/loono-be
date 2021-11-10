@@ -49,9 +49,8 @@ class HealthcareCSVParser {
             var toSearch = record
             while (toSearch.indexOf(COLUMN_START_QUOTE) > -1) {
                 val substr = toSearch.substring(
-                    toSearch.indexOf(COLUMN_START_QUOTE) + 1, toSearch.indexOf(
-                        COLUMN_END_QUOTE
-                    ) + 1
+                    toSearch.indexOf(COLUMN_START_QUOTE) + 1,
+                    toSearch.indexOf(COLUMN_END_QUOTE) + 1
                 )
                 var replacement = substr.substring(1, substr.length - 1)
                 replacement = replacement.replace(",", "_COMMA_")
