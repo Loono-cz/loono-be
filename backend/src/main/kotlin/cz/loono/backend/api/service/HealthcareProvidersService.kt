@@ -64,7 +64,6 @@ class HealthcareProvidersService @Autowired constructor(
     }
 
     @Synchronized
-    @Transactional(rollbackFor = [Exception::class])
     fun saveProviders(providers: List<HealthcareProvider>) {
         val cycles = providers.size.div(1000)
         val rest = providers.size % 1000 - 1
@@ -74,8 +73,14 @@ class HealthcareProvidersService @Autowired constructor(
             if (i == cycles) {
                 end = start + rest
             }
-            healthcareProviderRepository.saveAll(providers.subList(start, end))
+            saveProvidersBatch(providers.subList(start, end))
         }
+    }
+
+    @Synchronized
+    @Transactional
+    fun saveProvidersBatch(providersSublist: List<HealthcareProvider>) {
+        healthcareProviderRepository.saveAll(providersSublist)
     }
 
     @Synchronized
