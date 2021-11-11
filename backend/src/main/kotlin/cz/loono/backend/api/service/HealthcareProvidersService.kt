@@ -3,7 +3,6 @@ package cz.loono.backend.api.service
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.HealthcareProviderDetailsDto
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
-import cz.loono.backend.api.dto.HealthcareProviderListDto
 import cz.loono.backend.api.dto.SimpleHealthcareProviderDto
 import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.exception.LoonoBackendException
@@ -26,12 +25,18 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.io.ByteArrayOutputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStreamWriter
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.io.path.exists
 
 @Service
 class HealthcareProvidersService @Autowired constructor(
@@ -41,20 +46,28 @@ class HealthcareProvidersService @Autowired constructor(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private var zipFile: ByteArray? = null
+    private var providersCache = listOf<SimpleHealthcareProviderDto>()
     private val batchSize = 500
-    var lastUpdate = ""
+    private var updating = false
+    private var lastUpdate = ""
+    private var zipFilePath = Path.of("init")
 
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
     @Synchronized
     fun updateData(): UpdateStatusMessageDto {
+        updating = true
         val input = URL(OPEN_DATA_URL).openStream()
         val providers = HealthcareCSVParser().parse(input)
         if (providers.isNotEmpty()) {
-            saveCategories()
-            saveProviders(providers)
-            updateCache()
-            setLastUpdate()
+            updating = true
+            try {
+                saveCategories()
+                saveProviders(providers)
+                updateCache()
+                setLastUpdate()
+            } finally {
+                updating = false
+            }
         } else {
             throw LoonoBackendException(
                 HttpStatus.UNPROCESSABLE_ENTITY,
@@ -111,7 +124,7 @@ class HealthcareProvidersService @Autowired constructor(
     @Synchronized
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun updateCache() {
-        zipFile = null
+        providersCache = emptyList()
         val count = healthcareProviderRepository.count().toInt()
         val providers = LinkedHashSet<HealthcareProvider>(count)
         val cycles = count.div(1000)
@@ -119,22 +132,22 @@ class HealthcareProvidersService @Autowired constructor(
             val page = PageRequest.of(i, 1000)
             providers.addAll(healthcareProviderRepository.findAll(page))
         }
-        zipFile = zipProviders(providers)
+        providersCache = providers.map { it.simplify() }
+        zipProviders()
     }
 
-    private fun zipProviders(providers: LinkedHashSet<HealthcareProvider>): ByteArray {
-        val simplifyProviders = providers.map { it.simplify() }
-        val list = HealthcareProviderListDto(
-            healthcareProviders = simplifyProviders
-        )
-        val jsonString = Gson().toJson(list)
-        val byteArrayOutputStream = ByteArrayOutputStream()
+    @Synchronized
+    private fun zipProviders() {
+        if (!zipFilePath.endsWith("init") && zipFilePath.exists()) {
+            Files.delete(zipFilePath)
+        }
+        val filePath = Path.of("providers-$lastUpdate.zip")
         try {
-            ZipOutputStream(byteArrayOutputStream).use { zos ->
-                val entry = ZipEntry("providers.json")
-                zos.putNextEntry(entry)
-                zos.write(jsonString.toByteArray())
-                zos.closeEntry()
+            ZipOutputStream(BufferedOutputStream(FileOutputStream(File(filePath.toUri())))).use { zip ->
+                OutputStreamWriter(zip).use { writer ->
+                    zip.putNextEntry(ZipEntry("providers.json"))
+                    Gson().toJson(providersCache, writer)
+                }
             }
         } catch (ioe: IOException) {
             throw LoonoBackendException(
@@ -143,15 +156,18 @@ class HealthcareProvidersService @Autowired constructor(
                 errorMessage = "The file cannot be downloaded."
             )
         }
-        return byteArrayOutputStream.toByteArray()
+        zipFilePath = filePath
     }
 
-    fun getAllSimpleData(): ByteArray {
-        return zipFile ?: throw LoonoBackendException(
-            status = HttpStatus.UNPROCESSABLE_ENTITY,
-            errorCode = "422",
-            errorMessage = "The healthcare providers are still loading."
-        )
+    fun getAllSimpleData(): Path {
+        if (updating) {
+            throw throw LoonoBackendException(
+                status = HttpStatus.UNPROCESSABLE_ENTITY,
+                errorCode = "422",
+                errorMessage = "Server is updating data."
+            )
+        }
+        return zipFilePath
     }
 
     fun getHealthcareProviderDetail(healthcareProviderId: HealthcareProviderIdDto): HealthcareProviderDetailsDto {
