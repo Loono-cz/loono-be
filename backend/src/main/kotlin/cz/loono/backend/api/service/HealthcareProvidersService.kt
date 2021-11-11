@@ -24,6 +24,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -108,6 +109,7 @@ class HealthcareProvidersService @Autowired constructor(
     }
 
     @Synchronized
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun updateCache() {
         zipFile = null
         val count = healthcareProviderRepository.count().toInt()
