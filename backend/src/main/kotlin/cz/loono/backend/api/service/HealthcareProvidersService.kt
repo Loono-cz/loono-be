@@ -18,6 +18,7 @@ import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -121,20 +122,30 @@ class HealthcareProvidersService @Autowired constructor(
     }
 
     @Synchronized
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun updateCache() {
-        val count = healthcareProviderRepository.count().toInt()
-        val providers = LinkedHashSet<HealthcareProvider>(count)
-        val cycles = count.div(1000)
+        val providers = createDefaultProvidersSet()
+        val cycles = providers.size.div(500)
         for (i in 0..cycles) {
-            val page = PageRequest.of(i, 1000)
-            providers.addAll(healthcareProviderRepository.findAll(page))
+            providers.addAll(findPage(i))
         }
-        zipProviders(providers.map { it.simplify() })
+        zipProviders(providers)
     }
 
     @Synchronized
-    private fun zipProviders(providers: List<SimpleHealthcareProviderDto>) {
+    @Transactional(readOnly = true)
+    fun createDefaultProvidersSet(): LinkedHashSet<SimpleHealthcareProviderDto> {
+        val count = healthcareProviderRepository.count().toInt()
+        return LinkedHashSet(count)
+    }
+
+    @Synchronized
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+    fun findPage(page: Int): Page<SimpleHealthcareProviderDto> {
+        return healthcareProviderRepository.findAll(PageRequest.of(page, 500)).map { it.simplify() }
+    }
+
+    @Synchronized
+    private fun zipProviders(providers: LinkedHashSet<SimpleHealthcareProviderDto>) {
         if (!zipFilePath.endsWith("init") && zipFilePath.exists()) {
             Files.delete(zipFilePath)
         }
