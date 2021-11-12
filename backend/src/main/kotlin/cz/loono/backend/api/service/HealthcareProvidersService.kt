@@ -46,7 +46,6 @@ class HealthcareProvidersService @Autowired constructor(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private var providersCache = listOf<SimpleHealthcareProviderDto>()
     private val batchSize = 500
     private var updating = false
     private var lastUpdate = ""
@@ -124,7 +123,6 @@ class HealthcareProvidersService @Autowired constructor(
     @Synchronized
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun updateCache() {
-        providersCache = emptyList()
         val count = healthcareProviderRepository.count().toInt()
         val providers = LinkedHashSet<HealthcareProvider>(count)
         val cycles = count.div(1000)
@@ -132,12 +130,11 @@ class HealthcareProvidersService @Autowired constructor(
             val page = PageRequest.of(i, 1000)
             providers.addAll(healthcareProviderRepository.findAll(page))
         }
-        providersCache = providers.map { it.simplify() }
-        zipProviders()
+        zipProviders(providers.map { it.simplify() })
     }
 
     @Synchronized
-    private fun zipProviders() {
+    private fun zipProviders(providers: List<SimpleHealthcareProviderDto>) {
         if (!zipFilePath.endsWith("init") && zipFilePath.exists()) {
             Files.delete(zipFilePath)
         }
@@ -146,7 +143,7 @@ class HealthcareProvidersService @Autowired constructor(
             ZipOutputStream(BufferedOutputStream(FileOutputStream(File(filePath.toUri())))).use { zip ->
                 OutputStreamWriter(zip).use { writer ->
                     zip.putNextEntry(ZipEntry("providers.json"))
-                    Gson().toJson(providersCache, writer)
+                    Gson().toJson(providers, writer)
                 }
             }
         } catch (ioe: IOException) {
