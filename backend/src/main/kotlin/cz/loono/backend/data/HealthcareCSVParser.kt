@@ -45,13 +45,16 @@ class HealthcareCSVParser {
 
     private fun parseColumns(line: String): List<String> {
         var record = substituteQuotes(line)
-        if (record.indexOf(",\"") > -1) {
+        if (record.indexOf(COLUMN_START_QUOTE) > -1) {
             var toSearch = record
-            while (toSearch.indexOf(",\"") > -1) {
-                val substr = toSearch.substring(toSearch.indexOf(",\"") + 1, toSearch.indexOf("\",") + 1)
+            while (toSearch.indexOf(COLUMN_START_QUOTE) > -1) {
+                val substr = toSearch.substring(
+                    toSearch.indexOf(COLUMN_START_QUOTE) + 1,
+                    toSearch.indexOf(COLUMN_END_QUOTE) + 1
+                )
                 var replacement = substr.substring(1, substr.length - 1)
                 replacement = replacement.replace(",", "_COMMA_")
-                toSearch = toSearch.substring(toSearch.indexOf("\",") + 1)
+                toSearch = toSearch.substring(toSearch.indexOf(COLUMN_END_QUOTE) + 1)
                 record = record.replace(substr, replacement)
             }
         }
@@ -59,14 +62,21 @@ class HealthcareCSVParser {
     }
 
     private fun substituteQuotes(record: String): String {
-        var result = record.replace(",\"\"\"", ",\"_Q_")
-        result = result.replace("\"\"\",", "_Q_\",")
-        return result.replace("\"\"", "_Q_")
+        var result = record.replace("$COLUMN_START_QUOTE$QUOTE_CHAR", "$COLUMN_START_QUOTE$QUOTE_CHAR_SUB")
+        result = result.replace("$QUOTE_CHAR$COLUMN_END_QUOTE", "$QUOTE_CHAR_SUB$COLUMN_END_QUOTE")
+        return result.replace(QUOTE_CHAR, QUOTE_CHAR_SUB)
     }
 
     private fun verifyColumns(columns: List<String>) {
         if (Constants.healthcareProvidersCSVHeader != columns) {
             logger.warn("The structure of the file has changed.")
         }
+    }
+
+    companion object {
+        private const val QUOTE_CHAR = "\"\""
+        private const val QUOTE_CHAR_SUB = "_Q_"
+        private const val COLUMN_START_QUOTE = ",\""
+        private const val COLUMN_END_QUOTE = "\","
     }
 }
