@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "backend" {
   network_mode          = "awsvpc"
   execution_role_arn    = aws_iam_role.ecs-task-execution-role.arn
   task_role_arn         = aws_iam_role.ecs-task-execution-role.arn
-  memory                = "1024"
+  memory                = "512"
   cpu                   = "256"
 }
 
