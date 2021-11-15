@@ -1,24 +1,30 @@
 package cz.loono.backend.api.service
 
-import cz.loono.backend.api.dto.HealthcareProviderDetailsDto
+import cz.loono.backend.api.dto.HealthcareProviderDetailDto
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
-import cz.loono.backend.api.dto.UpdateStatusMessageDto
+import cz.loono.backend.api.dto.HealthcareProviderIdListDto
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.data.constants.CategoryValues
+import cz.loono.backend.db.model.HealthcareProvider
 import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import java.nio.file.Path
 import java.time.LocalDate
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.exists
+import kotlin.io.path.fileSize
+import kotlin.io.path.getLastModifiedTime
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-@Disabled
 class HealthcareProvidersServiceTest {
 
     @Autowired
@@ -32,86 +38,174 @@ class HealthcareProvidersServiceTest {
 
     private lateinit var healthcareProvidersService: HealthcareProvidersService
 
-    fun `init data`() {
+    @BeforeEach
+    fun init() {
         healthcareProvidersService =
             HealthcareProvidersService(
                 healthcareProviderRepository,
                 healthcareCategoryRepository,
                 serverPropertiesRepository
             )
+    }
 
+    @Test
+    fun `save categories`() {
+        healthcareProvidersService.saveCategories()
+
+        assert(healthcareCategoryRepository.count() == CategoryValues.values().count().toLong())
+    }
+
+    @Test
+    fun `complete save`() {
         val msg = healthcareProvidersService.updateData()
 
-        assert(msg == UpdateStatusMessageDto("Data successfully updated."))
-        assert(healthcareProviderRepository.count() > 30000)
+        assert(healthcareProviderRepository.count() < 30000)
+        assert(msg.message == "Data successfully updated.")
     }
 
     @Test
-    fun `providing zip file with providers json`() {
-//        `init data`()
+    fun `zip not initialized`() {
+        val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
 
-//        val response = String(healthcareProvidersService.getAllSimpleData())
+        healthcareProvidersService.prepareAllProviders()
 
-//        assert(response.contains("providers.json"))
-    }
-
-    @Test
-    fun `get provider detail`() {
-        `init data`()
-        val response = healthcareProvidersService.getHealthcareProviderDetail(
-            HealthcareProviderIdDto(
-                locationId = 239440,
-                institutionId = 161061
-            )
-        )
-
-        assert(
-            response == HealthcareProviderDetailsDto(
-                locationId = 239440,
-                institutionId = 161061,
-                title = "Unimedix Plus, s.r.o.",
-                institutionType = "Samostatná ordinace lékaře specialisty",
-                street = "Valovská",
-                houseNumber = "869",
-                city = "Podbořany",
-                postalCode = "44101",
-                phoneNumber = "+420415237167",
-                fax = "",
-                email = "recepce@unimedix.cz",
-                website = "",
-                ico = "01951939",
-                category = listOf("Ortopedie"),
-                specialization = "ortopedie a traumatologie pohybového ústrojí",
-                careForm = "specializovaná ambulantní péče",
-                careType = "",
-                substitute = "Filip Veselý",
-                lat = "50.225467144083",
-                lng = "13.415804369252"
-            )
-        )
-    }
-
-    @Test
-    fun `no exists provider`() {
-        `init data`()
-
-        assertThrows<LoonoBackendException> {
-            healthcareProvidersService.getHealthcareProviderDetail(
-                HealthcareProviderIdDto(
-                    locationId = 239440,
-                    institutionId = 161062
-                )
-            )
+        try {
+            assert(path.exists())
+            assert(path.fileSize() < 1000000L)
+        } finally {
+            path.deleteExisting()
         }
     }
 
     @Test
-    @Disabled
-    fun `last update`() {
-        `init data`()
-        val today = LocalDate.now()
-        val lastUpdate = "${today.year}-${today.monthValue}"
+    fun `zip all`() {
+        healthcareProvidersService.updateData()
+        val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
 
-//        assert(lastUpdate == healthcareProvidersService.lastUpdate)
+        healthcareProvidersService.prepareAllProviders()
+
+        try {
+            assert(path.exists())
+            assert(path.fileSize() < 1000000L)
+        } finally {
+            path.deleteExisting()
+        }
+    }
+
+    @Test
+    fun `zip update`() {
+        healthcareProvidersService.updateData()
+        val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
+        try {
+            healthcareProvidersService.prepareAllProviders()
+            assert(path.exists())
+            val originalCreationTime = path.getLastModifiedTime().toMillis()
+
+            healthcareProvidersService.prepareAllProviders()
+
+            assert(originalCreationTime < path.getLastModifiedTime().toMillis())
+        } finally {
+            path.deleteExisting()
+        }
+    }
+
+    @Test
+    fun `last update`() {
+        val today = LocalDate.now()
+        val lastUpdate = "${today.year}-${today.monthValue}-${today.dayOfMonth}"
+
+        healthcareProvidersService.setLastUpdate()
+
+        assert(lastUpdate == healthcareProvidersService.lastUpdate)
+        assert(serverPropertiesRepository.findAll().first().lastUpdate == LocalDate.now())
+    }
+
+    @Test
+    fun `get zipFilePath not init`() {
+        healthcareProvidersService.setLastUpdate()
+
+        val path = healthcareProvidersService.getAllSimpleData()
+
+        assert(path.fileName.toString() == "init")
+    }
+
+    @Test
+    fun `get zipFilePath`() {
+        healthcareProvidersService.setLastUpdate()
+        healthcareProvidersService.prepareAllProviders()
+
+        val path = healthcareProvidersService.getAllSimpleData()
+
+        path.deleteExisting()
+        assert(path.fileName.toString() == "providers-${healthcareProvidersService.lastUpdate}.zip")
+    }
+
+    @Test
+    fun `get details of multiple records`() {
+        healthcareProviderRepository.saveAll(
+            listOf(
+                HealthcareProvider(locationId = 1, institutionId = 1),
+                HealthcareProvider(locationId = 2, institutionId = 2),
+                HealthcareProvider(locationId = 3, institutionId = 3)
+            )
+        )
+
+        val result = healthcareProvidersService.getMultipleHealthcareProviderDetails(
+            HealthcareProviderIdListDto(
+                listOf(
+                    HealthcareProviderIdDto(locationId = 1, institutionId = 1),
+                    HealthcareProviderIdDto(locationId = 3, institutionId = 3)
+                )
+            )
+        )
+
+        assert(result.healthcareProvidersDetails!!.size == 2)
+        assert(
+            result.healthcareProvidersDetails == listOf(
+                HealthcareProviderDetailDto(
+                    locationId = 1,
+                    institutionId = 1,
+                    title = "",
+                    institutionType = "",
+                    houseNumber = "",
+                    city = "",
+                    postalCode = "",
+                    ico = "",
+                    lat = "",
+                    lng = "",
+                    category = emptyList()
+                ),
+                HealthcareProviderDetailDto(
+                    locationId = 3,
+                    institutionId = 3,
+                    title = "",
+                    institutionType = "",
+                    houseNumber = "",
+                    city = "",
+                    postalCode = "",
+                    ico = "",
+                    lat = "",
+                    lng = "",
+                    category = emptyList()
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `trying get details of a non-existing record`() {
+        healthcareProviderRepository.saveAll(
+            listOf(
+                HealthcareProvider(locationId = 1, institutionId = 1),
+                HealthcareProvider(locationId = 2, institutionId = 2),
+                HealthcareProvider(locationId = 3, institutionId = 3)
+            )
+        )
+
+        assertThrows<LoonoBackendException> {
+            healthcareProvidersService.getHealthcareProviderDetail(
+                HealthcareProviderIdDto(locationId = 4, institutionId = 4)
+            )
+        }
     }
 }

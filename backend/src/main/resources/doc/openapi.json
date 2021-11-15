@@ -441,8 +441,10 @@
         },
         "/providers/all": {
             "get": {
-                "summary": "Your GET endpoint",
-                "tags": [],
+                "summary": "Gets all healthcare providers data",
+                "tags": [
+                    "Providers"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -476,9 +478,9 @@
                 ]
             }
         },
-        "/providers/detail": {
+        "/providers/details": {
             "post": {
-                "summary": "",
+                "summary": "Gets details of given healthcare providers",
                 "operationId": "post-providers-detail",
                 "responses": {
                     "200": {
@@ -486,7 +488,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HealthcareProviderDetails"
+                                    "$ref": "#/components/schemas/HealthcareProviderDetail"
                                 }
                             }
                         }
@@ -496,24 +498,30 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/HealthcareProviderId"
+                                "$ref": "#/components/schemas/HealthcareProviderIdList"
                             }
                         }
                     },
-                    "description": "Healthcare provider ID"
+                    "description": "Healthcare provider IDs"
                 },
                 "security": [
                     {
                         "Bearer_Auth": []
                     }
                 ],
-                "description": "Returns complete detail of a healthcare provider"
-            }
+                "description": "Returns complete details of multiple healthcare providers",
+                "tags": [
+                    "Providers"
+                ]
+            },
+            "parameters": []
         },
         "/providers/update": {
             "get": {
-                "summary": "Your GET endpoint",
-                "tags": [],
+                "summary": "Trigger healthcare provider update",
+                "tags": [
+                    "Providers"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -527,6 +535,28 @@
                     }
                 },
                 "operationId": "get-providers-update"
+            }
+        },
+        "/providers/lastupdate": {
+            "get": {
+                "summary": "Gets last date of healthcare provider update",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthcareProviderLastUpdate"
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "get-providers-lastupdate",
+                "description": "Return a date of the latest update in form YYYY-MM-DD.",
+                "tags": [
+                    "Providers"
+                ]
             }
         }
     },
@@ -921,8 +951,8 @@
                     }
                 }
             },
-            "HealthcareProviderDetails": {
-                "title": "HealthcareProviderDetails",
+            "HealthcareProviderDetail": {
+                "title": "HealthcareProviderDetail",
                 "type": "object",
                 "description": "The details of a single healthcare provider record.",
                 "properties": {
@@ -1002,6 +1032,41 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/SimpleHealthcareProvider"
+                        }
+                    }
+                }
+            },
+            "HealthcareProviderLastUpdate": {
+                "title": "HealthcareProviderLastUpdate",
+                "type": "object",
+                "properties": {
+                    "lastUpdate": {
+                        "type": "string"
+                    }
+                },
+                "description": "Provides a date of the last healthcare providers update"
+            },
+            "HealthcareProviderDetailList": {
+                "title": "HealthcareProviderDetailList",
+                "type": "object",
+                "properties": {
+                    "healthcareProvidersDetails": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/HealthcareProviderDetail"
+                        }
+                    }
+                }
+            },
+            "HealthcareProviderIdList": {
+                "title": "HealthcareProviderIdList",
+                "type": "object",
+                "description": "List of healthcare providers Ids",
+                "properties": {
+                    "providersIds": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/HealthcareProviderId"
                         }
                     }
                 }

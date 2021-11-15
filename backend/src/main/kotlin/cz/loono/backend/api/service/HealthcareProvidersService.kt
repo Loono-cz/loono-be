@@ -1,8 +1,10 @@
 package cz.loono.backend.api.service
 
 import com.google.gson.Gson
-import cz.loono.backend.api.dto.HealthcareProviderDetailsDto
+import cz.loono.backend.api.dto.HealthcareProviderDetailDto
+import cz.loono.backend.api.dto.HealthcareProviderDetailListDto
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
+import cz.loono.backend.api.dto.HealthcareProviderIdListDto
 import cz.loono.backend.api.dto.SimpleHealthcareProviderDto
 import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.exception.LoonoBackendException
@@ -49,8 +51,8 @@ class HealthcareProvidersService @Autowired constructor(
 
     private val batchSize = 500
     private var updating = false
-    private var lastUpdate = ""
     private var zipFilePath = Path.of("init")
+    var lastUpdate = "not initialized"
 
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
     @Synchronized
@@ -63,8 +65,8 @@ class HealthcareProvidersService @Autowired constructor(
             try {
                 saveCategories()
                 saveProviders(providers)
-                updateCache()
                 setLastUpdate()
+                prepareAllProviders()
             } finally {
                 updating = false
             }
@@ -81,6 +83,9 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     fun saveProviders(providers: List<HealthcareProvider>) {
+        if (providers.isEmpty()) {
+            return
+        }
         val cycles = providers.size.div(batchSize)
         val rest = providers.size % batchSize - 1
         for (i in 0..cycles) {
@@ -111,7 +116,7 @@ class HealthcareProvidersService @Autowired constructor(
     fun setLastUpdate() {
         val serverProperties = serverPropertiesRepository.findAll()
         val updateDate = LocalDate.now()
-        lastUpdate = "${updateDate.year}-${updateDate.monthValue}"
+        lastUpdate = "${updateDate.year}-${updateDate.monthValue}-${updateDate.dayOfMonth}"
         if (serverProperties.isEmpty()) {
             serverPropertiesRepository.save(ServerProperties())
             return
@@ -122,11 +127,13 @@ class HealthcareProvidersService @Autowired constructor(
     }
 
     @Synchronized
-    fun updateCache() {
+    fun prepareAllProviders() {
         val providers = createDefaultProvidersSet()
-        val cycles = providers.size.div(500)
-        for (i in 0..cycles) {
-            providers.addAll(findPage(i))
+        if (providers.isNotEmpty()) {
+            val cycles = providers.size.div(batchSize)
+            for (i in 0..cycles) {
+                providers.addAll(findPage(i))
+            }
         }
         zipProviders(providers)
     }
@@ -141,7 +148,7 @@ class HealthcareProvidersService @Autowired constructor(
     @Synchronized
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun findPage(page: Int): Page<SimpleHealthcareProviderDto> {
-        return healthcareProviderRepository.findAll(PageRequest.of(page, 500)).map { it.simplify() }
+        return healthcareProviderRepository.findAll(PageRequest.of(page, batchSize)).map { it.simplify() }
     }
 
     @Synchronized
@@ -178,7 +185,8 @@ class HealthcareProvidersService @Autowired constructor(
         return zipFilePath
     }
 
-    fun getHealthcareProviderDetail(healthcareProviderId: HealthcareProviderIdDto): HealthcareProviderDetailsDto {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+    fun getHealthcareProviderDetail(healthcareProviderId: HealthcareProviderIdDto): HealthcareProviderDetailDto {
         val provider = healthcareProviderRepository.findByIdOrNull(
             HealthcareProviderId(
                 locationId = healthcareProviderId.locationId,
@@ -189,6 +197,14 @@ class HealthcareProvidersService @Autowired constructor(
             status = HttpStatus.NOT_FOUND,
             errorCode = "404",
             errorMessage = "The healthcare provider with this ID not found."
+        )
+    }
+
+    fun getMultipleHealthcareProviderDetails(providerIdsList: HealthcareProviderIdListDto): HealthcareProviderDetailListDto {
+        return HealthcareProviderDetailListDto(
+            healthcareProvidersDetails = providerIdsList.providersIds?.map {
+                getHealthcareProviderDetail(it)
+            }
         )
     }
 
@@ -208,8 +224,8 @@ class HealthcareProvidersService @Autowired constructor(
         )
     }
 
-    fun HealthcareProvider.getDetails(): HealthcareProviderDetailsDto {
-        return HealthcareProviderDetailsDto(
+    fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto {
+        return HealthcareProviderDetailDto(
             locationId = locationId,
             institutionId = institutionId,
             title = title,

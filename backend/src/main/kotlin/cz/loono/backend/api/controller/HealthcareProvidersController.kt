@@ -1,7 +1,8 @@
 package cz.loono.backend.api.controller
 
-import cz.loono.backend.api.dto.HealthcareProviderDetailsDto
-import cz.loono.backend.api.dto.HealthcareProviderIdDto
+import cz.loono.backend.api.dto.HealthcareProviderDetailListDto
+import cz.loono.backend.api.dto.HealthcareProviderIdListDto
+import cz.loono.backend.api.dto.HealthcareProviderLastUpdateDto
 import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.service.HealthcareProvidersService
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,6 +23,13 @@ class HealthcareProvidersController {
     @Autowired
     private lateinit var healthCareProvidersService: HealthcareProvidersService
 
+    @GetMapping(value = ["$DOCTORS_PATH/lastupdate"])
+    fun lastUpdate(): HealthcareProviderLastUpdateDto {
+        return HealthcareProviderLastUpdateDto(
+            lastUpdate = healthCareProvidersService.lastUpdate
+        )
+    }
+
     @GetMapping(value = ["$DOCTORS_PATH/update"])
     fun updateData(): UpdateStatusMessageDto {
         return healthCareProvidersService.updateData()
@@ -37,13 +45,13 @@ class HealthcareProvidersController {
         return FileSystemResource(path)
     }
 
-    @PostMapping(value = ["$DOCTORS_PATH/detail"])
+    @PostMapping(value = ["$DOCTORS_PATH/details"])
     fun getDetail(
         @RequestBody
         @Valid
-        healthcareProviderIdDto: HealthcareProviderIdDto
-    ): HealthcareProviderDetailsDto {
-        return healthCareProvidersService.getHealthcareProviderDetail(healthcareProviderIdDto)
+        providerIdListDto: HealthcareProviderIdListDto
+    ): HealthcareProviderDetailListDto {
+        return healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
     }
 
     companion object {
