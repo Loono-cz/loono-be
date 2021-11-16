@@ -2,7 +2,13 @@ name: Master branch CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ development ]
+    paths-ignore:
+      - '.github/**'
+      - '.gitignore'
+      - 'README.md'
+  pull_request:
+    branches: [ development ]
     paths-ignore:
       - '.github/**'
       - '.gitignore'
