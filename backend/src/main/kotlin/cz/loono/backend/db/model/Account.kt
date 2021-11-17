@@ -65,6 +65,9 @@ data class Settings(
 
     @Column(nullable = false)
     val newsletterOptIn: Boolean = false,
+
+    @Column(columnDefinition = "TEXT")
+    val profileImageUrl: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -73,14 +76,15 @@ data class Settings(
 
         return leaderboardAnonymizationOptIn == other.leaderboardAnonymizationOptIn &&
             appointmentReminderEmailsOptIn == other.appointmentReminderEmailsOptIn &&
-            newsletterOptIn == other.newsletterOptIn
+            newsletterOptIn == other.newsletterOptIn &&
+            profileImageUrl == other.profileImageUrl
     }
 
     override fun hashCode(): Int =
-        Objects.hash(leaderboardAnonymizationOptIn, appointmentReminderEmailsOptIn, newsletterOptIn)
+        Objects.hash(leaderboardAnonymizationOptIn, appointmentReminderEmailsOptIn, newsletterOptIn, profileImageUrl)
 
     override fun toString(): String {
-        return this::class.simpleName + "(leaderboardAnonymizationOptIn = $leaderboardAnonymizationOptIn , appointmentReminderEmailsOptIn = $appointmentReminderEmailsOptIn , newsletterOptIn = $newsletterOptIn )" // ktlint-disable max-line-length
+        return this::class.simpleName + "(leaderboardAnonymizationOptIn = $leaderboardAnonymizationOptIn , appointmentReminderEmailsOptIn = $appointmentReminderEmailsOptIn , newsletterOptIn = $newsletterOptIn , profileImageUrl = $profileImageUrl )" // ktlint-disable max-line-length
     }
 }
 

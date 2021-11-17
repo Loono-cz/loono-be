@@ -81,6 +81,7 @@ class AccountController @Autowired constructor(
             leaderboardAnonymizationOptIn = settings.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = settings.appointmentReminderEmailsOptIn,
             newsletterOptIn = settings.newsletterOptIn,
+            profileImageUrl = settings.profileImageUrl
         )
         val updatedAccount = accountService.updateSettings(basicUser.uid, domainSettings)
 
@@ -93,6 +94,7 @@ class AccountController @Autowired constructor(
             leaderboardAnonymizationOptIn = account.settings.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = account.settings.appointmentReminderEmailsOptIn,
             newsletterOptIn = account.settings.newsletterOptIn,
+            profileImageUrl = account.settings.profileImageUrl
         )
         return AccountDto(user = userDto, settings = settingsDto, points = account.points)
     }
@@ -105,7 +107,7 @@ class AccountController @Autowired constructor(
             sex = aux.sex?.let(SexDto::valueOf),
             birthdateMonth = aux.birthdate?.monthValue,
             birthdateYear = aux.birthdate?.year,
-            preferredEmail = aux.preferredEmail,
+            preferredEmail = aux.preferredEmail
         )
     }
 }

@@ -918,6 +918,9 @@
                     "newsletterOptIn": {
                         "type": "boolean",
                         "default": false
+                    },
+                    "profileImageUrl": {
+                        "type": "string"
                     }
                 },
                 "required": [
