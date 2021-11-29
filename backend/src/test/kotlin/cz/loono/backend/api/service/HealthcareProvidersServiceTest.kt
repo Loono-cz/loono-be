@@ -59,7 +59,7 @@ class HealthcareProvidersServiceTest {
     fun `complete save`() {
         val msg = healthcareProvidersService.updateData()
 
-        assert(healthcareProviderRepository.count() < 30000)
+        assert(healthcareProviderRepository.count() > 30000)
         assert(msg.message == "Data successfully updated.")
     }
 
@@ -159,7 +159,7 @@ class HealthcareProvidersServiceTest {
             )
         )
 
-        assert(result.healthcareProvidersDetails!!.size == 2)
+        assert(result.healthcareProvidersDetails.size == 2)
         assert(
             result.healthcareProvidersDetails == listOf(
                 HealthcareProviderDetailDto(
@@ -171,8 +171,8 @@ class HealthcareProvidersServiceTest {
                     city = "",
                     postalCode = "",
                     ico = "",
-                    lat = "",
-                    lng = "",
+                    lat = null,
+                    lng = null,
                     category = emptyList()
                 ),
                 HealthcareProviderDetailDto(
@@ -184,8 +184,8 @@ class HealthcareProvidersServiceTest {
                     city = "",
                     postalCode = "",
                     ico = "",
-                    lat = "",
-                    lng = "",
+                    lat = null,
+                    lng = null,
                     category = emptyList()
                 )
             )

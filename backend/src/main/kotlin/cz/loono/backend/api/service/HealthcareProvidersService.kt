@@ -90,7 +90,7 @@ class HealthcareProvidersService @Autowired constructor(
         val rest = providers.size % batchSize - 1
         for (i in 0..cycles) {
             val start = i * batchSize
-            var end = start + 99
+            var end = start + 499
             if (i == cycles) {
                 end = start + rest
             }

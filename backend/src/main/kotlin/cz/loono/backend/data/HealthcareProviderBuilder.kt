@@ -56,8 +56,8 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
             careForm = getColumnValue("FormaPece", columns),
             careType = getColumnValue("DruhPece", columns),
             substitute = getColumnValue("OdbornyZastupce", columns),
-            lat = getColumnValue("Lat", columns),
-            lng = getColumnValue("Lng", columns),
+            lat = getColumnValue("Lat", columns).toDoubleOrNull(),
+            lng = getColumnValue("Lng", columns).toDoubleOrNull(),
             category = categories
         )
     }

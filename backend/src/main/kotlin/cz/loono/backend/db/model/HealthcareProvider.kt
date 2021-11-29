@@ -136,11 +136,11 @@ data class HealthcareProvider(
     @Column(columnDefinition = "TEXT")
     val substitute: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    val lat: String = "",
+    @Column
+    val lat: Double? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    val lng: String = ""
+    @Column
+    val lng: Double? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

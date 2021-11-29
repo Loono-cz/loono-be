@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 @Service
 class PreventionService(
@@ -36,11 +36,12 @@ class PreventionService(
             Patient(age, SexDto.valueOf(sex))
         )
 
-        val examinationTypesToRecords: Map<String, List<ExaminationRecord>> = examinationRecordRepository.findAllByAccount(account)
-            .filter { it.lastVisit != null }
-            .groupBy { it.type }
-            .mapNotNull { entry -> entry.key to entry.value }
-            .toMap()
+        val examinationTypesToRecords: Map<String, List<ExaminationRecord>> =
+            examinationRecordRepository.findAllByAccount(account)
+                .filter { it.lastVisit != null }
+                .groupBy { it.type }
+                .mapNotNull { entry -> entry.key to entry.value }
+                .toMap()
 
         return examinationRequests.map { examinationInterval ->
             val examsOfType = examinationTypesToRecords[examinationInterval.examinationType.name]

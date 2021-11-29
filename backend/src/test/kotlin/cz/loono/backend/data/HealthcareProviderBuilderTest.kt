@@ -76,8 +76,8 @@ class HealthcareProviderBuilderTest {
                 careForm = "ambulantní péče",
                 careType = "careType",
                 substitute = "sub",
-                lat = "49.053069339386",
-                lng = "13.986452702303",
+                lat = 49.053069339386,
+                lng = 13.986452702303,
             )
         )
     }

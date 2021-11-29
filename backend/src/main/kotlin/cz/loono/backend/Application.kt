@@ -33,7 +33,11 @@ class Config(
         "/v3/api-docs",
         "/actuator/health",
         "/error",
-        "/providers/update"
+        "/providers/update",
+        // Temporary Auth disabled for endpoints bellow
+        "/providers/all",
+        "/providers/details",
+        "/providers/lastupdate"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {

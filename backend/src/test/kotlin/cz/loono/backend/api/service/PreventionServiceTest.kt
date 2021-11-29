@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 class PreventionServiceTest {
 
@@ -35,8 +35,14 @@ class PreventionServiceTest {
         whenever(examinationRecordRepository.findAllByAccount(account)).thenReturn(
             setOf(
                 ExaminationRecord(lastVisit = lastVisit, type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER.name),
-                ExaminationRecord(lastVisit = null, type = ExaminationTypeEnumDto.OPHTHALMOLOGIST.name), // is only planned
-                ExaminationRecord(lastVisit = lastVisit, type = ExaminationTypeEnumDto.COLONOSCOPY.name) // is not required
+                ExaminationRecord(
+                    lastVisit = null,
+                    type = ExaminationTypeEnumDto.OPHTHALMOLOGIST.name
+                ), // is only planned
+                ExaminationRecord(
+                    lastVisit = lastVisit,
+                    type = ExaminationTypeEnumDto.COLONOSCOPY.name
+                ) // is not required
             )
         )
 
