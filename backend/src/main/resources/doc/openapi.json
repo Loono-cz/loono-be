@@ -449,21 +449,10 @@
                     "200": {
                         "description": "OK",
                         "content": {
-                            "application/json": {
+                            "application/zip": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HealthcareProviderList"
-                                }
-                            },
-                            "application/octet-stream": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {}
-                                }
-                            },
-                            "application/xml": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {}
+                                    "type": "string",
+                                    "format": "binary"
                                 }
                             }
                         }
