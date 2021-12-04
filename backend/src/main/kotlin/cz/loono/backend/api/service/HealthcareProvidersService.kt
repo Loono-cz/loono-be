@@ -129,11 +129,9 @@ class HealthcareProvidersService @Autowired constructor(
     @Synchronized
     fun prepareAllProviders() {
         val providers = createDefaultProvidersSet()
-        if (providers.isNotEmpty()) {
-            val cycles = providers.size.div(batchSize)
-            for (i in 0..cycles) {
-                providers.addAll(findPage(i))
-            }
+        val cycles = providers.size.div(batchSize)
+        for (i in 0..cycles) {
+            providers.addAll(findPage(i))
         }
         zipProviders(providers)
     }
@@ -202,7 +200,7 @@ class HealthcareProvidersService @Autowired constructor(
 
     fun getMultipleHealthcareProviderDetails(providerIdsList: HealthcareProviderIdListDto): HealthcareProviderDetailListDto {
         return HealthcareProviderDetailListDto(
-            healthcareProvidersDetails = providerIdsList.providersIds?.map {
+            healthcareProvidersDetails = providerIdsList.providersIds.map {
                 getHealthcareProviderDetail(it)
             }
         )
