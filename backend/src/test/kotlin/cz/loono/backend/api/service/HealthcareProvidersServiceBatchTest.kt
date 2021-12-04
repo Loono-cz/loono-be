@@ -9,7 +9,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.springframework.data.domain.Pageable
 
 class HealthcareProvidersServiceBatchTest {
 
@@ -58,19 +57,6 @@ class HealthcareProvidersServiceBatchTest {
         healthcareProvidersService.saveProviders(list)
 
         verify(healthcareProviderRepository, times(80)).saveAll(any<List<HealthcareProvider>>())
-    }
-
-    @Test
-    fun `pagination on empty DB`() {
-        val healthcareProvidersService = HealthcareProvidersService(
-            healthcareProviderRepository,
-            healthcareCategoryRepository,
-            serverPropertiesRepository
-        )
-
-        healthcareProvidersService.prepareAllProviders()
-
-        verify(healthcareProviderRepository, times(0)).findAll(any<Pageable>())
     }
 
     private fun generateProviderList(size: Int): ArrayList<HealthcareProvider> {
