@@ -10,6 +10,7 @@ import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +56,9 @@ class HealthcareProvidersServiceTest {
         assert(healthcareCategoryRepository.count() == CategoryValues.values().count().toLong())
     }
 
+    // Working but long test
     @Test
+    @Disabled
     fun `complete save`() {
         val msg = healthcareProvidersService.updateData()
 
@@ -112,11 +115,10 @@ class HealthcareProvidersServiceTest {
     @Test
     fun `last update`() {
         val today = LocalDate.now()
-        val lastUpdate = "${today.year}-${today.monthValue}-${today.dayOfMonth}"
 
         healthcareProvidersService.setLastUpdate()
 
-        assert(lastUpdate == healthcareProvidersService.lastUpdate)
+        assert(today == healthcareProvidersService.lastUpdate)
         assert(serverPropertiesRepository.findAll().first().lastUpdate == LocalDate.now())
     }
 
@@ -144,9 +146,9 @@ class HealthcareProvidersServiceTest {
     fun `get details of multiple records`() {
         healthcareProviderRepository.saveAll(
             listOf(
-                HealthcareProvider(locationId = 1, institutionId = 1),
-                HealthcareProvider(locationId = 2, institutionId = 2),
-                HealthcareProvider(locationId = 3, institutionId = 3)
+                HealthcareProvider(locationId = 1, institutionId = 1, lat = 0.0, lng = 0.0),
+                HealthcareProvider(locationId = 2, institutionId = 2, lat = 0.0, lng = 0.0),
+                HealthcareProvider(locationId = 3, institutionId = 3, lat = 0.0, lng = 0.0)
             )
         )
 
@@ -171,8 +173,8 @@ class HealthcareProvidersServiceTest {
                     city = "",
                     postalCode = "",
                     ico = "",
-                    lat = null,
-                    lng = null,
+                    lat = 0.0,
+                    lng = 0.0,
                     category = emptyList()
                 ),
                 HealthcareProviderDetailDto(
@@ -184,8 +186,8 @@ class HealthcareProvidersServiceTest {
                     city = "",
                     postalCode = "",
                     ico = "",
-                    lat = null,
-                    lng = null,
+                    lat = 0.0,
+                    lng = 0.0,
                     category = emptyList()
                 )
             )

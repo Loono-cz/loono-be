@@ -898,7 +898,9 @@
                     "city",
                     "postalCode",
                     "houseNumber",
-                    "category"
+                    "category",
+                    "lat",
+                    "lng"
                 ]
             },
             "Settings": {
@@ -1043,7 +1045,9 @@
                     "city",
                     "postalCode",
                     "ico",
-                    "category"
+                    "category",
+                    "lat",
+                    "lng"
                 ]
             },
             "HealthcareProviderList": {
@@ -1068,7 +1072,8 @@
                 "description": "Provides a date of the last healthcare providers update",
                 "properties": {
                     "lastUpdate": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "date"
                     }
                 },
                 "required": [

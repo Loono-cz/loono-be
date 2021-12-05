@@ -20,7 +20,6 @@ import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -52,7 +51,7 @@ class HealthcareProvidersService @Autowired constructor(
     private val batchSize = 500
     private var updating = false
     private var zipFilePath = Path.of("init")
-    var lastUpdate = "not initialized"
+    var lastUpdate = LocalDate.MIN!!
 
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
     @Synchronized
@@ -115,14 +114,13 @@ class HealthcareProvidersService @Autowired constructor(
     @Transactional(rollbackFor = [Exception::class])
     fun setLastUpdate() {
         val serverProperties = serverPropertiesRepository.findAll()
-        val updateDate = LocalDate.now()
-        lastUpdate = "${updateDate.year}-${updateDate.monthValue}-${updateDate.dayOfMonth}"
+        lastUpdate = LocalDate.now()
         if (serverProperties.isEmpty()) {
             serverPropertiesRepository.save(ServerProperties())
             return
         }
         val firstProperties = serverProperties.first()
-        firstProperties.lastUpdate = updateDate
+        firstProperties.lastUpdate = lastUpdate
         serverPropertiesRepository.save(firstProperties)
     }
 
@@ -145,8 +143,10 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-    fun findPage(page: Int): Page<SimpleHealthcareProviderDto> {
-        return healthcareProviderRepository.findAll(PageRequest.of(page, batchSize)).map { it.simplify() }
+    fun findPage(page: Int): List<SimpleHealthcareProviderDto> {
+        return healthcareProviderRepository.findAll(PageRequest.of(page, batchSize))
+            .filter { it.lat != null && it.lng != null }.toSet()
+            .map { it.simplify() }
     }
 
     @Synchronized
@@ -217,8 +217,8 @@ class HealthcareProvidersService @Autowired constructor(
             postalCode = postalCode,
             category = category.map { it.value },
             specialization = specialization,
-            lat = lat,
-            lng = lng
+            lat = lat!!,
+            lng = lng!!
         )
     }
 
@@ -242,8 +242,8 @@ class HealthcareProvidersService @Autowired constructor(
             careForm = careForm,
             careType = careType,
             substitute = substitute,
-            lat = lat,
-            lng = lng
+            lat = lat!!,
+            lng = lng!!
         )
     }
 }
