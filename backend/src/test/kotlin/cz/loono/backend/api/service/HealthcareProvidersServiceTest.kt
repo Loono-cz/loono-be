@@ -86,7 +86,7 @@ class HealthcareProvidersServiceTest {
 
         try {
             assert(path.exists())
-            assert(path.fileSize() < 1000000L)
+            assert(path.fileSize() > 1000000L)
         } finally {
             path.deleteExisting()
         }
