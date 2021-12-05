@@ -128,8 +128,9 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     fun prepareAllProviders() {
-        val providers = createDefaultProvidersSet()
-        val cycles = providers.size.div(batchSize)
+        val count = storedProvidersCount()
+        val providers = LinkedHashSet<SimpleHealthcareProviderDto>(count)
+        val cycles = count.div(batchSize)
         for (i in 0..cycles) {
             providers.addAll(findPage(i))
         }
@@ -138,9 +139,8 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     @Transactional(readOnly = true)
-    fun createDefaultProvidersSet(): LinkedHashSet<SimpleHealthcareProviderDto> {
-        val count = healthcareProviderRepository.count().toInt()
-        return LinkedHashSet(count)
+    fun storedProvidersCount(): Int {
+        return healthcareProviderRepository.count().toInt()
     }
 
     @Synchronized

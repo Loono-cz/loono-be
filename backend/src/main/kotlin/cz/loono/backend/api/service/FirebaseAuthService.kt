@@ -26,7 +26,7 @@ class FirebaseAuthService : JwtAuthService {
         val decodedToken: FirebaseToken = try {
             FirebaseAuth.getInstance().verifyIdToken(jwt)
         } catch (e: FirebaseAuthException) {
-            logger.warn("Firebase verification failed: ${e.authErrorCode.name}")
+            logger.warn("Firebase verification failed: ${e.authErrorCode.name}", e)
             return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
         }
 
