@@ -200,9 +200,13 @@ class HealthcareProvidersService @Autowired constructor(
 
     fun getMultipleHealthcareProviderDetails(providerIdsList: HealthcareProviderIdListDto): HealthcareProviderDetailListDto {
         return HealthcareProviderDetailListDto(
-            healthcareProvidersDetails = providerIdsList.providersIds.map {
+            healthcareProvidersDetails = providerIdsList.providersIds?.map {
                 getHealthcareProviderDetail(it)
-            }
+            } ?: throw LoonoBackendException(
+                status = HttpStatus.UNPROCESSABLE_ENTITY,
+                errorCode = "422",
+                errorMessage = "Incorrect request."
+            )
         )
     }
 

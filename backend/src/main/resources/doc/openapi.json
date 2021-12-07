@@ -1106,10 +1106,7 @@
                             "$ref": "#/components/schemas/HealthcareProviderId"
                         }
                     }
-                },
-                "required": [
-                    "providersIds"
-                ]
+                }
             }
         },
         "securitySchemes": {
