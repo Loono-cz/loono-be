@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 /*
@@ -56,9 +57,16 @@ class GlobalErrorControllerAdvice : ResponseEntityExceptionHandler() {
         status: HttpStatus,
         request: WebRequest
     ): ResponseEntity<Any> {
-        errorLogger.error("handleExceptionInternal: " + ex.message, ex)
-        val response = ErrorDto(code = null, message = null)
-
+        var response = ErrorDto(code = null, message = null)
+        when (ex) {
+            is NoHandlerFoundException -> {
+                errorLogger.error("handleExceptionInternal: " + ex.message)
+                response = ErrorDto(code = "404", message = "Not found.")
+            }
+            else -> {
+                errorLogger.error("handleExceptionInternal: " + ex.message, ex)
+            }
+        }
         return super.handleExceptionInternal(ex, response, headers, status, request)
     }
 }
