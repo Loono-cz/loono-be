@@ -1,11 +1,13 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Settings
 import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,6 +21,18 @@ class AccountService @Autowired constructor(
     fun ensureAccountExists(uid: String) {
         if (!accountRepository.existsByUid(uid)) {
             accountRepository.save(Account(uid = uid))
+        }
+    }
+
+    @Transactional(rollbackFor = [Exception::class])
+    fun deleteAccount(uid: String) {
+        val deletedCount = accountRepository.deleteAccountByUid(uid)
+        if (deletedCount == 0L) {
+            throw LoonoBackendException(
+                status = HttpStatus.NOT_FOUND,
+                errorCode = "404",
+                errorMessage = "The account not found."
+            )
         }
     }
 

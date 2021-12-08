@@ -49,7 +49,7 @@
                 "description": "GET the account information of the current user.",
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Account successfully Deleted. Returns an empty response.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -95,6 +95,33 @@
                     }
                 ],
                 "parameters": []
+            },
+            "delete": {
+                "summary": "Delete account",
+                "operationId": "delete-account",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "description": "Deletes the user account and all associated data. This action is irreversible.\n\n\nIf it is necessary to keep certain pieces of information, for instance to comply with legal requirements, that data is anonymized to the maximum possible extent.\n\nSpecific error codes:\n\n|HTTP Status| code |description|\n|--- |--- | --- |\n|403|RECENT_LOGIN_REQUIRED| User must reauthenticate. Equivalent to the [FirebaseAuthRecentLoginRequiredException](https://firebase.google.com/docs/reference/android/com/google/firebase/auth/FirebaseAuthRecentLoginRequiredException)(Android) |",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "tags": [
+                    "Account"
+                ]
             }
         },
         "/leaderboard": {
@@ -116,16 +143,6 @@
                     },
                     "401": {
                         "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Error Response",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -236,64 +253,6 @@
                 "tags": [
                     "Account"
                 ]
-            }
-        },
-        "/account/delete": {
-            "post": {
-                "summary": "[Draft] Delete Account",
-                "operationId": "deleteAccount",
-                "responses": {
-                    "200": {
-                        "description": "Account successfully Deleted. Returns an empty JSON object.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden, likely needs a more recent recent login",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Account"
-                ],
-                "security": [
-                    {
-                        "Bearer_Auth": []
-                    }
-                ],
-                "description": "Deletes the user account and all associated data. This action is irreversible.\n\n\nIf it is necessary to keep certain pieces of information, for instance to comply with legal requirements, that data is anonymized to the maximum possible extent.\n\nSpecific error codes:\n\n|HTTP Status| code |description|\n|--- |--- | --- |\n|403|RECENT_LOGIN_REQUIRED| User must reauthenticate. Equivalent to the [FirebaseAuthRecentLoginRequiredException](https://firebase.google.com/docs/reference/android/com/google/firebase/auth/FirebaseAuthRecentLoginRequiredException)(Android) |",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {}
-                            }
-                        }
-                    },
-                    "description": "Empty object"
-                }
             }
         },
         "/examinations": {
@@ -447,7 +406,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Returns a zip file with providers.json.",
                         "content": {
                             "application/zip": {
                                 "schema": {
@@ -456,6 +415,15 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity: Server is updating data or the file cannot be downloaded."
                     }
                 },
                 "operationId": "get-providers-all",
@@ -481,6 +449,18 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Provider Not Found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity: Incorrect request"
                     }
                 },
                 "requestBody": {
@@ -521,9 +501,23 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity: update failed"
                     }
                 },
-                "operationId": "get-providers-update"
+                "operationId": "get-providers-update",
+                "security": [
+                    {
+                        "Basic_Auth": []
+                    }
+                ]
             }
         },
         "/providers/lastupdate": {
@@ -539,6 +533,12 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 },
                 "operationId": "get-providers-lastupdate",
@@ -1114,6 +1114,10 @@
                 "type": "http",
                 "scheme": "bearer",
                 "bearerFormat": "JWT"
+            },
+            "Basic_Auth": {
+                "type": "http",
+                "scheme": "basic"
             }
         }
     }

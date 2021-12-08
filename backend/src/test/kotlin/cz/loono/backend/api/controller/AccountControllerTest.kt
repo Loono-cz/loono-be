@@ -79,6 +79,35 @@ internal class AccountControllerTest {
     }
 
     @Test
+    fun `delete non-existing account`() {
+        // Arrange
+        val service = AccountService(repo)
+        val controller = AccountController(service, repo)
+
+        // Act
+        assertThrows<LoonoBackendException> {
+            controller.deleteAccount(createBasicUser())
+        }
+    }
+
+    @Test
+    fun `delete existing account`() {
+        // Arrange
+        val service = AccountService(repo)
+        val controller = AccountController(service, repo)
+        val basicUser = createBasicUser()
+        val existingAccount = createAccount()
+        repo.save(existingAccount)
+
+        // Act
+        controller.deleteAccount(basicUser)
+
+        // Assert
+        assert(repo.findByUid(basicUser.uid) == null)
+        assert(repo.count() == 0L)
+    }
+
+    @Test
     fun `updateSettings with existing account`() {
         // Arrange
         val service = AccountService(repo)

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestAttribute
@@ -50,6 +51,14 @@ class AccountController @Autowired constructor(
         }
 
         return assembleAccountDto(basicUser, account)
+    }
+
+    @DeleteMapping
+    fun deleteAccount(
+        @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser
+    ) {
+        accountService.deleteAccount(basicUser.uid)
     }
 
     @PostMapping("/user/update")

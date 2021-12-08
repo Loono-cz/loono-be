@@ -46,6 +46,6 @@ internal class GlobalErrorControllerAdviceTest {
 
         assertNotNull(response)
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response!!.statusCode)
-        assertEquals(ErrorDto(code = null, message = null), response.body)
+        assertEquals(ErrorDto(code = "404", message = "Not found."), response.body)
     }
 }

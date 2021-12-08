@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
@@ -59,8 +60,8 @@ class GlobalErrorControllerAdvice : ResponseEntityExceptionHandler() {
     ): ResponseEntity<Any> {
         var response = ErrorDto(code = null, message = null)
         when (ex) {
-            is NoHandlerFoundException -> {
-                errorLogger.error("handleExceptionInternal: " + ex.message)
+            is NoHandlerFoundException, is HttpRequestMethodNotSupportedException -> {
+                errorLogger.warn("handleExceptionInternal: " + ex.message)
                 response = ErrorDto(code = "404", message = "Not found.")
             }
             else -> {
