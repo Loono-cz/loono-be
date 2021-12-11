@@ -31,3 +31,7 @@ variable "certificate-arn" {
 variable "google-app-credentials" {
   type = string
 }
+
+variable "onesignal-api-key" {
+  type = string
+}
