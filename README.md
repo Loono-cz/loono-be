@@ -11,7 +11,7 @@ The application provides REST API and a Swagger / Open API documentation.
 <ul>
 <li>System environment variables</li>
 <li>PostgreSQL database (version 12.5 or later)</li>
-<li>JDK 11+</li>
+<li>JDK 17</li>
 <li>IDE with git and gradle (or installed separately)</li>
 <li>Service account credentials to the Firebase</li>
 </ul>
@@ -25,7 +25,7 @@ More information <a href="https://firebase.google.com/docs/admin/setup#initializ
 <li>POSTGRE_URL: host:port/db (i.e. localhost:5432/loono</li>
 <li>POSTGRE_USER: database owner</li>
 <li>POSTGRE_PWD: database password</li>
-<li>GOOGLE_APPLICATION_CREDENTIALS: path to the file with service account credentials to the Firebase</li>
+<li>GOOGLE_APPLICATION_CREDENTIALS: a content of the file with service account credentials to the Firebase</li>
 </ul>
 <h3>Gradle plugins and tasks</h3>
 <h4>Building bootable Jar file</h4>
@@ -70,7 +70,5 @@ Activated only default and database checks. We can enable more if needed.
 </ul>
 <h2>API documentation</h2>
 <ul>
-<li>Swagger documentation on <i>/v2/api-docs</i></li>
 <li>OpenAPI documentation on <i>/v3/api-docs</i></li>
-<li>Swagger UI on <i>/swagger-ui/</i></li>
 </ul>
