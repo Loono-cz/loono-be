@@ -1,17 +1,17 @@
 plugins {
-    id("org.springframework.boot") version "2.5.5"
+    id("org.springframework.boot") version "2.5.7"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    id("org.openapi.generator") version "5.2.1"
+    id("org.openapi.generator") version "5.3.0"
     id("de.undercouch.download") version "4.1.2"
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.spring") version "1.6.10"
     jacoco
 }
 
 group = "cz.loono"
 version = "1.0-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -29,10 +29,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.google.firebase:firebase-admin:8.1.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
     implementation("org.slf4j:slf4j-api:1.7.32")
-    implementation("ch.qos.logback:logback-classic:1.2.6")
-    implementation("ch.qos.logback:logback-core:1.2.6")
+    implementation("ch.qos.logback:logback-classic:1.2.9")
+    implementation("ch.qos.logback:logback-core:1.2.9")
 
     runtimeOnly("org.postgresql:postgresql")
 
@@ -40,7 +41,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 }
 
 val artifactFinalName = "loono-be.jar"
@@ -52,12 +53,13 @@ tasks.bootJar {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    maxHeapSize = "1024m"
 }
 
 tasks.jacocoTestReport {
