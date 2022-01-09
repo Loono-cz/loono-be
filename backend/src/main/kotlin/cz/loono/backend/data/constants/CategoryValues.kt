@@ -182,8 +182,6 @@ enum class CategoryValues(val value: String) {
     // LDN - medicína dlouhodobé péče
     LDN("LDN"),
 
-    COLOPROCTOLOGY("koloproktologie"),
-
     // Nezařazovat:
     // Behaviorální analytik
     BEHAVIORAL_ANALYST("Behaviorální analytik"),

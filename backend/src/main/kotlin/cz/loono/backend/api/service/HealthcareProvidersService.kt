@@ -53,6 +53,38 @@ class HealthcareProvidersService @Autowired constructor(
     private var zipFilePath = Path.of("init")
     var lastUpdate = LocalDate.MIN!!
 
+    private val removedCategories = listOf(
+        CategoryValues.PHARMACOLOGY.value,
+        CategoryValues.NURSE.value,
+        CategoryValues.ANESTHESIOLOGY_ARO.value,
+        CategoryValues.RADIOLOGY.value,
+        CategoryValues.SPEECH_THERAPY.value,
+        CategoryValues.BIOCHEMISTRY.value,
+        CategoryValues.PALLIATIVE_MEDICINE.value,
+        CategoryValues.MEDICAL_LABORATORY_TECHNICIAN.value,
+        CategoryValues.ONCOLOGY.value,
+        CategoryValues.MICROBIOLOGY.value,
+        CategoryValues.PHONIATRICS.value,
+        CategoryValues.GERIATRICS.value,
+        CategoryValues.GENETICS.value,
+        CategoryValues.PATHOLOGY.value,
+        CategoryValues.OCCUPATIONAL_MEDICINE.value,
+        CategoryValues.HYGIENE.value,
+        CategoryValues.NEONATAL.value,
+        CategoryValues.INFECTIOUS_MEDICINE.value,
+        CategoryValues.LDN.value,
+        CategoryValues.SPECIALIST.value,
+        CategoryValues.PSYCHOSOMATICS.value,
+        CategoryValues.FORENSIC_MEDICINE.value,
+        CategoryValues.PARAMEDIC.value,
+        CategoryValues.AERO_MEDICINE.value,
+        CategoryValues.SOCIAL_WORKER.value,
+        CategoryValues.BEHAVIORAL_ANALYST.value,
+        CategoryValues.PUBLIC_HEALTHCARE.value,
+        CategoryValues.RADIOLOGICAL_PHYSICIST.value,
+        CategoryValues.BIOMEDICAL_TECHNICIAN.value
+    )
+
     @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
     @Synchronized
     fun updateData(): UpdateStatusMessageDto {
@@ -147,6 +179,7 @@ class HealthcareProvidersService @Autowired constructor(
         return healthcareProviderRepository.findAll(PageRequest.of(page, batchSize))
             .filter { it.lat != null && it.lng != null }.toSet()
             .map { it.simplify() }
+            .filter { it.category.isNotEmpty() }
     }
 
     @Synchronized
@@ -219,7 +252,7 @@ class HealthcareProvidersService @Autowired constructor(
             houseNumber = houseNumber,
             city = city,
             postalCode = postalCode,
-            category = category.map { it.value },
+            category = category.map { it.value }.filter { !removedCategories.contains(it) },
             specialization = specialization,
             lat = lat!!,
             lng = lng!!
@@ -241,7 +274,7 @@ class HealthcareProvidersService @Autowired constructor(
             email = email,
             website = website,
             ico = ico,
-            category = category.map { it.value },
+            category = category.map { it.value }.filter { !removedCategories.contains(it) },
             specialization = specialization,
             careForm = careForm,
             careType = careType,

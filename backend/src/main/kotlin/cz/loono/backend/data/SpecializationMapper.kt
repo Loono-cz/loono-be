@@ -59,7 +59,7 @@ class SpecializationMapper {
                 "rehabilitační a fyzikální medicína" -> {
                     categories.add(HealthcareCategory(value = CategoryValues.REHABILITATION.value))
                 }
-                "dětská gastroenterologie a hepatologie", "gastroenterologie" -> {
+                "dětská gastroenterologie a hepatologie", "gastroenterologie", "koloproktologie" -> {
                     categories.add(HealthcareCategory(value = CategoryValues.GASTROENTEROLOGY.value))
                 }
                 "geriatrie" -> {
@@ -191,9 +191,6 @@ class SpecializationMapper {
                 "sestra pro péči v interních oborech", "sestra pro péči v psychiatrii", "dětská sestra",
                 "všeobecná sestra", "sestra pro intenzivní péči", "praktická sestra" -> {
                     categories.add(HealthcareCategory(value = CategoryValues.NURSE.value))
-                }
-                "koloproktologie" -> {
-                    categories.add(HealthcareCategory(value = CategoryValues.COLOPROCTOLOGY.value))
                 }
                 "sexuologie" -> {
                     categories.add(HealthcareCategory(value = CategoryValues.SEXOLOGY.value))
