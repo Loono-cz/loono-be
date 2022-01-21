@@ -2,14 +2,13 @@ package cz.loono.backend.api.controller
 
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
-import cz.loono.backend.api.dto.ExaminationCompletionDto
+import cz.loono.backend.api.dto.ExaminationIdDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.PreventionStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.ExaminationRecordService
-import cz.loono.backend.db.model.ExaminationRecord
-import cz.loono.backend.let3
-import org.springframework.beans.factory.annotation.Autowired
+import cz.loono.backend.api.service.PreventionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,34 +18,16 @@ import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/examinations", produces = [MediaType.APPLICATION_JSON_VALUE])
-class ExaminationsController @Autowired constructor(
-    private val recordService: ExaminationRecordService
+class ExaminationsController(
+    private val recordService: ExaminationRecordService,
+    private val preventionService: PreventionService
 ) {
-
-    @GetMapping
-    fun getExaminationRecords(
-        @RequestAttribute(Attributes.ATTR_BASIC_USER)
-        basicUser: BasicUser
-    ): List<ExaminationRecordDto> {
-        return recordService.getOrCreateRecords(basicUser.uid).map { it.toDto() }
-    }
-
-    private fun ExaminationRecord.toDto(): ExaminationRecordDto {
-        return ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.valueOf(type),
-            worth = examinationWorth(ExaminationTypeEnumDto.valueOf(type)),
-            lastVisitMonth = lastVisit?.monthValue,
-            lastVisitYear = lastVisit?.year,
-        )
-    }
-
-    @PostMapping("/{type}/complete")
-    fun complete(
+    @PostMapping("/{type}/confirm")
+    fun confirm(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
@@ -55,20 +36,49 @@ class ExaminationsController @Autowired constructor(
 
         @Valid
         @RequestBody
-        completionDto: ExaminationCompletionDto
-    ): List<ExaminationRecordDto> {
-        if (type !in ExaminationTypeEnumDto.values().map { it.name }) {
+        examinationIdDto: ExaminationIdDto
+    ): ExaminationRecordDto =
+        if (type !in getAvailableExaminations()) {
             throw LoonoBackendException(HttpStatus.NOT_FOUND)
+        } else {
+            recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
         }
 
-        recordService.completeExamination(
-            basicUser.uid,
-            type,
-            let3(completionDto.year, completionDto.month, 1, LocalDate::of)
-        )
+    @PostMapping("/{type}/cancel")
+    fun cancel(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser,
 
-        return getExaminationRecords(basicUser)
-    }
+        @PathVariable(name = "type")
+        type: String,
+
+        @Valid
+        @RequestBody
+        examinationIdDto: ExaminationIdDto
+    ): ExaminationRecordDto =
+        if (type !in getAvailableExaminations()) {
+            throw LoonoBackendException(HttpStatus.NOT_FOUND)
+        } else {
+            recordService.cancelExam(examinationIdDto.uuid, basicUser.uid)
+        }
+
+    @PostMapping
+    fun updateOrCreate(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser,
+
+        @Valid
+        @RequestBody
+        examinationRecordDto: ExaminationRecordDto
+    ): ExaminationRecordDto = recordService.createOrUpdateExam(examinationRecordDto, basicUser.uid)
+
+    @GetMapping
+    fun getPreventionStatus(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser
+    ): List<PreventionStatusDto> = preventionService.getPreventionStatus(basicUser.uid)
+
+    private fun getAvailableExaminations() = ExaminationTypeEnumDto.values().map(ExaminationTypeEnumDto::name)
 }
 
 // Purposefully implemented as an expression to leverage the exhaustiveness check performed by the compiler

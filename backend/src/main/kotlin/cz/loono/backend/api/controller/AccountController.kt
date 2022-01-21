@@ -15,7 +15,6 @@ import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.let3
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -30,7 +29,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/account", produces = [MediaType.APPLICATION_JSON_VALUE])
-class AccountController @Autowired constructor(
+class AccountController(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository,
 ) {
@@ -57,9 +56,7 @@ class AccountController @Autowired constructor(
     fun deleteAccount(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
-    ) {
-        accountService.deleteAccount(basicUser.uid)
-    }
+    ) = accountService.deleteAccount(basicUser.uid)
 
     @PostMapping("/user/update")
     fun updateUserAuxiliary(
@@ -108,8 +105,8 @@ class AccountController @Autowired constructor(
         return AccountDto(user = userDto, settings = settingsDto, points = account.points)
     }
 
-    private fun assembleUserDto(base: BasicUser, aux: UserAuxiliary): UserDto {
-        return UserDto(
+    private fun assembleUserDto(base: BasicUser, aux: UserAuxiliary): UserDto =
+        UserDto(
             uid = base.uid,
             email = base.email,
             nickname = base.name,
@@ -118,5 +115,4 @@ class AccountController @Autowired constructor(
             birthdateYear = aux.birthdate?.year,
             preferredEmail = aux.preferredEmail
         )
-    }
 }

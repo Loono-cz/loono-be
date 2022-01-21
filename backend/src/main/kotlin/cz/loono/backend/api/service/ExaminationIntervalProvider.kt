@@ -24,7 +24,8 @@ object ExaminationIntervalProvider {
             if (validInterval != null) {
                 ExaminationInterval(
                     preventionRule.examinationType,
-                    validInterval.intervalYears
+                    validInterval.intervalYears,
+                    preventionRule.priority
                 )
             } else null // no prevention required for patients age and sex
         }
@@ -33,37 +34,44 @@ object ExaminationIntervalProvider {
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
             intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 2))
+            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
+            priority = 1
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.MAMMOGRAM,
             intervalsMale = listOf(),
-            intervalsFemale = listOf(AgeInterval(fromAge = 45, intervalYears = 2))
+            intervalsFemale = listOf(AgeInterval(fromAge = 45, intervalYears = 2)),
+            priority = 2
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.GYNECOLOGIST,
             intervalsMale = listOf(),
-            intervalsFemale = listOf(AgeInterval(fromAge = 15, intervalYears = 1))
+            intervalsFemale = listOf(AgeInterval(fromAge = 15, intervalYears = 1)),
+            priority = 3
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.COLONOSCOPY,
             intervalsMale = listOf(AgeInterval(fromAge = 50, intervalYears = 10)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 50, intervalYears = 10))
+            intervalsFemale = listOf(AgeInterval(fromAge = 50, intervalYears = 10)),
+            priority = 4
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.UROLOGIST,
             intervalsMale = listOf(AgeInterval(fromAge = 50, intervalYears = 1)),
-            intervalsFemale = listOf()
+            intervalsFemale = listOf(),
+            priority = 5
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.DERMATOLOGIST,
             intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 1))
+            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
+            priority = 6
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.ULTRASOUND_BREAST,
             intervalsMale = listOf(),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2))
+            intervalsFemale = listOf(AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2)),
+            priority = 7
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.DENTIST,
@@ -72,7 +80,8 @@ object ExaminationIntervalProvider {
             ),
             intervalsFemale = listOf(
                 AgeInterval(fromAge = 19, intervalYears = 1)
-            )
+            ),
+            priority = 8
         ),
         PreventionRule(
             examinationType = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
@@ -85,7 +94,8 @@ object ExaminationIntervalProvider {
                 AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2),
                 AgeInterval(fromAge = 45, toAge = 61, intervalYears = 4),
                 AgeInterval(fromAge = 62, intervalYears = 2)
-            )
+            ),
+            priority = 9
         )
     )
 }
@@ -93,6 +103,7 @@ object ExaminationIntervalProvider {
 data class ExaminationInterval(
     val examinationType: ExaminationTypeEnumDto,
     val intervalYears: Int,
+    val priority: Int
 )
 
 data class Patient(
@@ -103,7 +114,8 @@ data class Patient(
 data class PreventionRule(
     val examinationType: ExaminationTypeEnumDto,
     val intervalsMale: List<AgeInterval>,
-    val intervalsFemale: List<AgeInterval>
+    val intervalsFemale: List<AgeInterval>,
+    val priority: Int
 )
 
 data class AgeInterval(

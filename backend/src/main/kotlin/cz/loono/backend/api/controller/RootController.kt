@@ -10,9 +10,7 @@ import java.net.URI
 class RootController {
 
     @GetMapping
-    fun index(): ResponseEntity<Void> {
-        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
-            .location(URI.create("https://www.loono.cz/"))
-            .build()
-    }
+    fun index(): ResponseEntity<Void> = ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT)
+        .location(URI.create("https://www.loono.cz/"))
+        .build()
 }

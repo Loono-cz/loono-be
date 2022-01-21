@@ -257,7 +257,7 @@
         },
         "/examinations": {
             "get": {
-                "summary": "Get Examination Records",
+                "summary": "Get Examinations Status",
                 "tags": [
                     "Examinations"
                 ],
@@ -269,7 +269,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/ExaminationRecord"
+                                        "$ref": "#/components/schemas/PreventionStatus"
                                     }
                                 }
                             }
@@ -293,22 +293,61 @@
                         "Bearer_Auth": []
                     }
                 ]
-            }
-        },
-        "/examinations/{type}/complete": {
+            },
             "post": {
-                "summary": "Complete Examination",
-                "operationId": "completeExamination",
+                "summary": "Create or update examination record",
+                "operationId": "post-examinations",
                 "responses": {
                     "200": {
-                        "description": "Returns the updated list of examination records.\n\nTODO: Co vracet?  Account? All the records? Just the one record?",
+                        "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ExaminationRecord"
-                                    }
+                                    "$ref": "#/components/schemas/ExaminationRecord"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExaminationRecord"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Examinations"
+                ]
+            }
+        },
+        "/examinations/{type}/confirm": {
+            "post": {
+                "summary": "Confirm Examination",
+                "operationId": "completeExamination",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExaminationRecord"
                                 }
                             }
                         }
@@ -337,7 +376,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ExaminationCompletion"
+                                "$ref": "#/components/schemas/ExaminationId"
                             }
                         }
                     },
@@ -356,30 +395,36 @@
                 }
             ]
         },
-        "/examinations/reset": {
+        "/examinations/{type}/cancel": {
             "post": {
-                "summary": "[Draft] Reset Examination Record",
-                "operationId": "deleteExamination",
+                "summary": "Cancel Examination",
+                "operationId": "cancelExamination",
                 "responses": {
-                    "201": {
-                        "description": "Returns the updated list of examination records.\n\nTODO: Co vracet?  Account? All the records? Just the one record?",
+                    "200": {
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ExaminationRecord"
-                                    }
+                                    "$ref": "#/components/schemas/ExaminationRecord"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
                                 }
                             }
                         }
                     }
                 },
                 "tags": [
-                    "Examinations",
-                    "Account"
+                    "Examinations"
                 ],
-                "description": "Delete the aggregate examination record for this examination type.\n\nSpecial consideration: How to prevent abuse and point cheating? SOME information about the history of point entitlement will have to be retained so that people don't spam create/delete to farm points.",
+                "description": "Notify the API that an examination has been performed.\n\nThe date of the completion must not be in the future.",
                 "security": [
                     {
                         "Bearer_Auth": []
@@ -389,14 +434,24 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object"
+                                "$ref": "#/components/schemas/ExaminationId"
                             }
                         }
                     },
-                    "description": "Empty object"
+                    "description": ""
                 }
             },
-            "parameters": []
+            "parameters": [
+                {
+                    "schema": {
+                        "type": "string"
+                    },
+                    "name": "type",
+                    "in": "path",
+                    "required": true,
+                    "description": "One of the `ExaminationTypeEnum` values"
+                }
+            ]
         },
         "/providers/all": {
             "get": {
@@ -593,26 +648,20 @@
                     }
                 }
             },
-            "ExaminationCompletion": {
-                "title": "ExaminationCompletion",
+            "ExaminationId": {
+                "title": "ExaminationId",
                 "type": "object",
-                "description": "A completed medical examination.\n\n`month` and `year` are optional and nullable. If any of them is missing or `null`, API defaults to `LocalDate.now()` - the current year and month.",
+                "description": "A examination identification.\n\n`month` and `year` are optional and nullable. If any of them is missing or `null`, API defaults to `LocalDate.now()` - the current year and month.",
                 "properties": {
-                    "month": {
-                        "type": "integer",
-                        "description": "",
-                        "format": "int32",
-                        "default": null,
-                        "nullable": true
-                    },
-                    "year": {
-                        "type": "integer",
+                    "uuid": {
+                        "type": "string",
                         "description": "Must not be in the future",
-                        "format": "int32",
-                        "default": null,
-                        "nullable": true
+                        "default": null
                     }
-                }
+                },
+                "required": [
+                    "uuid"
+                ]
             },
             "User": {
                 "title": "User",
@@ -775,58 +824,6 @@
                 "description": "Users can choose to have their communication email address be different from their main Firebase account email.\n\noptional and nullable\n",
                 "format": "email",
                 "nullable": true
-            },
-            "ExaminationRecord": {
-                "type": "object",
-                "title": "ExaminationRecord",
-                "description": "An aggregate record of a single examination type.",
-                "properties": {
-                    "type": {
-                        "$ref": "#/components/schemas/ExaminationTypeEnum"
-                    },
-                    "worth": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "description": "How many points will be awarded upon completing this examination if the user is eligible."
-                    },
-                    "streak": {
-                        "$ref": "#/components/schemas/Streak"
-                    },
-                    "lastVisitYear": {
-                        "type": "integer",
-                        "format": "date"
-                    },
-                    "lastVisitMonth": {
-                        "type": "integer"
-                    }
-                },
-                "required": [
-                    "type",
-                    "worth"
-                ],
-                "readOnly": true
-            },
-            "Streak": {
-                "title": "Streak",
-                "type": "object",
-                "description": "Examination completion streak.",
-                "properties": {
-                    "currentStreak": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "format": "int32"
-                    },
-                    "downtimeRemainingDays": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "gracePeriodRemainingDays": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    }
-                }
             },
             "Appointment": {
                 "title": "Appointment",
@@ -1107,6 +1104,93 @@
                         }
                     }
                 }
+            },
+            "ExaminationStatus": {
+                "type": "string",
+                "title": "ExaminationStatus",
+                "description": "Status enum of the examination",
+                "enum": [
+                    "NEW",
+                    "TO_BE_CONFIRMED",
+                    "CONFIRMED",
+                    "CANCELED",
+                    "UNKNOWN"
+                ],
+                "default": "NEW"
+            },
+            "PreventionStatus": {
+                "type": "object",
+                "title": "PreventionStatus",
+                "description": "Overview status of examinations",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "examinationType": {
+                        "$ref": "#/components/schemas/ExaminationTypeEnum"
+                    },
+                    "intervalYears": {
+                        "type": "integer"
+                    },
+                    "plannedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "firstExam": {
+                        "type": "boolean"
+                    },
+                    "priority": {
+                        "type": "integer"
+                    },
+                    "state": {
+                        "$ref": "#/components/schemas/ExaminationStatus"
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "lastConfirmedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "examinationType",
+                    "intervalYears",
+                    "firstExam",
+                    "priority",
+                    "state",
+                    "count"
+                ]
+            },
+            "ExaminationRecord": {
+                "title": "ExaminationRecord",
+                "type": "object",
+                "description": "Examination object to update or create an object",
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/ExaminationTypeEnum"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ExaminationStatus"
+                    },
+                    "firstExam": {
+                        "type": "boolean",
+                        "default": true
+                    }
+                },
+                "required": [
+                    "type"
+                ]
             }
         },
         "securitySchemes": {

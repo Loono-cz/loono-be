@@ -118,5 +118,6 @@ fun setUpOpenApiGenerator() {
             )
         )
         inputSpec.set(localSpecFile.toString())
+        typeMappings.put("java.time.OffsetDateTime", "java.time.LocalDateTime")
     }
 }

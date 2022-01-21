@@ -9,7 +9,5 @@ class SwaggerController {
 
     @GetMapping(value = ["v3/api-docs"], produces = ["application/json"])
     @ResponseBody
-    fun getOpenAPI(): String {
-        return javaClass.getResource("/doc/openapi.json").readText()
-    }
+    fun getOpenAPI(): String = javaClass.getResource("/doc/openapi.json").readText()
 }

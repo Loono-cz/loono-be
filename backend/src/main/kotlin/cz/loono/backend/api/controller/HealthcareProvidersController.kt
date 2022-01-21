@@ -24,35 +24,31 @@ class HealthcareProvidersController {
     private lateinit var healthCareProvidersService: HealthcareProvidersService
 
     @GetMapping(value = ["$DOCTORS_PATH/lastupdate"])
-    fun lastUpdate(): HealthcareProviderLastUpdateDto {
-        return HealthcareProviderLastUpdateDto(
+    fun lastUpdate(): HealthcareProviderLastUpdateDto =
+        HealthcareProviderLastUpdateDto(
             lastUpdate = healthCareProvidersService.lastUpdate
         )
-    }
 
     @GetMapping(value = ["$DOCTORS_PATH/update"])
-    fun updateData(): UpdateStatusMessageDto {
-        return healthCareProvidersService.updateData()
-    }
+    fun updateData(): UpdateStatusMessageDto = healthCareProvidersService.updateData()
 
     @GetMapping(value = ["$DOCTORS_PATH/all"], produces = ["application/zip"])
-    fun getAll(response: HttpServletResponse): FileSystemResource {
-        val path = healthCareProvidersService.getAllSimpleData()
-        response.setHeader(
-            "Content-Disposition",
-            "attachment; filename=${path.fileName}"
-        )
-        return FileSystemResource(path)
-    }
+    fun getAll(response: HttpServletResponse): FileSystemResource =
+        healthCareProvidersService.getAllSimpleData().let { path ->
+            response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=${path.fileName}"
+            )
+            FileSystemResource(path)
+        }
 
     @PostMapping(value = ["$DOCTORS_PATH/details"])
     fun getDetail(
         @RequestBody
         @Valid
         providerIdListDto: HealthcareProviderIdListDto
-    ): HealthcareProviderDetailListDto {
-        return healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
-    }
+    ): HealthcareProviderDetailListDto =
+        healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
 
     companion object {
         const val DOCTORS_PATH = "/providers"
