@@ -3,7 +3,6 @@ package cz.loono.backend.security
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
@@ -11,7 +10,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-class BearerTokenAuthenticator @Autowired constructor(
+class BearerTokenAuthenticator(
     private val authService: JwtAuthService,
 ) : HandlerInterceptor {
 

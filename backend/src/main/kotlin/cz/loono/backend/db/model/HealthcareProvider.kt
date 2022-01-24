@@ -160,11 +160,10 @@ data class HealthcareProvider(
         return result
     }
 
-    override fun toString(): String {
-        return "$locationId,$institutionId,$code,$title,$institutionType,$city,$postalCode,$street,$houseNumber,$region," +
+    override fun toString(): String =
+        "$locationId,$institutionId,$code,$title,$institutionType,$city,$postalCode,$street,$houseNumber,$region," +
             "$regionCode,$district,$districtCode,$administrativeDistrict,$phoneNumber,$fax,$email,$website,$ico," +
             "$personTypeCode,$lawyerFormCode,$layerForm,$personType,$hqRegion,$hqRegionCode,$hqDistrict,$hqDistrictCode," +
             "$hqCity,$hqPostalCode,$hqStreet,$hqHouseNumber,$specialization,$category,$careForm,$careType,$substitute," +
             "$lat,$lng"
-    }
 }

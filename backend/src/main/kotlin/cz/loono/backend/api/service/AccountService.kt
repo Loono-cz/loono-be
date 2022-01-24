@@ -6,13 +6,12 @@ import cz.loono.backend.db.model.Settings
 import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class AccountService @Autowired constructor(
+class AccountService(
     private val accountRepository: AccountRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)

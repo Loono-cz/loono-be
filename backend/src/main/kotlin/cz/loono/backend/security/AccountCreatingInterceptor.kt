@@ -5,7 +5,6 @@ import cz.loono.backend.api.BasicUser
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
@@ -16,7 +15,7 @@ import javax.servlet.http.HttpServletResponse
  * An interceptor that ensures an account exists
  */
 @Component
-class AccountCreatingInterceptor @Autowired constructor(
+class AccountCreatingInterceptor(
     private val accountService: AccountService,
 ) : HandlerInterceptor {
 

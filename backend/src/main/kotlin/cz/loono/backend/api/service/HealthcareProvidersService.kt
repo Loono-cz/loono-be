@@ -19,7 +19,6 @@ import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -41,7 +40,7 @@ import java.util.zip.ZipOutputStream
 import kotlin.io.path.exists
 
 @Service
-class HealthcareProvidersService @Autowired constructor(
+class HealthcareProvidersService(
     private val healthcareProviderRepository: HealthcareProviderRepository,
     private val healthcareCategoryRepository: HealthcareCategoryRepository,
     private val serverPropertiesRepository: ServerPropertiesRepository
@@ -169,18 +168,15 @@ class HealthcareProvidersService @Autowired constructor(
 
     @Synchronized
     @Transactional(readOnly = true)
-    fun storedProvidersCount(): Int {
-        return healthcareProviderRepository.count().toInt()
-    }
+    fun storedProvidersCount(): Int = healthcareProviderRepository.count().toInt()
 
     @Synchronized
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-    fun findPage(page: Int): List<SimpleHealthcareProviderDto> {
-        return healthcareProviderRepository.findAll(PageRequest.of(page, batchSize))
+    fun findPage(page: Int): List<SimpleHealthcareProviderDto> =
+        healthcareProviderRepository.findAll(PageRequest.of(page, batchSize))
             .filter { it.lat != null && it.lng != null }.toSet()
             .map { it.simplify() }
             .filter { it.category.isNotEmpty() }
-    }
 
     @Synchronized
     private fun zipProviders(providers: LinkedHashSet<SimpleHealthcareProviderDto>) {
@@ -231,8 +227,8 @@ class HealthcareProvidersService @Autowired constructor(
         )
     }
 
-    fun getMultipleHealthcareProviderDetails(providerIdsList: HealthcareProviderIdListDto): HealthcareProviderDetailListDto {
-        return HealthcareProviderDetailListDto(
+    fun getMultipleHealthcareProviderDetails(providerIdsList: HealthcareProviderIdListDto): HealthcareProviderDetailListDto =
+        HealthcareProviderDetailListDto(
             healthcareProvidersDetails = providerIdsList.providersIds?.map {
                 getHealthcareProviderDetail(it)
             } ?: throw LoonoBackendException(
@@ -241,10 +237,9 @@ class HealthcareProvidersService @Autowired constructor(
                 errorMessage = "Incorrect request."
             )
         )
-    }
 
-    fun HealthcareProvider.simplify(): SimpleHealthcareProviderDto {
-        return SimpleHealthcareProviderDto(
+    fun HealthcareProvider.simplify(): SimpleHealthcareProviderDto =
+        SimpleHealthcareProviderDto(
             locationId = locationId,
             institutionId = institutionId,
             title = title,
@@ -252,15 +247,14 @@ class HealthcareProvidersService @Autowired constructor(
             houseNumber = houseNumber,
             city = city,
             postalCode = postalCode,
-            category = category.map { it.value }.filter { !removedCategories.contains(it) },
+            category = category.map(HealthcareCategory::value).filter { !removedCategories.contains(it) },
             specialization = specialization,
             lat = lat!!,
             lng = lng!!
         )
-    }
 
-    fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto {
-        return HealthcareProviderDetailDto(
+    fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto =
+        HealthcareProviderDetailDto(
             locationId = locationId,
             institutionId = institutionId,
             title = title,
@@ -274,7 +268,7 @@ class HealthcareProvidersService @Autowired constructor(
             email = email,
             website = website,
             ico = ico,
-            category = category.map { it.value }.filter { !removedCategories.contains(it) },
+            category = category.map(HealthcareCategory::value).filter { !removedCategories.contains(it) },
             specialization = specialization,
             careForm = careForm,
             careType = careType,
@@ -282,5 +276,4 @@ class HealthcareProvidersService @Autowired constructor(
             lat = lat!!,
             lng = lng!!
         )
-    }
 }

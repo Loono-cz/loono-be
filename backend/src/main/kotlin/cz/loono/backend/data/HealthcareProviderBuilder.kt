@@ -19,8 +19,8 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
     private var hqDistrictName = ""
     private var hqRegionName = ""
 
-    fun build(): HealthcareProvider {
-        return HealthcareProvider(
+    fun build(): HealthcareProvider =
+        HealthcareProvider(
             locationId = getColumnValue("MistoPoskytovaniId", columns).toLong(),
             institutionId = getColumnValue("ZdravotnickeZarizeniId", columns).toLong(),
             code = getColumnValue("Kod", columns),
@@ -60,7 +60,6 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
             lng = getColumnValue("Lng", columns).toDoubleOrNull(),
             category = categories
         )
-    }
 
     fun withLawyerForm(): HealthcareProviderBuilder {
         val lawyerFormCodeId = getColumnValue("PravniFormaKod", columns).toIntOrNull()

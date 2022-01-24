@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig @Autowired constructor(
+class SecurityConfig(
     private val authenticationEntryPoint: CustomBasicAuthenticationEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
@@ -25,9 +25,7 @@ class SecurityConfig @Autowired constructor(
     private lateinit var serverPropertiesRepository: ServerPropertiesRepository
 
     @Bean
-    override fun userDetailsService(): UserDetailsService {
-        return SuperUserDetailsService(serverPropertiesRepository)
-    }
+    override fun userDetailsService(): UserDetailsService = SuperUserDetailsService(serverPropertiesRepository)
 
     @Bean
     fun authProvider(): DaoAuthenticationProvider {
@@ -57,7 +55,5 @@ class SecurityConfig @Autowired constructor(
     }
 
     @Bean
-    fun encoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
 }

@@ -111,7 +111,6 @@ data class UserAuxiliary(
 
     override fun hashCode(): Int = Objects.hash(preferredEmail, sex, birthdate)
 
-    override fun toString(): String {
-        return this::class.simpleName + "(preferredEmail = $preferredEmail , sex = $sex , birthdate = $birthdate )"
-    }
+    override fun toString(): String =
+        this::class.simpleName + "(preferredEmail = $preferredEmail , sex = $sex , birthdate = $birthdate )"
 }

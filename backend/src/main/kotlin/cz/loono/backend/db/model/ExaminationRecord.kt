@@ -50,7 +50,6 @@ data class ExaminationRecord(
     override fun hashCode(): Int = 0
 
     @Override
-    override fun toString(): String {
-        return this::class.simpleName + "(id = $id , type = $type , date = $plannedDate , accountId = ${account.uid}, firstExam = $firstExam, status = $status)" // ktlint-disable max-line-ength
-    }
+    override fun toString(): String =
+        this::class.simpleName + "(id = $id , type = $type , date = $plannedDate , accountId = ${account.uid}, firstExam = $firstExam, status = $status)" // ktlint-disable max-line-ength
 }
