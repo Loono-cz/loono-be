@@ -5,6 +5,7 @@ import cz.loono.backend.api.dto.ExaminationTypeEnumDto
 import cz.loono.backend.api.dto.PreventionStatusDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
@@ -19,10 +20,7 @@ class PreventionService(
     private val accountRepository: AccountRepository
 ) {
 
-    fun getPreventionStatus(accountUuid: String): List<PreventionStatusDto> {
-        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
-            HttpStatus.NOT_FOUND, "Account not found"
-        )
+    fun getExaminationRequests(account: Account): List<ExaminationInterval> {
 
         val sex = account.userAuxiliary.sex ?: throw LoonoBackendException(
             HttpStatus.UNPROCESSABLE_ENTITY, "sex not known"
@@ -33,9 +31,18 @@ class PreventionService(
         )
         val age = ChronoUnit.YEARS.between(birthDate, LocalDate.now()).toInt()
 
-        val examinationRequests = ExaminationIntervalProvider.findExaminationRequests(
+        return ExaminationIntervalProvider.findExaminationRequests(
             Patient(age, SexDto.valueOf(sex))
         )
+    }
+
+    fun getPreventionStatus(accountUuid: String): List<PreventionStatusDto> {
+
+        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
+            HttpStatus.NOT_FOUND, "Account not found"
+        )
+
+        val examinationRequests = getExaminationRequests(account)
 
         val examinationTypesToRecords: Map<ExaminationTypeEnumDto, List<ExaminationRecord>> =
             examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)

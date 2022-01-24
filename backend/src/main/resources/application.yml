@@ -38,3 +38,6 @@ management.endpoint.health.show-details: always
 management.health:
   db.enabled: true
   diskspace.enabled: false
+scheduler.cron:
+  daily-task: "0 0 3 * * ?"
+  data-update: "0 0 2 2 * ?"

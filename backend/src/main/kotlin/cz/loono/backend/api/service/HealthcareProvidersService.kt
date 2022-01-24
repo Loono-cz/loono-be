@@ -84,7 +84,7 @@ class HealthcareProvidersService(
         CategoryValues.BIOMEDICAL_TECHNICIAN.value
     )
 
-    @Scheduled(cron = "0 0 2 2 * ?") // each the 2nd day of month at 2AM
+    @Scheduled(cron = "\${scheduler.cron.data-update}") // each the 2nd day of month at 2AM
     @Synchronized
     fun updateData(): UpdateStatusMessageDto {
         updating = true
