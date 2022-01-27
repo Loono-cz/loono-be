@@ -1,5 +1,6 @@
 package cz.loono.backend.db.model
 
+import org.hibernate.envers.Audited
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -10,6 +11,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "\"healthcare_category\"")
+@Audited
 data class HealthcareCategory(
 
     @Id

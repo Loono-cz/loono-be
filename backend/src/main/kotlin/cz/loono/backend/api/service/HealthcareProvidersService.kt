@@ -26,11 +26,8 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStreamWriter
+import java.io.*
+import java.net.ConnectException
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
@@ -88,7 +85,16 @@ class HealthcareProvidersService(
     @Synchronized
     fun updateData(): UpdateStatusMessageDto {
         updating = true
-        val input = URL(OPEN_DATA_URL).openStream()
+        val input: InputStream
+        try {
+            input = URL(OPEN_DATA_URL).openStream()
+        } catch (e: ConnectException) {
+            throw LoonoBackendException(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                errorCode = HttpStatus.SERVICE_UNAVAILABLE.value().toString(),
+                errorMessage = "New open data are not available."
+            )
+        }
         val providers = HealthcareCSVParser().parse(input)
         if (providers.isNotEmpty()) {
             updating = true

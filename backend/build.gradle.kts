@@ -36,6 +36,8 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.2.9")
 
     runtimeOnly("org.postgresql:postgresql")
+    implementation("org.hibernate:hibernate-envers:5.4.32.Final")
+    implementation("org.hibernate:hibernate-entitymanager:5.4.32.Final")
 
     testRuntimeOnly("com.h2database:h2")
 

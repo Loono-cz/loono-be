@@ -3,6 +3,7 @@ package cz.loono.backend.db.model
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
 import org.hibernate.Hibernate
+import org.hibernate.envers.Audited
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -15,6 +16,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "\"examination_record\"")
+@Audited
 data class ExaminationRecord(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

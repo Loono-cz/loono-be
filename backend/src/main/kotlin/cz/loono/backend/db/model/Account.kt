@@ -1,6 +1,7 @@
 package cz.loono.backend.db.model
 
 import org.hibernate.Hibernate
+import org.hibernate.envers.Audited
 import java.time.LocalDate
 import java.util.Objects
 import javax.persistence.CascadeType
@@ -16,6 +17,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "\"account\"")
+@Audited
 data class Account(
 
     @Id

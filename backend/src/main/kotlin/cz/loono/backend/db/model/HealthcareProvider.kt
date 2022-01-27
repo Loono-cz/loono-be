@@ -1,6 +1,7 @@
 package cz.loono.backend.db.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.hibernate.envers.Audited
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -15,6 +16,7 @@ import javax.persistence.Table
 @Entity
 @IdClass(HealthcareProviderId::class)
 @Table(name = "\"healthcare_provider\"")
+@Audited
 data class HealthcareProvider(
 
     @Id
