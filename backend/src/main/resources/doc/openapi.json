@@ -622,6 +622,9 @@
                         "description": "The total amount of points earned by the user from gamification features.",
                         "format": "int32",
                         "minimum": 0
+                    },
+                    "badges": {
+                        "$ref": "#/components/schemas/Badges"
                     }
                 },
                 "required": [
@@ -788,6 +791,20 @@
                     }
                 },
                 "writeOnly": true
+            },
+            "BadgeType": {
+                "type": "string",
+                "title": "Badge type",
+                "description": "Available badges enum",
+                "enum": [
+                    "COAT",
+                    "TOP",
+                    "BELT",
+                    "SHOES",
+                    "GLOVES",
+                    "HEADBAND",
+                    "GLASSES"
+                ]
             },
             "Sex": {
                 "type": "string",
@@ -1191,6 +1208,34 @@
                 "required": [
                     "type"
                 ]
+            },
+            "Badge": {
+                "type": "object",
+                "title": "Badge",
+                "description": "Badge owned by the user",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/BadgeType"
+                    },
+                    "level": {
+                        "type": "integer"
+                    },
+                    "updatedOnDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "type",
+                    "level",
+                    "updatedOnDate"
+                ]
+            },
+            "Badges": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Badge"
+                }
             }
         },
         "securitySchemes": {

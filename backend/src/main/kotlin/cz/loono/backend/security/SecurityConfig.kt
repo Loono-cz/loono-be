@@ -3,7 +3,6 @@ package cz.loono.backend.security
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import cz.loono.backend.security.basic.CustomBasicAuthenticationEntryPoint
 import cz.loono.backend.security.basic.SuperUserDetailsService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -18,29 +17,22 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val authenticationEntryPoint: CustomBasicAuthenticationEntryPoint
+    private val authenticationEntryPoint: CustomBasicAuthenticationEntryPoint,
+    private val serverPropertiesRepository: ServerPropertiesRepository
 ) : WebSecurityConfigurerAdapter() {
-
-    @Autowired
-    private lateinit var serverPropertiesRepository: ServerPropertiesRepository
 
     @Bean
     override fun userDetailsService(): UserDetailsService = SuperUserDetailsService(serverPropertiesRepository)
 
     @Bean
-    fun authProvider(): DaoAuthenticationProvider {
-        val authProvider = DaoAuthenticationProvider()
-        authProvider.setUserDetailsService(userDetailsService())
-        authProvider.setPasswordEncoder(encoder())
-        return authProvider
-    }
-
-    @Autowired
-    fun configureGlobal(authentication: AuthenticationManagerBuilder) {
-        authentication.userDetailsService(userDetailsService())
-    }
+    fun authProvider(): DaoAuthenticationProvider =
+        DaoAuthenticationProvider().apply {
+            setUserDetailsService(userDetailsService())
+            setPasswordEncoder(encoder())
+        }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
+        auth.userDetailsService(userDetailsService())
         auth.authenticationProvider(authProvider())
     }
 

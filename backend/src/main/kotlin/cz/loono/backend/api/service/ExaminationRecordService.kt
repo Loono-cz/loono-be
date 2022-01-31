@@ -19,17 +19,15 @@ class ExaminationRecordService(
 
     @Synchronized
     @Transactional(rollbackFor = [Exception::class])
-    fun confirmExam(examUuid: String, accoutUid: String): ExaminationRecordDto {
-        return changeState(examUuid, accoutUid, ExaminationStatusDto.CONFIRMED)
-    }
+    fun confirmExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
+        changeState(examUuid, accountUuid, ExaminationStatusDto.CONFIRMED)
 
     @Synchronized
     @Transactional(rollbackFor = [Exception::class])
-    fun cancelExam(examUuid: String, accountUid: String): ExaminationRecordDto {
-        return changeState(examUuid, accountUid, ExaminationStatusDto.CANCELED)
-    }
+    fun cancelExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
+        changeState(examUuid, accountUuid, ExaminationStatusDto.CANCELED)
 
-    fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, uid: String): ExaminationRecordDto {
+    fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, uuid: String): ExaminationRecordDto {
         val record = validateUpdateAttempt(examinationRecordDto)
         return examinationRecordRepository.save(
             ExaminationRecord(
@@ -37,7 +35,7 @@ class ExaminationRecordService(
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
                 plannedDate = examinationRecordDto.date,
-                account = findAccount(uid),
+                account = findAccount(uuid),
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
             )
@@ -56,13 +54,13 @@ class ExaminationRecordService(
             ExaminationRecord()
         }
 
-    private fun findAccount(uid: String): Account =
-        accountRepository.findByUid(uid) ?: throw LoonoBackendException(
+    private fun findAccount(uuid: String): Account =
+        accountRepository.findByUid(uuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND, "Account not found"
         )
 
-    private fun changeState(examUuid: String, accountUid: String, state: ExaminationStatusDto): ExaminationRecordDto {
-        val account = findAccount(accountUid)
+    private fun changeState(examUuid: String, accountUuid: String, state: ExaminationStatusDto): ExaminationRecordDto {
+        val account = findAccount(accountUuid)
 
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         exam.status = state
