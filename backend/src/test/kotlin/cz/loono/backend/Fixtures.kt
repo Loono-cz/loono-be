@@ -18,9 +18,11 @@ internal fun createBasicUser() = BasicUser(
 internal fun createAccount(uid: String = "uid") = Account(
     uid = uid,
     userAuxiliary = UserAuxiliary(
-        "preferredZilvar@example.com",
-        SexDto.MALE.name,
-        LocalDate.of(2000, 1, 1)
+        nickname = "Zilvar z chudobince",
+        preferredEmail = "preferredZilvar@example.com",
+        sex = SexDto.MALE.name,
+        birthdate = LocalDate.of(2000, 1, 1),
+        profileImageUrl = "https://example.com"
     ),
     settings = Settings(
         leaderboardAnonymizationOptIn = false,

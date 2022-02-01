@@ -6,7 +6,9 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
+import com.google.firebase.auth.UserRecord
 import cz.loono.backend.api.BasicUser
+import cz.loono.backend.db.model.UserAuxiliary
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.net.URL
@@ -52,6 +54,24 @@ class FirebaseAuthService : JwtAuthService {
 
         val user = BasicUser(decodedToken.uid, decodedToken.email, decodedToken.name, URL(decodedToken.picture))
         return JwtAuthService.VerificationResult.Success(user)
+    }
+
+    fun updateUser(uid: String, userAuxiliary: UserAuxiliary) {
+        val request: UserRecord.UpdateRequest = UserRecord.UpdateRequest(uid)
+        var change = false
+
+        if (userAuxiliary.nickname != null) {
+            request.setDisplayName(userAuxiliary.nickname)
+            change = true
+        }
+        if (userAuxiliary.profileImageUrl != null) {
+            request.setPhotoUrl(userAuxiliary.profileImageUrl)
+            change = true
+        }
+
+        if (change) {
+            FirebaseAuth.getInstance().updateUser(request)
+        }
     }
 
     private fun loadFirebaseCredentials(): FirebaseOptions? {

@@ -2,6 +2,7 @@ package cz.loono.backend.api
 
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
+import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.createBasicUser
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.security.AccountCreatingInterceptor
@@ -31,9 +32,11 @@ internal class AccountCreatingInterceptorTest {
     @Autowired
     private lateinit var realRepo: AccountRepository
 
+    private val firebaseAuthService: FirebaseAuthService = mock()
+
     @Test
     fun `user is created if not exists`() {
-        val interceptor = AccountCreatingInterceptor(AccountService(realRepo))
+        val interceptor = AccountCreatingInterceptor(AccountService(realRepo, firebaseAuthService))
         val request = MockHttpServletRequest().apply {
             setAttribute(Attributes.ATTR_BASIC_USER, createBasicUser())
         }
@@ -50,7 +53,7 @@ internal class AccountCreatingInterceptorTest {
     @Test
     fun `request without decoded user throws 500`() {
         val repo = mock<AccountRepository>()
-        val interceptor = AccountCreatingInterceptor(AccountService(repo))
+        val interceptor = AccountCreatingInterceptor(AccountService(repo, firebaseAuthService))
         val request = MockHttpServletRequest()
         val response = MockHttpServletResponse()
 
@@ -67,7 +70,7 @@ internal class AccountCreatingInterceptorTest {
     @Test
     fun `request with invalid decoded user attribute throws 500`() {
         val repo = mock<AccountRepository>()
-        val interceptor = AccountCreatingInterceptor(AccountService(repo))
+        val interceptor = AccountCreatingInterceptor(AccountService(repo, firebaseAuthService))
         val request = MockHttpServletRequest().apply {
             setAttribute(Attributes.ATTR_BASIC_USER, Any())
         }
@@ -88,7 +91,7 @@ internal class AccountCreatingInterceptorTest {
         val repo = mock<AccountRepository>()
         whenever(repo.existsByUid("uid")).thenReturn(true)
 
-        val interceptor = AccountCreatingInterceptor(AccountService(repo))
+        val interceptor = AccountCreatingInterceptor(AccountService(repo, firebaseAuthService))
         val request = MockHttpServletRequest().apply {
             setAttribute(Attributes.ATTR_BASIC_USER, createBasicUser())
         }

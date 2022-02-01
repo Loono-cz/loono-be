@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -25,9 +29,11 @@ internal class AccountServiceTest {
     @Autowired
     private lateinit var repo: AccountRepository
 
+    private val firebaseAuthService: FirebaseAuthService = mock()
+
     @Test
     fun `ensureAccountExists with missing account`() {
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
 
         assertFalse(repo.existsByUid("uid"))
 
@@ -41,7 +47,7 @@ internal class AccountServiceTest {
         val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
 
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
 
         service.ensureAccountExists("uid")
 
@@ -52,7 +58,7 @@ internal class AccountServiceTest {
 
     @Test
     fun `updateSettings with missing account`() {
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val settings = Settings(
             leaderboardAnonymizationOptIn = false,
             appointmentReminderEmailsOptIn = false,
@@ -69,7 +75,7 @@ internal class AccountServiceTest {
     fun `updateSettings with existing account`() {
         val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
 
         val newSettings = Settings(
             leaderboardAnonymizationOptIn = false,
@@ -88,11 +94,13 @@ internal class AccountServiceTest {
 
     @Test
     fun `updateUserAuxiliary with missing account`() {
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val aux = UserAuxiliary(
+            nickname = "Zilvar z chudobince",
             preferredEmail = "zilvar@example.com",
             sex = SexDto.MALE.name,
-            birthdate = LocalDate.of(2000, 1, 1)
+            birthdate = LocalDate.of(2000, 1, 1),
+            profileImageUrl = "https://example.com"
         )
 
         val ex = assertThrows<IllegalStateException> {
@@ -105,7 +113,7 @@ internal class AccountServiceTest {
     fun `updateUserAuxiliary with existing account`() {
         val initialAccount = Account(uid = "uid", points = 1000)
         repo.save(initialAccount)
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
 
         val newAux = UserAuxiliary(
             preferredEmail = "zilvar@example.com",
@@ -120,5 +128,6 @@ internal class AccountServiceTest {
 
         assertEquals(newAux, updatedAccount.userAuxiliary)
         assertEquals(newAux, persistedUpdatedAccount.userAuxiliary)
+        verify(firebaseAuthService, times(1)).updateUser(any(), any())
     }
 }

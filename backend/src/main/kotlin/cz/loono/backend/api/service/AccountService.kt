@@ -12,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AccountService(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val firebaseAuthService: FirebaseAuthService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -60,6 +61,7 @@ class AccountService(
             throw IllegalStateException("Tried to update User Auxiliary for uid: $uid but no such account exists.")
         }
 
+        firebaseAuthService.updateUser(uid, aux)
         return accountRepository.save(account.copy(userAuxiliary = aux))
     }
 }

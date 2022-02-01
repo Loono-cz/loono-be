@@ -68,9 +68,11 @@ class AccountController(
         patch: UserPatchDto
     ): AccountDto {
         val aux = UserAuxiliary(
+            nickname = patch.nickname,
             preferredEmail = patch.preferredEmail,
             sex = patch.sex?.name,
-            birthdate = let3(patch.birthdateYear, patch.birthdateMonth, 1, LocalDate::of)
+            birthdate = let3(patch.birthdateYear, patch.birthdateMonth, 1, LocalDate::of),
+            profileImageUrl = patch.profileImageUrl
         )
         val updatedAccount = accountService.updateUserAuxiliary(basicUser.uid, aux)
 
@@ -86,8 +88,7 @@ class AccountController(
         val domainSettings = Settings(
             leaderboardAnonymizationOptIn = settings.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = settings.appointmentReminderEmailsOptIn,
-            newsletterOptIn = settings.newsletterOptIn,
-            profileImageUrl = settings.profileImageUrl
+            newsletterOptIn = settings.newsletterOptIn
         )
         val updatedAccount = accountService.updateSettings(basicUser.uid, domainSettings)
 
@@ -99,8 +100,7 @@ class AccountController(
         val settingsDto = SettingsDto(
             leaderboardAnonymizationOptIn = account.settings.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = account.settings.appointmentReminderEmailsOptIn,
-            newsletterOptIn = account.settings.newsletterOptIn,
-            profileImageUrl = account.settings.profileImageUrl
+            newsletterOptIn = account.settings.newsletterOptIn
         )
         return AccountDto(user = userDto, settings = settingsDto, points = account.points)
     }
@@ -113,6 +113,7 @@ class AccountController(
             sex = aux.sex?.let(SexDto::valueOf),
             birthdateMonth = aux.birthdate?.monthValue,
             birthdateYear = aux.birthdate?.year,
-            preferredEmail = aux.preferredEmail
+            preferredEmail = aux.preferredEmail,
+            profileImageUrl = aux.profileImageUrl
         )
 }

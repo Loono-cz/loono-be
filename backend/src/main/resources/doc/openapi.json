@@ -701,6 +701,9 @@
                     "preferredEmail": {
                         "type": "string",
                         "format": "email"
+                    },
+                    "profileImageUrl": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -766,6 +769,9 @@
                 "title": "UserPatch",
                 "description": "All fields are always updated, so beware of defaults.",
                 "properties": {
+                    "nickname": {
+                        "type": "string"
+                    },
                     "sex": {
                         "$ref": "#/components/schemas/Sex"
                     },
@@ -788,6 +794,9 @@
                         "format": "email",
                         "nullable": true,
                         "writeOnly": true
+                    },
+                    "profileImageUrl": {
+                        "type": "string"
                     }
                 },
                 "writeOnly": true
@@ -934,9 +943,6 @@
                     "newsletterOptIn": {
                         "type": "boolean",
                         "default": false
-                    },
-                    "profileImageUrl": {
-                        "type": "string"
                     }
                 },
                 "required": [

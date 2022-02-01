@@ -7,6 +7,7 @@ import cz.loono.backend.api.dto.UserDto
 import cz.loono.backend.api.dto.UserPatchDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
+import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.createAccount
 import cz.loono.backend.createBasicUser
 import cz.loono.backend.db.model.Settings
@@ -33,6 +34,8 @@ internal class AccountControllerTest {
     @Autowired
     private lateinit var repo: AccountRepository
 
+    private val firebaseAuthService: FirebaseAuthService = mock()
+
     @Test
     fun `getAccount with missing account`() {
         val service = mock<AccountService>()
@@ -50,7 +53,7 @@ internal class AccountControllerTest {
     @Test
     fun `getAccount with existing account`() {
         // Arrange
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
         val existingAccount = createAccount()
@@ -67,6 +70,7 @@ internal class AccountControllerTest {
                 birthdateMonth = existingAccount.userAuxiliary.birthdate?.monthValue,
                 birthdateYear = existingAccount.userAuxiliary.birthdate?.year,
                 preferredEmail = existingAccount.userAuxiliary.preferredEmail,
+                profileImageUrl = existingAccount.userAuxiliary.profileImageUrl
             ),
             SettingsDto(
                 existingAccount.settings.leaderboardAnonymizationOptIn,
@@ -81,7 +85,7 @@ internal class AccountControllerTest {
     @Test
     fun `delete non-existing account`() {
         // Arrange
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val controller = AccountController(service, repo)
 
         // Act
@@ -93,7 +97,7 @@ internal class AccountControllerTest {
     @Test
     fun `delete existing account`() {
         // Arrange
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
         val existingAccount = createAccount()
@@ -110,7 +114,7 @@ internal class AccountControllerTest {
     @Test
     fun `updateSettings with existing account`() {
         // Arrange
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
         val existingAccount = createAccount()
@@ -130,6 +134,7 @@ internal class AccountControllerTest {
                 birthdateMonth = existingAccount.userAuxiliary.birthdate?.monthValue,
                 birthdateYear = existingAccount.userAuxiliary.birthdate?.year,
                 preferredEmail = existingAccount.userAuxiliary.preferredEmail,
+                profileImageUrl = existingAccount.userAuxiliary.profileImageUrl
             ),
             newSettings, // <-- This is under test
             existingAccount.points
@@ -150,7 +155,7 @@ internal class AccountControllerTest {
     @Test
     fun `updateUserAuxiliary with existing account`() {
         // Arrange
-        val service = AccountService(repo)
+        val service = AccountService(repo, firebaseAuthService)
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
         val existingAccount = createAccount()

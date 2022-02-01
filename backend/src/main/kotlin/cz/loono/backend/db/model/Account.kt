@@ -66,10 +66,7 @@ data class Settings(
     val appointmentReminderEmailsOptIn: Boolean = true,
 
     @Column(nullable = false)
-    val newsletterOptIn: Boolean = false,
-
-    @Column(columnDefinition = "TEXT")
-    val profileImageUrl: String? = null
+    val newsletterOptIn: Boolean = false
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -78,20 +75,23 @@ data class Settings(
 
         return leaderboardAnonymizationOptIn == other.leaderboardAnonymizationOptIn &&
             appointmentReminderEmailsOptIn == other.appointmentReminderEmailsOptIn &&
-            newsletterOptIn == other.newsletterOptIn &&
-            profileImageUrl == other.profileImageUrl
+            newsletterOptIn == other.newsletterOptIn
     }
 
     override fun hashCode(): Int =
-        Objects.hash(leaderboardAnonymizationOptIn, appointmentReminderEmailsOptIn, newsletterOptIn, profileImageUrl)
+        Objects.hash(leaderboardAnonymizationOptIn, appointmentReminderEmailsOptIn, newsletterOptIn)
 
     override fun toString(): String {
-        return this::class.simpleName + "(leaderboardAnonymizationOptIn = $leaderboardAnonymizationOptIn , appointmentReminderEmailsOptIn = $appointmentReminderEmailsOptIn , newsletterOptIn = $newsletterOptIn , profileImageUrl = $profileImageUrl )" // ktlint-disable max-line-length
+        return this::class.simpleName + "(leaderboardAnonymizationOptIn = $leaderboardAnonymizationOptIn , appointmentReminderEmailsOptIn = $appointmentReminderEmailsOptIn , newsletterOptIn = $newsletterOptIn)" // ktlint-disable max-line-length
     }
 }
 
 @Embeddable
 data class UserAuxiliary(
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    val nickname: String? = null,
+
     @Column(nullable = true, columnDefinition = "TEXT")
     val preferredEmail: String? = null,
 
@@ -100,19 +100,29 @@ data class UserAuxiliary(
 
     @Column(nullable = true)
     val birthdate: LocalDate? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val profileImageUrl: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        if (javaClass != other?.javaClass) return false
+
         other as UserAuxiliary
 
-        return preferredEmail == other.preferredEmail &&
-            sex == other.sex &&
-            birthdate == other.birthdate
+        if (nickname != other.nickname) return false
+        if (preferredEmail != other.preferredEmail) return false
+        if (sex != other.sex) return false
+        if (birthdate != other.birthdate) return false
+        if (profileImageUrl != other.profileImageUrl) return false
+
+        return true
     }
 
-    override fun hashCode(): Int = Objects.hash(preferredEmail, sex, birthdate)
+    override fun hashCode(): Int =
+        Objects.hash(nickname, preferredEmail, sex, birthdate, profileImageUrl)
 
-    override fun toString(): String =
-        this::class.simpleName + "(preferredEmail = $preferredEmail , sex = $sex , birthdate = $birthdate )"
+    override fun toString(): String {
+        return this::class.simpleName + "(nickname=$nickname, preferredEmail=$preferredEmail, sex=$sex, birthdate=$birthdate, profileImageUrl=$profileImageUrl)"
+    }
 }
