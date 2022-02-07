@@ -68,7 +68,7 @@ class AccountService(
             preferredEmail = aux.preferredEmail ?: account.userAuxiliary.preferredEmail,
             birthdate = aux.birthdate ?: account.userAuxiliary.birthdate,
             sex = account.userAuxiliary.sex ?: aux.sex,
-            profileImageUrl = aux.profileImageUrl ?: account.userAuxiliary.profileImageUrl
+            profileImageUrl = aux.profileImageUrl
         )
         return accountRepository.save(account.copy(userAuxiliary = copy))
     }
