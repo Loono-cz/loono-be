@@ -62,7 +62,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    maxHeapSize = "1024m"
+    maxHeapSize = "2048m"
 }
 
 tasks.jacocoTestReport {
