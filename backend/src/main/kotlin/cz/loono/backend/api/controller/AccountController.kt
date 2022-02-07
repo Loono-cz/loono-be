@@ -109,11 +109,11 @@ class AccountController(
         UserDto(
             uid = base.uid,
             email = base.email,
-            nickname = base.name,
+            nickname = aux.nickname ?: base.name,
             sex = aux.sex?.let(SexDto::valueOf),
             birthdateMonth = aux.birthdate?.monthValue,
             birthdateYear = aux.birthdate?.year,
             preferredEmail = aux.preferredEmail,
-            profileImageUrl = aux.profileImageUrl
+            profileImageUrl = aux.profileImageUrl ?: base.photoUrl.toString()
         )
 }

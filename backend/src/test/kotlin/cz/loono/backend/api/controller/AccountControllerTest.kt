@@ -160,23 +160,31 @@ internal class AccountControllerTest {
         val basicUser = createBasicUser()
         val existingAccount = createAccount()
         repo.save(existingAccount)
-        val userPatch = UserPatchDto()
         // Sanity precondition check that they aren't already the same - that would lead to a false positive test!
-        val userDtoFromPatch = UserDto(
-            basicUser.uid, basicUser.email, basicUser.name,
-            userPatch.sex,
-            birthdateMonth = userPatch.birthdateMonth,
-            birthdateYear = userPatch.birthdateYear,
-            preferredEmail = userPatch.preferredEmail,
+        val userWithAux = UserDto(
+            basicUser.uid, basicUser.email, "nickname",
+            SexDto.MALE,
+            birthdateMonth = 2,
+            birthdateYear = 2002,
+            preferredEmail = "preferredZilvar@example.net",
+            profileImageUrl = "profileImage"
         )
-        assertNotEquals(controller.getAccount(basicUser).user, userDtoFromPatch)
+        val userDtoPatch = UserPatchDto(
+            nickname = "nickname",
+            sex = SexDto.FEMALE,
+            birthdateMonth = 2,
+            birthdateYear = 2002,
+            preferredEmail = "preferredZilvar@example.net",
+            profileImageUrl = "profileImage"
+        )
+        assertNotEquals(controller.getAccount(basicUser).user, userDtoPatch)
 
         // Act
-        val actualDto = controller.updateUserAuxiliary(basicUser, userPatch)
+        val actualDto = controller.updateUserAuxiliary(basicUser, userDtoPatch)
 
         // Assert DTO shape
         val expectedDto = AccountDto(
-            userDtoFromPatch, // <-- This is under test
+            userWithAux, // <-- This is under test
             SettingsDto(
                 existingAccount.settings.leaderboardAnonymizationOptIn,
                 existingAccount.settings.appointmentReminderEmailsOptIn,
@@ -188,9 +196,11 @@ internal class AccountControllerTest {
 
         // Assert DB content
         val expectedDomainUser = UserAuxiliary(
-            preferredEmail = userPatch.preferredEmail,
-            sex = userPatch.sex?.name,
-            birthdate = let3(userPatch.birthdateYear, userPatch.birthdateMonth, 1, LocalDate::of)
+            nickname = userDtoPatch.nickname,
+            preferredEmail = userDtoPatch.preferredEmail,
+            sex = SexDto.MALE.value,
+            birthdate = let3(userDtoPatch.birthdateYear, userDtoPatch.birthdateMonth, 1, LocalDate::of),
+            profileImageUrl = userDtoPatch.profileImageUrl
         )
         val actualDomainUser = repo.findByUid(basicUser.uid)!!.userAuxiliary
 

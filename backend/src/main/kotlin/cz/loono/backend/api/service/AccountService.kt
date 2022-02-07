@@ -62,6 +62,14 @@ class AccountService(
         }
 
         firebaseAuthService.updateUser(uid, aux)
-        return accountRepository.save(account.copy(userAuxiliary = aux))
+
+        val copy = UserAuxiliary(
+            nickname = aux.nickname ?: account.userAuxiliary.nickname,
+            preferredEmail = aux.preferredEmail ?: account.userAuxiliary.preferredEmail,
+            birthdate = aux.birthdate ?: account.userAuxiliary.birthdate,
+            sex = account.userAuxiliary.sex ?: aux.sex,
+            profileImageUrl = aux.profileImageUrl ?: account.userAuxiliary.profileImageUrl
+        )
+        return accountRepository.save(account.copy(userAuxiliary = copy))
     }
 }
