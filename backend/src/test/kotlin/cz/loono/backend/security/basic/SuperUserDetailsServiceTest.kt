@@ -4,17 +4,15 @@ import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class SuperUserDetailsServiceTest {
-
-    @Autowired
-    private lateinit var serverPropertiesRepository: ServerPropertiesRepository
+class SuperUserDetailsServiceTest(
+    private val serverPropertiesRepository: ServerPropertiesRepository
+) {
 
     @Test
     fun `get loonoAdmin details`() {

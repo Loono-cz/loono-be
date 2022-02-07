@@ -16,7 +16,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -24,10 +23,9 @@ import java.time.LocalDate
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-internal class AccountServiceTest {
-
-    @Autowired
-    private lateinit var repo: AccountRepository
+class AccountServiceTest(
+    private val repo: AccountRepository
+) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
 

@@ -4,6 +4,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     id("org.openapi.generator") version "5.3.0"
     id("de.undercouch.download") version "4.1.2"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.6.10"
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.spring") version "1.6.10"
     jacoco
