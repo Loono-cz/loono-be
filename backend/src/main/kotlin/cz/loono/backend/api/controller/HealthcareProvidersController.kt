@@ -5,7 +5,6 @@ import cz.loono.backend.api.dto.HealthcareProviderIdListDto
 import cz.loono.backend.api.dto.HealthcareProviderLastUpdateDto
 import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.service.HealthcareProvidersService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,10 +17,9 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-class HealthcareProvidersController {
-
-    @Autowired
-    private lateinit var healthCareProvidersService: HealthcareProvidersService
+class HealthcareProvidersController(
+    private var healthCareProvidersService: HealthcareProvidersService
+) {
 
     @GetMapping(value = ["$DOCTORS_PATH/lastupdate"])
     fun lastUpdate(): HealthcareProviderLastUpdateDto =

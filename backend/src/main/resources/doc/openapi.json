@@ -1225,16 +1225,11 @@
                     },
                     "level": {
                         "type": "integer"
-                    },
-                    "updatedOnDate": {
-                        "type": "string",
-                        "format": "date-time"
                     }
                 },
                 "required": [
                     "type",
-                    "level",
-                    "updatedOnDate"
+                    "level"
                 ]
             },
             "Badges": {

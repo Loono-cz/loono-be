@@ -10,7 +10,6 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -18,13 +17,10 @@ import java.time.LocalDateTime
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-internal class ExaminationRecordServiceTest {
-
-    @Autowired
-    private lateinit var accountRepository: AccountRepository
-
-    @Autowired
-    private lateinit var examinationRecordRepository: ExaminationRecordRepository
+class ExaminationRecordServiceTest(
+    private val accountRepository: AccountRepository,
+    private val examinationRecordRepository: ExaminationRecordRepository,
+) {
 
     @Test
     fun `changing state for a non-existing user`() {

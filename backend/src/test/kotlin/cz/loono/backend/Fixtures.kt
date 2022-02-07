@@ -29,5 +29,5 @@ internal fun createAccount(uid: String = "uid") = Account(
         appointmentReminderEmailsOptIn = false,
         newsletterOptIn = true
     ),
-    points = 1000
+    points = 0
 )

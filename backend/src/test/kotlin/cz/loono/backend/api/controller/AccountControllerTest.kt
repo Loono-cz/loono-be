@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -29,10 +28,9 @@ import java.time.LocalDate
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-internal class AccountControllerTest {
-
-    @Autowired
-    private lateinit var repo: AccountRepository
+class AccountControllerTest(
+    private val repo: AccountRepository
+) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
 

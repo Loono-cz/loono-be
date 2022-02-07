@@ -17,7 +17,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -27,10 +26,9 @@ import org.springframework.mock.web.MockHttpServletResponse
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-internal class AccountCreatingInterceptorTest {
-
-    @Autowired
-    private lateinit var realRepo: AccountRepository
+class AccountCreatingInterceptorTest(
+    private val realRepo: AccountRepository
+) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
 

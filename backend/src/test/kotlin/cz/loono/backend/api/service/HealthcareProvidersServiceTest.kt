@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -26,16 +25,11 @@ import kotlin.io.path.getLastModifiedTime
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class HealthcareProvidersServiceTest {
-
-    @Autowired
-    private lateinit var healthcareProviderRepository: HealthcareProviderRepository
-
-    @Autowired
-    private lateinit var healthcareCategoryRepository: HealthcareCategoryRepository
-
-    @Autowired
-    private lateinit var serverPropertiesRepository: ServerPropertiesRepository
+class HealthcareProvidersServiceTest(
+    private val healthcareProviderRepository: HealthcareProviderRepository,
+    private val healthcareCategoryRepository: HealthcareCategoryRepository,
+    private val serverPropertiesRepository: ServerPropertiesRepository
+) {
 
     private lateinit var healthcareProvidersService: HealthcareProvidersService
 
