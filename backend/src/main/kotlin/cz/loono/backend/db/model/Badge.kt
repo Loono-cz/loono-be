@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
-@Table(name = "\"badge\"")
+@Table(name = "badge")
 @Audited
 @IdClass(BadgeCompositeKey::class)
 data class Badge(

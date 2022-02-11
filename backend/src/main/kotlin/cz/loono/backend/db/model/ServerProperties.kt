@@ -9,7 +9,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "\"server_properties\"")
+@Table(name = "server_properties")
 data class ServerProperties(
 
     @Id

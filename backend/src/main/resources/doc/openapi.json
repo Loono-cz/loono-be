@@ -153,13 +153,24 @@
                     }
                 },
                 "operationId": "getLeaderboard",
-                "description": "TODO: This is a mock.\n\nReturns the leaderboard rendering.",
+                "description": "Returns the top leading accounts.",
                 "security": [
                     {
                         "Bearer_Auth": []
                     }
+                ],
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query",
+                        "name": "leaderboard_size",
+                        "description": "Count of leading accounts"
+                    }
                 ]
-            }
+            },
+            "parameters": []
         },
         "/account/user/update": {
             "post": {
@@ -746,17 +757,10 @@
             },
             "Leaderboard": {
                 "title": "Leaderboard",
-                "description": "Rendered leaderboard from the POV of the authenticated user. Contains the top profiles and peers.",
+                "description": "Rendered leaderboard from the POV of the authenticated user. Contains the top profiles.",
                 "type": "object",
                 "properties": {
-                    "top": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LeaderboardUser"
-                        }
-                    },
-                    "peers": {
-                        "description": "The users immediately adjacent to the authenticated user. One of the items is the current user.",
+                    "leaderboard": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/LeaderboardUser"
@@ -1186,6 +1190,29 @@
                     "count"
                 ]
             },
+            "Badge": {
+                "type": "object",
+                "title": "Badge",
+                "description": "Badge owned by the user",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/BadgeType"
+                    },
+                    "level": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "type",
+                    "level"
+                ]
+            },
+            "Badges": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Badge"
+                }
+            },
             "ExaminationRecord": {
                 "title": "ExaminationRecord",
                 "type": "object",
@@ -1214,29 +1241,6 @@
                 "required": [
                     "type"
                 ]
-            },
-            "Badge": {
-                "type": "object",
-                "title": "Badge",
-                "description": "Badge owned by the user",
-                "properties": {
-                    "type": {
-                        "$ref": "#/components/schemas/BadgeType"
-                    },
-                    "level": {
-                        "type": "integer"
-                    }
-                },
-                "required": [
-                    "type",
-                    "level"
-                ]
-            },
-            "Badges": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/Badge"
-                }
             }
         },
         "securitySchemes": {

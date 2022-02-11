@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
-@Table(name = "\"examination_record\"")
+@Table(name = "examination_record")
 @Audited
 data class ExaminationRecord(
     @Id

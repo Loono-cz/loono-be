@@ -15,7 +15,7 @@ import javax.persistence.Table
 
 @Entity
 @IdClass(HealthcareProviderId::class)
-@Table(name = "\"healthcare_provider\"")
+@Table(name = "healthcare_provider")
 @Audited
 data class HealthcareProvider(
 

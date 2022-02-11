@@ -10,7 +10,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.Table
 
 @Entity
-@Table(name = "\"healthcare_category\"")
+@Table(name = "healthcare_category")
 @Audited
 data class HealthcareCategory(
 
