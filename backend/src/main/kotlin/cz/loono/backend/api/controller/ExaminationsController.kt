@@ -80,22 +80,3 @@ class ExaminationsController(
 
     private fun getAvailableExaminations() = ExaminationTypeEnumDto.values().map(ExaminationTypeEnumDto::name)
 }
-
-// Purposefully implemented as an expression to leverage the exhaustiveness check performed by the compiler
-// TODO update the types with 0 points
-fun examinationWorth(type: ExaminationTypeEnumDto): Int =
-    when (type) {
-        ExaminationTypeEnumDto.BREAST_SELF -> 0
-        ExaminationTypeEnumDto.COLONOSCOPY -> 0
-        ExaminationTypeEnumDto.DENTIST -> 300
-        ExaminationTypeEnumDto.DERMATOLOGIST -> 100
-        ExaminationTypeEnumDto.GENERAL_PRACTITIONER -> 200
-        ExaminationTypeEnumDto.GYNECOLOGIST -> 200
-        ExaminationTypeEnumDto.MAMMOGRAM -> 500
-        ExaminationTypeEnumDto.OPHTHALMOLOGIST -> 100
-        ExaminationTypeEnumDto.TESTICULAR_SELF -> 0
-        ExaminationTypeEnumDto.TOKS -> 500
-        ExaminationTypeEnumDto.ULTRASOUND_BREAST -> 100
-        ExaminationTypeEnumDto.UROLOGIST -> 300
-        ExaminationTypeEnumDto.VENEREAL_DISEASES -> 0
-    }
