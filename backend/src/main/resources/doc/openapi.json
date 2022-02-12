@@ -1150,9 +1150,8 @@
                 "title": "PreventionStatus",
                 "description": "Overview status of examinations",
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int64"
+                    "uuid": {
+                        "type": "string"
                     },
                     "examinationType": {
                         "$ref": "#/components/schemas/ExaminationTypeEnum"

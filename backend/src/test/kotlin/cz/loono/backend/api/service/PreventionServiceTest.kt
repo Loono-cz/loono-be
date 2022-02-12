@@ -25,6 +25,10 @@ class PreventionServiceTest {
     @Test
     fun `get prevention for patient`() {
         val uuid = UUID.randomUUID().toString()
+        val examsUUIDs: MutableMap<Int, String> = mutableMapOf()
+        repeat(6) {
+            examsUUIDs[it] = UUID.randomUUID().toString()
+        }
         val age: Long = 45
         val now = LocalDateTime.now()
         val lastVisit = now.minusYears(1)
@@ -41,26 +45,38 @@ class PreventionServiceTest {
                 ExaminationRecord(
                     id = 1,
                     plannedDate = now,
-                    type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER
+                    type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+                    uuid = examsUUIDs[0]!!
                 ),
                 ExaminationRecord(
                     id = 2,
-                    type = ExaminationTypeEnumDto.OPHTHALMOLOGIST
+                    type = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
+                    uuid = examsUUIDs[1]!!
                 ), // is only planned
                 ExaminationRecord(
                     id = 3,
                     plannedDate = lastVisit,
-                    type = ExaminationTypeEnumDto.COLONOSCOPY
+                    type = ExaminationTypeEnumDto.COLONOSCOPY,
+                    uuid = examsUUIDs[2]!!
                 ), // is not required
                 ExaminationRecord(
                     id = 4,
-                    type = ExaminationTypeEnumDto.DENTIST
+                    type = ExaminationTypeEnumDto.DENTIST,
+                    uuid = examsUUIDs[3]!!
                 ),
                 ExaminationRecord(
                     id = 5,
                     type = ExaminationTypeEnumDto.DENTIST,
                     plannedDate = LocalDateTime.MIN,
-                    status = ExaminationStatusDto.CONFIRMED
+                    status = ExaminationStatusDto.CONFIRMED,
+                    uuid = examsUUIDs[4]!!
+                ),
+                ExaminationRecord(
+                    id = 6,
+                    type = ExaminationTypeEnumDto.DERMATOLOGIST,
+                    plannedDate = LocalDateTime.MIN,
+                    status = ExaminationStatusDto.CONFIRMED,
+                    uuid = examsUUIDs[5]!!
                 )
             )
         )
@@ -69,7 +85,7 @@ class PreventionServiceTest {
         assertEquals(
             /* expected = */ listOf(
                 PreventionStatusDto(
-                    id = 1,
+                    uuid = examsUUIDs[0],
                     examinationType = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
                     intervalYears = 2,
                     firstExam = true,
@@ -79,17 +95,18 @@ class PreventionServiceTest {
                     plannedDate = now
                 ),
                 PreventionStatusDto(
-                    id = 0,
+                    uuid = examsUUIDs[5],
                     examinationType = ExaminationTypeEnumDto.DERMATOLOGIST,
                     intervalYears = 1,
-                    plannedDate = null,
+                    plannedDate = LocalDateTime.MIN,
+                    lastConfirmedDate = LocalDateTime.MIN,
                     firstExam = true,
                     priority = 6,
-                    state = ExaminationStatusDto.NEW,
-                    count = 0
+                    state = ExaminationStatusDto.CONFIRMED,
+                    count = 1
                 ),
                 PreventionStatusDto(
-                    id = 4,
+                    uuid = examsUUIDs[3],
                     examinationType = ExaminationTypeEnumDto.DENTIST,
                     intervalYears = 1,
                     plannedDate = null,
@@ -100,7 +117,7 @@ class PreventionServiceTest {
                     lastConfirmedDate = LocalDateTime.MIN
                 ),
                 PreventionStatusDto(
-                    id = 2,
+                    uuid = examsUUIDs[1],
                     examinationType = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
                     intervalYears = 4,
                     plannedDate = null,

@@ -68,7 +68,7 @@ class PreventionService(
             val totalCountOfConfirmedExams = confirmedExamsOfCurrentType?.size ?: 0
 
             PreventionStatusDto(
-                id = sortedExamsOfType[0].id,
+                uuid = sortedExamsOfType[0].uuid,
                 examinationType = examinationInterval.examinationType,
                 intervalYears = examinationInterval.intervalYears,
                 plannedDate = sortedExamsOfType[0].plannedDate,
