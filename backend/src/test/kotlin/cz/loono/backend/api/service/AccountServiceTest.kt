@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -126,6 +123,5 @@ class AccountServiceTest(
 
         assertEquals(newAux, updatedAccount.userAuxiliary)
         assertEquals(newAux, persistedUpdatedAccount.userAuxiliary)
-        verify(firebaseAuthService, times(1)).updateUser(any(), any())
     }
 }

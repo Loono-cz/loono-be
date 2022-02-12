@@ -6,9 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
-import com.google.firebase.auth.UserRecord
 import cz.loono.backend.api.BasicUser
-import cz.loono.backend.db.model.UserAuxiliary
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.net.URL
@@ -32,45 +30,18 @@ class FirebaseAuthService : JwtAuthService {
             return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
         }
 
-        if (decodedToken.email == null) {
-            val error = "Firebase accounts without email are not permitted.\n" +
-                "UID: ${decodedToken.uid}\n" +
-                "Probable reason: Client application may have allowed a login method " +
-                "which doesn't provide user email. Loono only permits login methods which provide user email."
-            logger.error(error)
-
-            return JwtAuthService.VerificationResult.MissingPrimaryEmail
-        }
-
-        if (decodedToken.name == null) {
-            val error = "Firebase accounts without name are not permitted.\n" +
-                "UID: ${decodedToken.uid}\n" +
-                "Probable reason: Client application may have allowed a login method " +
-                "which doesn't provide account name. Loono only permits login methods which provide user name."
-            logger.error(error)
-
-            return JwtAuthService.VerificationResult.MissingUserName
-        }
-
         val user = BasicUser(decodedToken.uid, decodedToken.email, decodedToken.name, URL(decodedToken.picture))
         return JwtAuthService.VerificationResult.Success(user)
     }
 
-    fun updateUser(uid: String, userAuxiliary: UserAuxiliary) {
-        val request: UserRecord.UpdateRequest = UserRecord.UpdateRequest(uid)
-        var change = false
-
-        if (userAuxiliary.nickname != null) {
-            request.setDisplayName(userAuxiliary.nickname)
-            change = true
-        }
-        if (userAuxiliary.profileImageUrl != null) {
-            request.setPhotoUrl(userAuxiliary.profileImageUrl)
-            change = true
-        }
-
-        if (change) {
-            FirebaseAuth.getInstance().updateUser(request)
+    fun deleteAccount(uid: String) {
+        val results = FirebaseAuth.getInstance().deleteUsers(listOf(uid))
+        if (results.successCount != 1 || results.failureCount > 0) {
+            logger.error(
+                "Deleting account in the Firebase has failed. " +
+                    "Successfully deleted count ${results.successCount} " +
+                    "and failed deletion count ${results.failureCount}."
+            )
         }
     }
 

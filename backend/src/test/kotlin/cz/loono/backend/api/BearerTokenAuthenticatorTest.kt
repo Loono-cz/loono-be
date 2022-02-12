@@ -3,8 +3,6 @@ package cz.loono.backend.api
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.JwtAuthService
 import cz.loono.backend.security.BearerTokenAuthenticator
-import cz.loono.backend.security.MissingPrimaryEmailException
-import cz.loono.backend.security.MissingUserNameException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
@@ -37,32 +35,6 @@ internal class BearerTokenAuthenticatorTest {
         assertEquals(HttpStatus.UNAUTHORIZED, error.status)
         assertNull(error.errorCode)
         assertEquals("Missing Authorization header.", error.errorMessage)
-    }
-
-    @Test
-    fun `missing primary email throws`() {
-        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
-        val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.MissingPrimaryEmail }
-        val request = MockHttpServletRequest().apply {
-            addHeader("Authorization", "Bearer token")
-        }
-
-        assertThrows<MissingPrimaryEmailException> {
-            authenticator.preHandle(request, response, Any())
-        }
-    }
-
-    @Test
-    fun `missing username throws`() {
-        val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })
-        val authenticator = BearerTokenAuthenticator { JwtAuthService.VerificationResult.MissingUserName }
-        val request = MockHttpServletRequest().apply {
-            addHeader("Authorization", "Bearer token")
-        }
-
-        assertThrows<MissingUserNameException> {
-            authenticator.preHandle(request, response, Any())
-        }
     }
 
     @ParameterizedTest

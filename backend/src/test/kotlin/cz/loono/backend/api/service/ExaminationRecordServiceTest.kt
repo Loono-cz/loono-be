@@ -123,7 +123,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `try to create exam with non-suitable sex`() {
-        val account = accountRepository.save(
+        accountRepository.save(
             Account(
                 uid = "101",
                 userAuxiliary = UserAuxiliary(

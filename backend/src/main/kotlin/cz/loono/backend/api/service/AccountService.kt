@@ -34,6 +34,7 @@ class AccountService(
                 errorMessage = "The account not found."
             )
         }
+        firebaseAuthService.deleteAccount(uid)
     }
 
     @Transactional(rollbackFor = [Exception::class])
@@ -60,8 +61,6 @@ class AccountService(
             )
             throw IllegalStateException("Tried to update User Auxiliary for uid: $uid but no such account exists.")
         }
-
-        firebaseAuthService.updateUser(uid, aux)
 
         val copy = UserAuxiliary(
             nickname = aux.nickname ?: account.userAuxiliary.nickname,
