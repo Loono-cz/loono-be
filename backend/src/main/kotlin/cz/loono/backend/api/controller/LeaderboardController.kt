@@ -23,5 +23,5 @@ class LeaderboardController(
         basicUser: BasicUser,
         @RequestParam(name = "leaderboard_size")
         leaderboardSize: Int = 100
-    ): LeaderboardDto = leaderboardService.getLeaderboard(basicUser.uid, leaderboardSize)
+    ): LeaderboardDto = leaderboardService.getLeaderboard(basicUser.uid)
 }

@@ -19,22 +19,26 @@ class LeaderboardServiceTest(
 
     @Test
     fun `empty db`() {
-        val leaderboard = leaderboardService.getLeaderboard("uid", 10)
+        val leaderboard = leaderboardService.getLeaderboard("uid")
 
-        assert(leaderboard.leaderboard!!.isEmpty())
+        assert(leaderboard.top.isEmpty())
+        assert(leaderboard.peers.isEmpty())
+        assert(leaderboard.myOrder == 0)
     }
 
     @Test
     fun `me in top`() {
         accountRepo.save(Account(uid = "uid"))
 
-        val leaderboard = leaderboardService.getLeaderboard("uid", 10)
+        val leaderboard = leaderboardService.getLeaderboard("uid")
 
-        assert(leaderboard.leaderboard!!.first().isThisMe == true)
+        assert(leaderboard.top.first().isThisMe == true)
+        assert(leaderboard.peers.first().isThisMe == true)
+        assert(leaderboard.myOrder == 1)
     }
 
     @Test
-    fun `top 3`() {
+    fun `happy case`() {
         accountRepo.save(Account(uid = "1", points = 0))
         accountRepo.save(Account(uid = "2", points = 100))
         accountRepo.save(Account(uid = "3", points = 200))
@@ -42,12 +46,16 @@ class LeaderboardServiceTest(
         accountRepo.save(Account(uid = "5", points = 5))
         accountRepo.save(Account(uid = "6", points = 1000))
 
-        val leaderboard = leaderboardService.getLeaderboard("uid", 3)
+        val leaderboard = leaderboardService.getLeaderboard("5")
 
-        assert(leaderboard.leaderboard!!.size == 3)
-        assert(leaderboard.leaderboard!![0].points == 1000)
-        assert(leaderboard.leaderboard!![1].points == 200)
-        assert(leaderboard.leaderboard!![2].points == 100)
+        assert(leaderboard.top.size == 3)
+        assert(leaderboard.top[0].points == 1000)
+        assert(leaderboard.top[1].points == 200)
+        assert(leaderboard.top[2].points == 100)
+        assert(leaderboard.peers[0].points == 10)
+        assert(leaderboard.peers[1].points == 5)
+        assert(leaderboard.peers[2].points == 0)
+        assert(leaderboard.myOrder == 5)
     }
 
     @Test
@@ -55,9 +63,11 @@ class LeaderboardServiceTest(
         accountRepo.save(Account(uid = "1", points = 200))
         accountRepo.save(Account(uid = "2", points = 10))
 
-        val leaderboard = leaderboardService.getLeaderboard("uid", 3)
+        val leaderboard = leaderboardService.getLeaderboard("2")
 
-        assert(leaderboard.leaderboard!!.size == 2)
+        assert(leaderboard.top.size == 2)
+        assert(leaderboard.peers.size == 2)
+        assert(leaderboard.myOrder == 2)
     }
 
     @Test
@@ -70,10 +80,10 @@ class LeaderboardServiceTest(
             )
         )
 
-        val leaderboard = leaderboardService.getLeaderboard("uid", 3)
+        val leaderboard = leaderboardService.getLeaderboard("uid")
 
         assert(
-            leaderboard.leaderboard!![0] == LeaderboardUserDto(
+            leaderboard.top[0] == LeaderboardUserDto(
                 name = "boss",
                 profileImageUrl = "image",
                 points = 200,

@@ -1,5 +1,8 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.BasicUser
+import cz.loono.backend.api.dto.SexDto
+import cz.loono.backend.api.dto.UserDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Settings
@@ -70,5 +73,23 @@ class AccountService(
             profileImageUrl = aux.profileImageUrl
         )
         return accountRepository.save(account.copy(userAuxiliary = copy))
+    }
+
+    fun assembleUserDto(base: BasicUser, aux: UserAuxiliary): UserDto {
+        val account = accountRepository.findByUid(base.uid) ?: throw LoonoBackendException(
+            status = HttpStatus.NOT_FOUND,
+            errorCode = "404",
+            errorMessage = "The account not found."
+        )
+        return UserDto(
+            uid = base.uid,
+            email = base.email,
+            nickname = aux.nickname ?: account.userAuxiliary.nickname,
+            sex = aux.sex?.let(SexDto::valueOf),
+            birthdateMonth = aux.birthdate?.monthValue,
+            birthdateYear = aux.birthdate?.year,
+            preferredEmail = aux.preferredEmail,
+            profileImageUrl = aux.profileImageUrl ?: account.userAuxiliary.profileImageUrl
+        )
     }
 }

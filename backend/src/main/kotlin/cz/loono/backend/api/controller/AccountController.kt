@@ -4,8 +4,6 @@ import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
 import cz.loono.backend.api.dto.AccountDto
 import cz.loono.backend.api.dto.SettingsDto
-import cz.loono.backend.api.dto.SexDto
-import cz.loono.backend.api.dto.UserDto
 import cz.loono.backend.api.dto.UserPatchDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
@@ -96,7 +94,7 @@ class AccountController(
     }
 
     private fun assembleAccountDto(basicUser: BasicUser, account: Account): AccountDto {
-        val userDto = assembleUserDto(basicUser, account.userAuxiliary)
+        val userDto = accountService.assembleUserDto(basicUser, account.userAuxiliary)
         val settingsDto = SettingsDto(
             leaderboardAnonymizationOptIn = account.settings.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = account.settings.appointmentReminderEmailsOptIn,
@@ -104,16 +102,4 @@ class AccountController(
         )
         return AccountDto(user = userDto, settings = settingsDto, points = account.points)
     }
-
-    private fun assembleUserDto(base: BasicUser, aux: UserAuxiliary): UserDto =
-        UserDto(
-            uid = base.uid,
-            email = base.email,
-            nickname = aux.nickname ?: base.name,
-            sex = aux.sex?.let(SexDto::valueOf),
-            birthdateMonth = aux.birthdate?.monthValue,
-            birthdateYear = aux.birthdate?.year,
-            preferredEmail = aux.preferredEmail,
-            profileImageUrl = aux.profileImageUrl ?: base.photoUrl.toString()
-        )
 }

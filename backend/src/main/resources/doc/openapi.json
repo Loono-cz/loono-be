@@ -758,13 +758,27 @@
                 "description": "Rendered leaderboard from the POV of the authenticated user. Contains the top profiles.",
                 "type": "object",
                 "properties": {
-                    "leaderboard": {
+                    "top": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/LeaderboardUser"
                         }
+                    },
+                    "peers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LeaderboardUser"
+                        }
+                    },
+                    "myOrder": {
+                        "type": "integer"
                     }
-                }
+                },
+                "required": [
+                    "top",
+                    "peers",
+                    "myOrder"
+                ]
             },
             "UserPatch": {
                 "type": "object",
