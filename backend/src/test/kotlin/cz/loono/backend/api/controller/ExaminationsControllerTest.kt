@@ -4,7 +4,6 @@ import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationIdDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationTypeEnumDto
-import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.createAccount
@@ -13,11 +12,11 @@ import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.repository.AccountRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
+import java.time.LocalDate
 
 @DataJpaTest
 @Import(value = [ExaminationRecordService::class, PreventionService::class])
@@ -32,7 +31,7 @@ class ExaminationsControllerTest(
     fun `Should add badge and points`() {
         val controller = ExaminationsController(recordService, preventionService)
         val basicUser = createBasicUser()
-        var existingAccount = createAccount()
+        var existingAccount = createAccount(birthday = LocalDate.of(1970, 1, 1))
         val examinationRecord = ExaminationRecordDto(type = ExaminationTypeEnumDto.DENTIST)
         // This is done to get assigned ID by the DB
         existingAccount = repo.save(existingAccount)
@@ -60,22 +59,5 @@ class ExaminationsControllerTest(
             expectedBadge.copy(level = 2), expectedBadge.copy(type = BadgeTypeDto.BELT.value)
         )
         assertThat(actual.points).isEqualTo(900)
-    }
-
-    @Test
-    fun `Should fail when unsupported exam confirmed`() {
-        val controller = ExaminationsController(recordService, preventionService)
-        val basicUser = createBasicUser()
-        val existingAccount = createAccount()
-        val examinationRecord = ExaminationRecordDto(type = ExaminationTypeEnumDto.MAMMOGRAM)
-        // This is done to get assigned ID by the DB
-        repo.save(existingAccount)
-
-        val examUUID = controller.updateOrCreate(basicUser, examinationRecord).uuid!!
-
-        val actualError = assertThrows<LoonoBackendException> {
-            controller.confirm(basicUser, ExaminationTypeEnumDto.MAMMOGRAM.toString(), ExaminationIdDto(examUUID))
-        }
-        assertThat(actualError.errorMessage).isEqualTo("Unsupported examination type MAMMOGRAM")
     }
 }

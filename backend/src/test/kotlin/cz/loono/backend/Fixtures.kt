@@ -15,13 +15,17 @@ internal fun createBasicUser() = BasicUser(
     URL("https://example.com")
 )
 
-internal fun createAccount(uid: String = "uid") = Account(
+internal fun createAccount(
+    uid: String = "uid",
+    sex: String = SexDto.MALE.name,
+    birthday: LocalDate = LocalDate.of(2000, 1, 1)
+) = Account(
     uid = uid,
     userAuxiliary = UserAuxiliary(
         nickname = "Zilvar z chudobince",
         preferredEmail = "preferredZilvar@example.com",
-        sex = SexDto.MALE.name,
-        birthdate = LocalDate.of(2000, 1, 1),
+        sex = sex,
+        birthdate = birthday,
         profileImageUrl = "https://example.com"
     ),
     settings = Settings(

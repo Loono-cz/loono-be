@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ExaminationRecordService(
     private val accountRepository: AccountRepository,
-    private val examinationRecordRepository: ExaminationRecordRepository
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val preventionService: PreventionService
 ) {
 
     companion object {
@@ -34,7 +35,8 @@ class ExaminationRecordService(
     fun cancelExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
         changeState(examUuid, accountUuid, ExaminationStatusDto.CANCELED)
 
-    fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, uuid: String): ExaminationRecordDto {
+    fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
+        validateAccountPrerequisites(examinationRecordDto.type, accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto)
         return examinationRecordRepository.save(
             ExaminationRecord(
@@ -42,11 +44,27 @@ class ExaminationRecordService(
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
                 plannedDate = examinationRecordDto.date,
-                account = findAccount(uuid),
+                account = findAccount(accountUuid),
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
             )
         ).toExaminationRecordDto()
+    }
+
+    private fun validateAccountPrerequisites(type: ExaminationTypeEnumDto, accountUuid: String) {
+        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
+            HttpStatus.NOT_FOUND,
+            "404",
+            "The account not found."
+        )
+        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == type }
+        intervals.ifEmpty {
+            throw LoonoBackendException(
+                HttpStatus.BAD_REQUEST,
+                "400",
+                "The account doesn't have rights to create this type of examinations."
+            )
+        }
     }
 
     private fun validateUpdateAttempt(examinationRecordDto: ExaminationRecordDto): ExaminationRecord =
