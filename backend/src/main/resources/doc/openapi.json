@@ -126,7 +126,7 @@
         },
         "/leaderboard": {
             "get": {
-                "summary": "Draft Get Leaderboard",
+                "summary": "Get Leaderboard",
                 "tags": [
                     "Leaderboard"
                 ],
@@ -1155,7 +1155,7 @@
                     "CANCELED",
                     "UNKNOWN"
                 ],
-                "default": "NEW"
+                "default": "UNKNOWN"
             },
             "PreventionStatus": {
                 "type": "object",
@@ -1246,7 +1246,7 @@
                     },
                     "firstExam": {
                         "type": "boolean",
-                        "default": true
+                        "default": false
                     }
                 },
                 "required": [
