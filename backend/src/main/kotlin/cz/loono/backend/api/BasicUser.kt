@@ -7,7 +7,7 @@ import java.net.URL
  */
 data class BasicUser(
     val uid: String,
-    val email: String,
-    val name: String,
+    val email: String?,
+    val name: String?,
     val photoUrl: URL?
 )

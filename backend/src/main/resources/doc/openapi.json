@@ -718,9 +718,7 @@
                     }
                 },
                 "required": [
-                    "uid",
-                    "email",
-                    "nickname"
+                    "uid"
                 ]
             },
             "LeaderboardUser": {
