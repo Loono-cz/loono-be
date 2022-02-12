@@ -30,7 +30,11 @@ class FirebaseAuthService : JwtAuthService {
             return JwtAuthService.VerificationResult.Error("Could not verify JWT.")
         }
 
-        val user = BasicUser(decodedToken.uid, decodedToken.email, decodedToken.name, URL(decodedToken.picture))
+        var profileImage: URL? = null
+        if (decodedToken.picture != null) {
+            profileImage = URL(decodedToken.picture)
+        }
+        val user = BasicUser(decodedToken.uid, decodedToken.email, decodedToken.name, profileImage)
         return JwtAuthService.VerificationResult.Success(user)
     }
 
