@@ -1,6 +1,7 @@
 name: 'Deploy backend to ECS'
 on:
-  push, workflow_dispatch:
+  workflow_dispatch:
+  push:
     branches:
       - master
     paths-ignore:
