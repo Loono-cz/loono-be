@@ -8,7 +8,7 @@ on:
       - '.github/**'
       - '.gitignore'
       - 'README.md'
-      - 'LICENSE
+      - 'LICENSE'
 
 env:
   region: ${{ secrets.AWS_REGION }}
