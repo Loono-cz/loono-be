@@ -8,6 +8,7 @@ RUN gradle build --info --stacktrace --no-daemon
 FROM gcr.io/distroless/java17
 
 COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/dists/loono-be.jar /app/loono-be.jar
+COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/test-results /tests-results
 
 WORKDIR "/app"
 USER nonroot
