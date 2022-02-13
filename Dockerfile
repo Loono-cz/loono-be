@@ -3,12 +3,11 @@ FROM gradle:7.3.2-jdk17 as gradle
 COPY . /home/gradle/backend
 WORKDIR /home/gradle/backend
 
-RUN gradle build --info --stacktrace --no-daemon
+RUN gradle build --info --stacktrace --no-daemon --mount source=/home/gradle/backend/backend/build/test-results,target=/tests-results
 
 FROM gcr.io/distroless/java17
 
 COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/dists/loono-be.jar /app/loono-be.jar
-COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/test-results /tests-results
 
 WORKDIR "/app"
 USER nonroot
