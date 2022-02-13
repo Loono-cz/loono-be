@@ -31,10 +31,6 @@ class BadgeDowngradeTaskTest(
     private val badgeDowngradeTask: BadgeDowngradeTask,
     private val accountRepository: AccountRepository,
 ) {
-    companion object {
-        // 1644682446419L == 2022-02-12T17:14:06.419
-        private const val MILLIS = 1644682446419L
-    }
 
     @Test
     fun `Should correctly downgrade badges`() {
@@ -45,21 +41,21 @@ class BadgeDowngradeTaskTest(
                 1,
                 3,
                 account,
-                LocalDateTime.parse("2020-02-13T17:14:06.419")
+                LocalDateTime.parse("2020-02-13T17:14:06.00")
             ),
             Badge(
                 BadgeTypeDto.HEADBAND.toString(),
                 1,
                 3,
                 account,
-                LocalDateTime.parse("2022-02-12T17:14:06.419")
+                LocalDateTime.parse("2022-02-12T17:14:06.00")
             ),
             Badge(
                 BadgeTypeDto.COAT.toString(),
                 1,
                 3,
                 account,
-                LocalDateTime.parse("2020-02-12T17:14:06.419")
+                LocalDateTime.parse("2020-02-12T17:14:06.00")
             )
         )
         accountRepository.save(account)
@@ -68,7 +64,7 @@ class BadgeDowngradeTaskTest(
             examinationRecords = listOf(
                 ExaminationRecord(
                     type = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
-                    plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.419"),
+                    plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.00"),
                     account = account,
                     status = ExaminationStatusDto.CONFIRMED
                 )
@@ -88,21 +84,21 @@ class BadgeDowngradeTaskTest(
                 1,
                 2,
                 account,
-                LocalDateTime.parse("2024-02-12T17:14:06.419")
+                LocalDateTime.parse("2024-02-12T17:14:06.00")
             ),
             Badge(
                 BadgeTypeDto.HEADBAND.toString(),
                 1,
                 3,
                 account,
-                LocalDateTime.parse("2022-02-12T17:14:06.419")
+                LocalDateTime.parse("2022-02-12T17:14:06.00")
             ),
             Badge(
                 BadgeTypeDto.COAT.toString(),
                 1,
                 2,
                 account,
-                LocalDateTime.parse("2024-02-12T17:14:06.419")
+                LocalDateTime.parse("2024-02-12T17:14:06.00")
             )
         )
 
@@ -118,7 +114,7 @@ class BadgeDowngradeTaskTest(
                 1,
                 1,
                 account,
-                LocalDateTime.parse("2020-02-13T17:14:06.419")
+                LocalDateTime.parse("2020-02-13T17:14:06.00")
             )
         )
         accountRepository.save(account)
@@ -127,7 +123,7 @@ class BadgeDowngradeTaskTest(
             examinationRecords = listOf(
                 ExaminationRecord(
                     type = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
-                    plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.419"),
+                    plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.00"),
                     account = account,
                     status = ExaminationStatusDto.CONFIRMED
                 )
@@ -147,7 +143,7 @@ class BadgeDowngradeTaskTest(
         @Bean
         @Primary
         fun mockedClock() = mock<Clock>().apply {
-            whenever(instant()).thenReturn(Instant.ofEpochMilli(MILLIS))
+            whenever(instant()).thenReturn(Instant.parse("2022-02-12T17:14:06.00Z"))
         }
     }
 }

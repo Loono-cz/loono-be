@@ -3,7 +3,7 @@ FROM gradle:7.3.2-jdk17 as gradle
 COPY . /home/gradle/backend
 WORKDIR /home/gradle/backend
 
-RUN -v /home/gradle/backend/backend/build/test-results:/tests-results gradle build --info --stacktrace --no-daemon
+RUN gradle build --info --stacktrace --no-daemon
 
 FROM gcr.io/distroless/java17
 
