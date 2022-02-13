@@ -2,6 +2,7 @@ package cz.loono.backend.db.model
 
 import org.hibernate.envers.Audited
 import java.io.Serializable
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Entity
@@ -26,6 +27,7 @@ data class Badge(
     @ManyToOne(optional = false)
     @JoinColumns(JoinColumn(name = "account_id", insertable = false, updatable = false))
     val account: Account = Account(),
+    val lastUpdateOn: LocalDateTime = LocalDateTime.now()
 )
 
 /**

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -26,11 +27,12 @@ class ExaminationRecordServiceTest(
 ) {
 
     private val preventionService = PreventionService(examinationRecordRepository, accountRepository)
+    private val clock = Clock.systemUTC()
 
     @Test
     fun `changing state for a non-existing user`() {
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
 
         assertThrows<LoonoBackendException>("Account not found") {
             examinationRecordService.createOrUpdateExam(
@@ -48,7 +50,7 @@ class ExaminationRecordServiceTest(
     fun `changing state of a non-existing exam`() {
         accountRepository.save(Account(uid = "101"))
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             uuid = "1",
             type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
@@ -77,7 +79,7 @@ class ExaminationRecordServiceTest(
             )
         )
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER
         )
@@ -101,7 +103,7 @@ class ExaminationRecordServiceTest(
             )
         )
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER
         )
@@ -133,7 +135,7 @@ class ExaminationRecordServiceTest(
             )
         )
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val examRecord = ExaminationRecordDto(
             type = ExaminationTypeEnumDto.GYNECOLOGIST,
             date = LocalDateTime.MAX
@@ -148,7 +150,7 @@ class ExaminationRecordServiceTest(
     fun `confirm exam`() {
         val account = accountRepository.save(Account(uid = "101"))
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.TO_BE_CONFIRMED
@@ -164,7 +166,7 @@ class ExaminationRecordServiceTest(
     fun `cancel exam`() {
         val account = accountRepository.save(Account(uid = "101"))
         val examinationRecordService =
-            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService)
+            ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.TO_BE_CONFIRMED

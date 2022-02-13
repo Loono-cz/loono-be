@@ -25,4 +25,14 @@ object BadgesPointsProvider {
                 status = HttpStatus.BAD_REQUEST, errorMessage = "Unsupported examination type $examType"
             )
         }
+
+    val BADGES_TO_EXAMS = mapOf(
+        BadgeTypeDto.GLASSES to ExaminationTypeEnumDto.OPHTHALMOLOGIST,
+        BadgeTypeDto.COAT to ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+        BadgeTypeDto.GLOVES to ExaminationTypeEnumDto.DERMATOLOGIST,
+        BadgeTypeDto.HEADBAND to ExaminationTypeEnumDto.DENTIST,
+        BadgeTypeDto.SHOES to ExaminationTypeEnumDto.COLONOSCOPY,
+        BadgeTypeDto.TOP to ExaminationTypeEnumDto.MAMMOGRAM,
+        BadgeTypeDto.BELT to ExaminationTypeEnumDto.UROLOGIST,
+    )
 }

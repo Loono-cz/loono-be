@@ -10,15 +10,18 @@ import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.extensions.toLocalDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 
 @Service
 class ExaminationRecordService(
     private val accountRepository: AccountRepository,
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val preventionService: PreventionService
+    private val preventionService: PreventionService,
+    private val clock: Clock,
 ) {
 
     companion object {
@@ -110,7 +113,9 @@ class ExaminationRecordService(
                     .minus(toIncrement)
                     .toMutableSet()
                 badgesWithoutToIncrement.apply { add(toIncrement.copy(level = toIncrement.level.inc())) }
-            } ?: account.badges.plus(Badge(badgeType, account.id, STARTING_LEVEL, account))
+            } ?: account.badges.plus(
+                Badge(badgeType, account.id, STARTING_LEVEL, account, clock.instant().toLocalDateTime())
+            )
 
             account.copy(badges = badgesToCopy, points = account.points + points)
         }

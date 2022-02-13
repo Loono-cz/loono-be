@@ -12,9 +12,9 @@ class ExaminationCancellationTask(
     private val preventionService: PreventionService,
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository
-) {
+) : SchedulerTask {
 
-    fun run() {
+    override fun run() {
         // TODO Filter conditions could be changed. There is a question mark related to the statuses.
         val exams = examinationRecordRepository.findAll()
             .filter { it.status == ExaminationStatusDto.TO_BE_CONFIRMED && it.plannedDate != null }
