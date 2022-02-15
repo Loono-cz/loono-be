@@ -39,5 +39,4 @@ data class SelfExaminationRecord(
 
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
     val uuid: String = UUID.randomUUID().toString()
-) {
-}
+)

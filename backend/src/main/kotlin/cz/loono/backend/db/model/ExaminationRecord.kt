@@ -5,7 +5,7 @@ import cz.loono.backend.api.dto.ExaminationTypeDto
 import org.hibernate.Hibernate
 import org.hibernate.envers.Audited
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue

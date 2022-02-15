@@ -4,7 +4,7 @@ import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
 import cz.loono.backend.api.dto.ExaminationIdDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.PreventionStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.ExaminationRecordService
@@ -78,5 +78,5 @@ class ExaminationsController(
         basicUser: BasicUser
     ): PreventionStatusDto = preventionService.getPreventionStatus(basicUser.uid)
 
-    private fun getAvailableExaminations() = ExaminationTypeEnumDto.values().map(ExaminationTypeEnumDto::name)
+    private fun getAvailableExaminations() = ExaminationTypeDto.values().map(ExaminationTypeDto::name)
 }
