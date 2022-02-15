@@ -1,6 +1,6 @@
 package cz.loono.backend.api.service
 
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 
 /**
@@ -32,49 +32,49 @@ object ExaminationIntervalProvider {
 
     private val rules = listOf(
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+            examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
             intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
             intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
             priority = 1
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.MAMMOGRAM,
+            examinationType = ExaminationTypeDto.MAMMOGRAM,
             intervalsMale = listOf(),
             intervalsFemale = listOf(AgeInterval(fromAge = 45, intervalYears = 2)),
             priority = 2
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.GYNECOLOGIST,
+            examinationType = ExaminationTypeDto.GYNECOLOGIST,
             intervalsMale = listOf(),
             intervalsFemale = listOf(AgeInterval(fromAge = 15, intervalYears = 1)),
             priority = 3
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.COLONOSCOPY,
+            examinationType = ExaminationTypeDto.COLONOSCOPY,
             intervalsMale = listOf(AgeInterval(fromAge = 50, intervalYears = 10)),
             intervalsFemale = listOf(AgeInterval(fromAge = 50, intervalYears = 10)),
             priority = 4
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.UROLOGIST,
+            examinationType = ExaminationTypeDto.UROLOGIST,
             intervalsMale = listOf(AgeInterval(fromAge = 50, intervalYears = 1)),
             intervalsFemale = listOf(),
             priority = 5
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.DERMATOLOGIST,
+            examinationType = ExaminationTypeDto.DERMATOLOGIST,
             intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
             intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
             priority = 6
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.ULTRASOUND_BREAST,
+            examinationType = ExaminationTypeDto.ULTRASOUND_BREAST,
             intervalsMale = listOf(),
             intervalsFemale = listOf(AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2)),
             priority = 7
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.DENTIST,
+            examinationType = ExaminationTypeDto.DENTIST,
             intervalsMale = listOf(
                 AgeInterval(fromAge = 19, intervalYears = 1)
             ),
@@ -84,7 +84,7 @@ object ExaminationIntervalProvider {
             priority = 8
         ),
         PreventionRule(
-            examinationType = ExaminationTypeEnumDto.OPHTHALMOLOGIST,
+            examinationType = ExaminationTypeDto.OPHTHALMOLOGIST,
             intervalsMale = listOf(
                 AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2),
                 AgeInterval(fromAge = 45, toAge = 61, intervalYears = 4),
@@ -101,7 +101,7 @@ object ExaminationIntervalProvider {
 }
 
 data class ExaminationInterval(
-    val examinationType: ExaminationTypeEnumDto,
+    val examinationType: ExaminationTypeDto,
     val intervalYears: Int,
     val priority: Int
 )
@@ -112,7 +112,7 @@ data class Patient(
 )
 
 data class PreventionRule(
-    val examinationType: ExaminationTypeEnumDto,
+    val examinationType: ExaminationTypeDto,
     val intervalsMale: List<AgeInterval>,
     val intervalsFemale: List<AgeInterval>,
     val priority: Int

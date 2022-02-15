@@ -1,7 +1,7 @@
 package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.ExaminationInterval
 import cz.loono.backend.api.service.ExaminationRecordService
@@ -39,9 +39,9 @@ class ExaminationCancellationTaskTest {
             .thenReturn(
                 listOf(
                     ExaminationRecord(
-                        type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+                        type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         plannedDate = LocalDateTime.now().minusYears(2),
-                        status = ExaminationStatusDto.TO_BE_CONFIRMED,
+                        status = ExaminationStatusDto.NEW,
                         uuid = "1",
                         account = getAccount()
                     )
@@ -65,16 +65,16 @@ class ExaminationCancellationTaskTest {
             .thenReturn(
                 listOf(
                     ExaminationRecord(
-                        type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+                        type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         plannedDate = LocalDateTime.now().minusYears(2),
                         status = ExaminationStatusDto.CONFIRMED,
                         uuid = "1",
                         account = getAccount()
                     ),
                     ExaminationRecord(
-                        type = ExaminationTypeEnumDto.DENTIST,
+                        type = ExaminationTypeDto.DENTIST,
                         plannedDate = null,
-                        status = ExaminationStatusDto.TO_BE_CONFIRMED,
+                        status = ExaminationStatusDto.NEW,
                         uuid = "1",
                         account = getAccount()
                     )
@@ -99,9 +99,9 @@ class ExaminationCancellationTaskTest {
             .thenReturn(
                 listOf(
                     ExaminationRecord(
-                        type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+                        type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         plannedDate = LocalDateTime.now().minusYears(1),
-                        status = ExaminationStatusDto.TO_BE_CONFIRMED,
+                        status = ExaminationStatusDto.NEW,
                         uuid = "1",
                         account = getAccount()
                     )
@@ -115,8 +115,8 @@ class ExaminationCancellationTaskTest {
 
     private fun definitionList(): List<ExaminationInterval> =
         listOf(
-            ExaminationInterval(ExaminationTypeEnumDto.GENERAL_PRACTITIONER, 2, 1),
-            ExaminationInterval(ExaminationTypeEnumDto.DENTIST, 1, 9)
+            ExaminationInterval(ExaminationTypeDto.GENERAL_PRACTITIONER, 2, 1),
+            ExaminationInterval(ExaminationTypeDto.DENTIST, 1, 9)
         )
 
     private fun getAccount(): Account =

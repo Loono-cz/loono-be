@@ -15,9 +15,8 @@ class ExaminationCancellationTask(
 ) : SchedulerTask {
 
     override fun run() {
-        // TODO Filter conditions could be changed. There is a question mark related to the statuses.
         val exams = examinationRecordRepository.findAll()
-            .filter { it.status == ExaminationStatusDto.TO_BE_CONFIRMED && it.plannedDate != null }
+            .filter { it.status == ExaminationStatusDto.NEW && it.plannedDate != null }
 
         val now = LocalDateTime.now()
         exams.forEach { exam ->

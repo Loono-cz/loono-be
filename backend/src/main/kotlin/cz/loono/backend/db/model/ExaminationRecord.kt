@@ -1,11 +1,11 @@
 package cz.loono.backend.db.model
 
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import org.hibernate.Hibernate
 import org.hibernate.envers.Audited
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -23,7 +23,7 @@ data class ExaminationRecord(
     val id: Long = 0,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    val type: ExaminationTypeEnumDto = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
+    val type: ExaminationTypeDto = ExaminationTypeDto.GENERAL_PRACTITIONER,
 
     @Column
     val plannedDate: LocalDateTime? = null,

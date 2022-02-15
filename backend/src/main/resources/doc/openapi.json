@@ -278,10 +278,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/PreventionStatus"
-                                    }
+                                    "$ref": "#/components/schemas/PreventionStatus"
                                 }
                             }
                         }
@@ -840,12 +837,11 @@
                     "FEMALE"
                 ]
             },
-            "ExaminationTypeEnum": {
+            "ExaminationType": {
                 "type": "string",
-                "title": "ExaminationTypeEnum",
+                "title": "ExaminationType",
                 "description": "",
                 "enum": [
-                    "BREAST_SELF",
                     "COLONOSCOPY",
                     "DENTIST",
                     "DERMATOLOGIST",
@@ -853,11 +849,19 @@
                     "GYNECOLOGIST",
                     "MAMMOGRAM",
                     "OPHTHALMOLOGIST",
-                    "TESTICULAR_SELF",
                     "TOKS",
                     "ULTRASOUND_BREAST",
                     "UROLOGIST",
                     "VENEREAL_DISEASES"
+                ]
+            },
+            "SelfExaminationType": {
+                "type": "string",
+                "title": "SelfExaminationType",
+                "description": "",
+                "enum": [
+                    "BREAST",
+                    "TESTICULAR"
                 ]
             },
             "PreferredEmail": {
@@ -1150,23 +1154,22 @@
                 "description": "Status enum of the examination",
                 "enum": [
                     "NEW",
-                    "TO_BE_CONFIRMED",
                     "CONFIRMED",
                     "CANCELED",
                     "UNKNOWN"
                 ],
                 "default": "UNKNOWN"
             },
-            "PreventionStatus": {
+            "ExaminationPreventionStatus": {
                 "type": "object",
-                "title": "PreventionStatus",
+                "title": "ExamanationPreventionStatus",
                 "description": "Overview status of examinations",
                 "properties": {
                     "uuid": {
                         "type": "string"
                     },
                     "examinationType": {
-                        "$ref": "#/components/schemas/ExaminationTypeEnum"
+                        "$ref": "#/components/schemas/ExaminationType"
                     },
                     "intervalYears": {
                         "type": "integer"
@@ -1193,12 +1196,40 @@
                     }
                 },
                 "required": [
+                    "uuid",
                     "examinationType",
                     "intervalYears",
                     "firstExam",
                     "priority",
                     "state",
                     "count"
+                ]
+            },
+            "SelfExaminationPreventionStatus": {
+                "type": "object",
+                "title": "SelfExamanationPreventionStatus",
+                "description": "Overview status of self-examinations",
+                "properties": {
+                    "lastExamUuid": {
+                        "type": "string"
+                    },
+                    "plannedDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/SelfExaminationType"
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SelfExaminationStatus"
+                        }
+                    }
+                },
+                "required": [
+                    "type",
+                    "history"
                 ]
             },
             "Badge": {
@@ -1234,7 +1265,7 @@
                         "nullable": true
                     },
                     "type": {
-                        "$ref": "#/components/schemas/ExaminationTypeEnum"
+                        "$ref": "#/components/schemas/ExaminationType"
                     },
                     "date": {
                         "type": "string",
@@ -1252,6 +1283,50 @@
                 "required": [
                     "type"
                 ]
+            },
+            "PreventionStatus": {
+                "title": "PreventionStatus",
+                "type": "object",
+                "description": "Overview prevention statuses of all examinations",
+                "properties": {
+                    "examinations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ExaminationPreventionStatus"
+                        }
+                    },
+                    "selfexaminations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SelfExaminationPreventionStatus"
+                        }
+                    }
+                },
+                "required": [
+                    "examinations",
+                    "selfexaminations"
+                ]
+            },
+            "SelfExaminationStatus": {
+                "type": "string",
+                "title": "SelfExaminationStatus",
+                "description": "Self-examination statuses",
+                "enum": [
+                    "PLANNED",
+                    "COMPLETED",
+                    "MISSED"
+                ],
+                "default": "PLANNED"
+            },
+            "SelfExaminationResult": {
+                "type": "string",
+                "title": "SelfExaminationResult",
+                "description": "",
+                "enum": [
+                    "OK",
+                    "FINDING"
+                ],
+                "default": "OK"
             }
         },
         "securitySchemes": {

@@ -2,7 +2,7 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
@@ -10,6 +10,7 @@ import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
@@ -23,10 +24,12 @@ import java.time.LocalDateTime
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class ExaminationRecordServiceTest(
     private val accountRepository: AccountRepository,
-    private val examinationRecordRepository: ExaminationRecordRepository
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
 ) {
 
-    private val preventionService = PreventionService(examinationRecordRepository, accountRepository)
+    private val preventionService =
+        PreventionService(examinationRecordRepository, selfExaminationRecordRepository, accountRepository)
     private val clock = Clock.systemUTC()
 
     @Test
@@ -38,8 +41,8 @@ class ExaminationRecordServiceTest(
             examinationRecordService.createOrUpdateExam(
                 ExaminationRecordDto(
                     uuid = "1",
-                    type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-                    status = ExaminationStatusDto.TO_BE_CONFIRMED
+                    type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                    status = ExaminationStatusDto.NEW
                 ),
                 "1"
             )
@@ -53,8 +56,8 @@ class ExaminationRecordServiceTest(
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
             uuid = "1",
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.TO_BE_CONFIRMED,
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW,
             firstExam = false,
             date = LocalDateTime.MIN
         )
@@ -81,7 +84,7 @@ class ExaminationRecordServiceTest(
         val examinationRecordService =
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER
         )
 
         val result = examinationRecordService.createOrUpdateExam(exam, "101")
@@ -105,13 +108,13 @@ class ExaminationRecordServiceTest(
         val examinationRecordService =
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER
         )
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
         val changedExam = ExaminationRecordDto(
             uuid = storedExam.uuid,
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.TO_BE_CONFIRMED,
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW,
             firstExam = false,
             date = LocalDateTime.MAX
         )
@@ -137,7 +140,7 @@ class ExaminationRecordServiceTest(
         val examinationRecordService =
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val examRecord = ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.GYNECOLOGIST,
+            type = ExaminationTypeDto.GYNECOLOGIST,
             date = LocalDateTime.MAX
         )
 
@@ -152,8 +155,8 @@ class ExaminationRecordServiceTest(
         val examinationRecordService =
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.TO_BE_CONFIRMED
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW
         )
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
@@ -168,8 +171,8 @@ class ExaminationRecordServiceTest(
         val examinationRecordService =
             ExaminationRecordService(accountRepository, examinationRecordRepository, preventionService, clock)
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.TO_BE_CONFIRMED
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW
         )
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 

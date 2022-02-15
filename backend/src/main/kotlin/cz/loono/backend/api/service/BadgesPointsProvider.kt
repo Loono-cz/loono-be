@@ -1,25 +1,25 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import org.springframework.http.HttpStatus
 
 object BadgesPointsProvider {
-    fun getBadgesAndPoints(examType: ExaminationTypeEnumDto, sex: SexDto) =
+    fun getBadgesAndPoints(examType: ExaminationTypeDto, sex: SexDto) =
         when {
-            examType == ExaminationTypeEnumDto.OPHTHALMOLOGIST -> BadgeTypeDto.GLASSES to 100
-            examType == ExaminationTypeEnumDto.GENERAL_PRACTITIONER -> BadgeTypeDto.COAT to 200
-            examType == ExaminationTypeEnumDto.DERMATOLOGIST -> BadgeTypeDto.GLOVES to 200
-            examType == ExaminationTypeEnumDto.DENTIST -> BadgeTypeDto.HEADBAND to 300
-            examType == ExaminationTypeEnumDto.COLONOSCOPY -> BadgeTypeDto.SHOES to 1000
+            examType == ExaminationTypeDto.OPHTHALMOLOGIST -> BadgeTypeDto.GLASSES to 100
+            examType == ExaminationTypeDto.GENERAL_PRACTITIONER -> BadgeTypeDto.COAT to 200
+            examType == ExaminationTypeDto.DERMATOLOGIST -> BadgeTypeDto.GLOVES to 200
+            examType == ExaminationTypeDto.DENTIST -> BadgeTypeDto.HEADBAND to 300
+            examType == ExaminationTypeDto.COLONOSCOPY -> BadgeTypeDto.SHOES to 1000
 
-            examType == ExaminationTypeEnumDto.ULTRASOUND_BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 100
-            examType == ExaminationTypeEnumDto.GYNECOLOGIST && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
-            examType == ExaminationTypeEnumDto.MAMMOGRAM && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 500
+            examType == ExaminationTypeDto.ULTRASOUND_BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 100
+            examType == ExaminationTypeDto.GYNECOLOGIST && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
+            examType == ExaminationTypeDto.MAMMOGRAM && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 500
 
-            examType == ExaminationTypeEnumDto.UROLOGIST && sex == SexDto.MALE -> BadgeTypeDto.BELT to 300
+            examType == ExaminationTypeDto.UROLOGIST && sex == SexDto.MALE -> BadgeTypeDto.BELT to 300
 
             else -> throw LoonoBackendException(
                 status = HttpStatus.BAD_REQUEST, errorMessage = "Unsupported examination type $examType"
@@ -27,12 +27,12 @@ object BadgesPointsProvider {
         }
 
     val BADGES_TO_EXAMS = mapOf(
-        BadgeTypeDto.GLASSES to ExaminationTypeEnumDto.OPHTHALMOLOGIST,
-        BadgeTypeDto.COAT to ExaminationTypeEnumDto.GENERAL_PRACTITIONER,
-        BadgeTypeDto.GLOVES to ExaminationTypeEnumDto.DERMATOLOGIST,
-        BadgeTypeDto.HEADBAND to ExaminationTypeEnumDto.DENTIST,
-        BadgeTypeDto.SHOES to ExaminationTypeEnumDto.COLONOSCOPY,
-        BadgeTypeDto.TOP to ExaminationTypeEnumDto.MAMMOGRAM,
-        BadgeTypeDto.BELT to ExaminationTypeEnumDto.UROLOGIST,
+        BadgeTypeDto.GLASSES to ExaminationTypeDto.OPHTHALMOLOGIST,
+        BadgeTypeDto.COAT to ExaminationTypeDto.GENERAL_PRACTITIONER,
+        BadgeTypeDto.GLOVES to ExaminationTypeDto.DERMATOLOGIST,
+        BadgeTypeDto.HEADBAND to ExaminationTypeDto.DENTIST,
+        BadgeTypeDto.SHOES to ExaminationTypeDto.COLONOSCOPY,
+        BadgeTypeDto.TOP to ExaminationTypeDto.MAMMOGRAM,
+        BadgeTypeDto.BELT to ExaminationTypeDto.UROLOGIST,
     )
 }

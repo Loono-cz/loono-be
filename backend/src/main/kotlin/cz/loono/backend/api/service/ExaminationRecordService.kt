@@ -2,7 +2,7 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
@@ -54,7 +54,7 @@ class ExaminationRecordService(
         ).toExaminationRecordDto()
     }
 
-    private fun validateAccountPrerequisites(type: ExaminationTypeEnumDto, accountUuid: String) {
+    private fun validateAccountPrerequisites(type: ExaminationTypeDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
             "404",
@@ -99,7 +99,7 @@ class ExaminationRecordService(
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
 
-    private fun updateWithBadgeAndPoints(examType: ExaminationTypeEnumDto, account: Account): Account? =
+    private fun updateWithBadgeAndPoints(examType: ExaminationTypeDto, account: Account): Account? =
         account.userAuxiliary.sex?.let { sexString ->
             val badgeToPoints = BadgesPointsProvider.getBadgesAndPoints(examType, SexDto.valueOf(sexString))
             val badgeType = badgeToPoints.first.toString()

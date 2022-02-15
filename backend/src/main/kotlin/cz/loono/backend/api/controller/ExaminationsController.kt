@@ -76,7 +76,7 @@ class ExaminationsController(
     fun getPreventionStatus(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
-    ): List<PreventionStatusDto> = preventionService.getPreventionStatus(basicUser.uid)
+    ): PreventionStatusDto = preventionService.getPreventionStatus(basicUser.uid)
 
     private fun getAvailableExaminations() = ExaminationTypeEnumDto.values().map(ExaminationTypeEnumDto::name)
 }

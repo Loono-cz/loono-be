@@ -3,7 +3,7 @@ package cz.loono.backend.api.controller
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationIdDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.createAccount
@@ -40,19 +40,19 @@ class ExaminationsControllerTest(
         val controller = ExaminationsController(recordService, preventionService)
         val basicUser = createBasicUser()
         var existingAccount = createAccount(birthday = LocalDate.of(1970, 1, 1))
-        val examinationRecord = ExaminationRecordDto(type = ExaminationTypeEnumDto.DENTIST)
+        val examinationRecord = ExaminationRecordDto(type = ExaminationTypeDto.DENTIST)
         // This is done to get assigned ID by the DB
         existingAccount = repo.save(existingAccount)
         val expectedBadge = Badge(BadgeTypeDto.HEADBAND.value, existingAccount.id, 1, existingAccount, Instant.ofEpochMilli(1644682446419L).toLocalDateTime())
 
         var examUUID = controller.updateOrCreate(basicUser, examinationRecord).uuid!!
-        controller.confirm(basicUser, ExaminationTypeEnumDto.DENTIST.toString(), ExaminationIdDto(examUUID))
+        controller.confirm(basicUser, ExaminationTypeDto.DENTIST.toString(), ExaminationIdDto(examUUID))
 
         var actual = repo.findByUid("uid")!!
         assertThat(actual.badges).containsExactly(expectedBadge)
         assertThat(actual.points).isEqualTo(300)
 
-        controller.confirm(basicUser, ExaminationTypeEnumDto.DENTIST.toString(), ExaminationIdDto(examUUID))
+        controller.confirm(basicUser, ExaminationTypeDto.DENTIST.toString(), ExaminationIdDto(examUUID))
 
         // Making sure that level upgraded and points increased
         actual = repo.findByUid("uid")!!
@@ -61,8 +61,8 @@ class ExaminationsControllerTest(
 
         // Creating exam of another type
         examUUID =
-            controller.updateOrCreate(basicUser, examinationRecord.copy(type = ExaminationTypeEnumDto.UROLOGIST)).uuid!!
-        controller.confirm(basicUser, ExaminationTypeEnumDto.UROLOGIST.toString(), ExaminationIdDto(examUUID))
+            controller.updateOrCreate(basicUser, examinationRecord.copy(type = ExaminationTypeDto.UROLOGIST)).uuid!!
+        controller.confirm(basicUser, ExaminationTypeDto.UROLOGIST.toString(), ExaminationIdDto(examUUID))
 
         assertThat(actual.badges).containsExactly(
             expectedBadge.copy(level = 2), expectedBadge.copy(type = BadgeTypeDto.BELT.value)

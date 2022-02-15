@@ -1,7 +1,7 @@
 package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.BadgeTypeDto
-import cz.loono.backend.api.dto.ExaminationTypeEnumDto
+import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.service.BadgesPointsProvider.BADGES_TO_EXAMS
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.db.model.Account
@@ -95,6 +95,6 @@ class BadgeDowngradeTask(
     private fun removeZeroLevelBadges(accounts: List<Account>) =
         accounts.map { account -> account.copy(badges = account.badges.filter { it.level > 0 }.toSet()) }
 
-    private fun getLatestExam(examRecords: List<ExaminationRecord>, examType: ExaminationTypeEnumDto) =
+    private fun getLatestExam(examRecords: List<ExaminationRecord>, examType: ExaminationTypeDto) =
         examRecords.lastOrNull { it.plannedDate != null && it.type == examType }
 }
