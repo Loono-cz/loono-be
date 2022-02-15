@@ -11,6 +11,7 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.ExaminationRecord
+import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
@@ -34,7 +35,8 @@ class PreventionService(
         val age = ChronoUnit.YEARS.between(birthDate, LocalDate.now()).toInt()
 
         return ExaminationIntervalProvider.findExaminationRequests(
-            Patient(age, SexDto.valueOf(account.userAuxiliary.sex))
+            // Using double-bang operator, since sex is non-nullable
+            Patient(age, SexDto.valueOf(account.userAuxiliary.sex!!))
         )
     }
 
@@ -96,7 +98,8 @@ class PreventionService(
         val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
             val filteredExams = selfExams.filter { exam -> exam.type == type }
-            val suitableSelfExam = validateSexPrerequisites(type, account.userAuxiliary.sex)
+            // Using double-bang operator, since sex is non-nullable
+            val suitableSelfExam = validateSexPrerequisites(type, account.userAuxiliary.sex!!)
             if (filteredExams.isNotEmpty() && suitableSelfExam) {
                 val plannedExam = filteredExams.filter { exam -> exam.status == SelfExaminationStatusDto.PLANNED }[0]
                 result.add(
