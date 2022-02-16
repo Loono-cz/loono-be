@@ -35,8 +35,7 @@ class PreventionService(
         val age = ChronoUnit.YEARS.between(birthDate, LocalDate.now()).toInt()
 
         return ExaminationIntervalProvider.findExaminationRequests(
-            // Using double-bang operator, since sex is non-nullable
-            Patient(age, SexDto.valueOf(account.userAuxiliary.sex!!))
+            Patient(age, SexDto.valueOf(account.userAuxiliary.sex))
         )
     }
 
@@ -54,7 +53,11 @@ class PreventionService(
                 .mapNotNull { entry -> entry.key to entry.value }
                 .toMap()
 
-        val examinations = prepareExaminationStatuses(examinationRequests, examinationTypesToRecords)
+        val examinations = prepareExaminationStatuses(
+            examinationRequests,
+            examinationTypesToRecords,
+            account.userAuxiliary.sex
+        )
 
         val selfExamsList = prepareSelfExaminationsStatuses(account)
         return PreventionStatusDto(examinations = examinations, selfexaminations = selfExamsList)
@@ -62,7 +65,8 @@ class PreventionService(
 
     private fun prepareExaminationStatuses(
         examinationRequests: List<ExaminationInterval>,
-        examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>>
+        examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>>,
+        sex: String
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
         val sortedExamsOfType = examsOfType
@@ -79,6 +83,7 @@ class PreventionService(
         // 3) Find the largest or return null if the list is empty
         val lastConfirmedDate = confirmedExamsOfCurrentType?.mapNotNull(ExaminationRecord::plannedDate)?.maxOrNull()
         val totalCountOfConfirmedExams = confirmedExamsOfCurrentType?.size ?: 0
+        val rewards = BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(sex))
 
         ExaminationPreventionStatusDto(
             uuid = sortedExamsOfType[0].uuid,
@@ -89,7 +94,9 @@ class PreventionService(
             priority = examinationInterval.priority,
             state = sortedExamsOfType[0].status,
             count = totalCountOfConfirmedExams,
-            lastConfirmedDate = lastConfirmedDate
+            lastConfirmedDate = lastConfirmedDate,
+            points = rewards.second,
+            badge = rewards.first
         )
     }
 
@@ -98,25 +105,31 @@ class PreventionService(
         val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
             val filteredExams = selfExams.filter { exam -> exam.type == type }
-            // Using double-bang operator, since sex is non-nullable
-            val suitableSelfExam = validateSexPrerequisites(type, account.userAuxiliary.sex!!)
-            if (filteredExams.isNotEmpty() && suitableSelfExam) {
-                val plannedExam = filteredExams.filter { exam -> exam.status == SelfExaminationStatusDto.PLANNED }[0]
-                result.add(
-                    SelfExaminationPreventionStatusDto(
-                        lastExamUuid = plannedExam.uuid,
-                        plannedDate = plannedExam.dueDate,
-                        type = type,
-                        history = filteredExams.map(SelfExaminationRecord::status)
+            val rewards = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.userAuxiliary.sex))
+            when {
+                filteredExams.isNotEmpty() && rewards != null -> {
+                    val plannedExam = filteredExams.first { exam -> exam.status == SelfExaminationStatusDto.PLANNED }
+                    result.add(
+                        SelfExaminationPreventionStatusDto(
+                            lastExamUuid = plannedExam.uuid,
+                            plannedDate = plannedExam.dueDate,
+                            type = type,
+                            history = filteredExams.map(SelfExaminationRecord::status),
+                            points = rewards.second,
+                            badge = rewards.first
+                        )
                     )
-                )
-            } else if (suitableSelfExam) {
-                result.add(
-                    SelfExaminationPreventionStatusDto(
-                        type = type,
-                        history = emptyList()
+                }
+                rewards != null -> {
+                    result.add(
+                        SelfExaminationPreventionStatusDto(
+                            type = type,
+                            history = emptyList(),
+                            points = rewards.second,
+                            badge = rewards.first
+                        )
                     )
-                )
+                }
             }
         }
         return result

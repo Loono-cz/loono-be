@@ -2,6 +2,7 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
+import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import org.springframework.http.HttpStatus
@@ -24,6 +25,13 @@ object BadgesPointsProvider {
             else -> throw LoonoBackendException(
                 status = HttpStatus.BAD_REQUEST, errorMessage = "Unsupported examination type $examType"
             )
+        }
+
+    fun getBadgesAndPoints(selfExamType: SelfExaminationTypeDto, sex: SexDto): Pair<BadgeTypeDto, Int>? =
+        when {
+            selfExamType == SelfExaminationTypeDto.BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.SHIELD to 50
+            selfExamType == SelfExaminationTypeDto.TESTICULAR && sex == SexDto.MALE -> BadgeTypeDto.SHIELD to 50
+            else -> null
         }
 
     val BADGES_TO_EXAMS = mapOf(

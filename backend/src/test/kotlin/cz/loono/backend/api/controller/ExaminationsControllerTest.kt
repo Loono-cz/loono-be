@@ -46,13 +46,13 @@ class ExaminationsControllerTest(
         val expectedBadge = Badge(BadgeTypeDto.HEADBAND.value, existingAccount.id, 1, existingAccount, Instant.ofEpochMilli(1644682446419L).toLocalDateTime())
 
         var examUUID = controller.updateOrCreate(basicUser, examinationRecord).uuid!!
-        controller.confirm(basicUser, ExaminationTypeDto.DENTIST.toString(), ExaminationIdDto(examUUID))
+        controller.confirm(basicUser, ExaminationIdDto(examUUID))
 
         var actual = repo.findByUid("uid")!!
         assertThat(actual.badges).containsExactly(expectedBadge)
         assertThat(actual.points).isEqualTo(300)
 
-        controller.confirm(basicUser, ExaminationTypeDto.DENTIST.toString(), ExaminationIdDto(examUUID))
+        controller.confirm(basicUser, ExaminationIdDto(examUUID))
 
         // Making sure that level upgraded and points increased
         actual = repo.findByUid("uid")!!
@@ -62,7 +62,7 @@ class ExaminationsControllerTest(
         // Creating exam of another type
         examUUID =
             controller.updateOrCreate(basicUser, examinationRecord.copy(type = ExaminationTypeDto.UROLOGIST)).uuid!!
-        controller.confirm(basicUser, ExaminationTypeDto.UROLOGIST.toString(), ExaminationIdDto(examUUID))
+        controller.confirm(basicUser, ExaminationIdDto(examUUID))
 
         assertThat(actual.badges).containsExactly(
             expectedBadge.copy(level = 2), expectedBadge.copy(type = BadgeTypeDto.BELT.value)

@@ -34,6 +34,9 @@
         },
         {
             "name": "Examinations"
+        },
+        {
+            "name": "Providers"
         }
     ],
     "paths": {
@@ -304,6 +307,7 @@
             },
             "post": {
                 "summary": "Create or update examination record",
+                "description": "Creating or updating an examination.",
                 "operationId": "post-examinations",
                 "responses": {
                     "200": {
@@ -345,7 +349,7 @@
                 ]
             }
         },
-        "/examinations/{type}/confirm": {
+        "/examinations/confirm": {
             "post": {
                 "summary": "Confirm Examination",
                 "operationId": "completeExamination",
@@ -391,19 +395,67 @@
                     "description": ""
                 }
             },
+            "parameters": []
+        },
+        "/examinations/{self-type}/self": {
+            "post": {
+                "summary": "Confirm Self-Examination",
+                "operationId": "confirmSelfExamination",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SelfExaminationCompletionInformation"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Examinations"
+                ],
+                "description": "Notify the API that an self-examination has been completed.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelfExaminationResult"
+                            }
+                        }
+                    },
+                    "description": ""
+                }
+            },
             "parameters": [
                 {
                     "schema": {
                         "type": "string"
                     },
-                    "name": "type",
+                    "name": "self-type",
                     "in": "path",
                     "required": true,
-                    "description": "One of the `ExaminationTypeEnum` values"
+                    "description": "One of the `SelfExaminationType` values"
                 }
             ]
         },
-        "/examinations/{type}/cancel": {
+        "/examinations/cancel": {
             "post": {
                 "summary": "Cancel Examination",
                 "operationId": "cancelExamination",
@@ -449,17 +501,7 @@
                     "description": ""
                 }
             },
-            "parameters": [
-                {
-                    "schema": {
-                        "type": "string"
-                    },
-                    "name": "type",
-                    "in": "path",
-                    "required": true,
-                    "description": "One of the `ExaminationTypeEnum` values"
-                }
-            ]
+            "parameters": []
         },
         "/providers/all": {
             "get": {
@@ -508,7 +550,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HealthcareProviderDetail"
+                                    "$ref": "#/components/schemas/HealthcareProviderDetailList"
                                 }
                             }
                         }
@@ -551,6 +593,7 @@
         "/providers/update": {
             "get": {
                 "summary": "Trigger healthcare provider update",
+                "description": "Trigger to execute the providers update manually.",
                 "tags": [
                     "Providers"
                 ],
@@ -666,8 +709,7 @@
                 "properties": {
                     "uuid": {
                         "type": "string",
-                        "description": "Must not be in the future",
-                        "default": null
+                        "description": "Must not be in the future"
                     }
                 },
                 "required": [
@@ -825,7 +867,8 @@
                     "SHOES",
                     "GLOVES",
                     "HEADBAND",
-                    "GLASSES"
+                    "GLASSES",
+                    "SHIELD"
                 ]
             },
             "Sex": {
@@ -863,30 +906,6 @@
                     "BREAST",
                     "TESTICULAR"
                 ]
-            },
-            "PreferredEmail": {
-                "type": "string",
-                "title": "PreferredEmail",
-                "description": "Users can choose to have their communication email address be different from their main Firebase account email.\n\noptional and nullable\n",
-                "format": "email",
-                "nullable": true
-            },
-            "Appointment": {
-                "title": "Appointment",
-                "type": "object",
-                "description": "A planned visit to the doctor.",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "provider": {
-                        "$ref": "#/components/schemas/HealthcareProviderId"
-                    },
-                    "datetime": {
-                        "type": "string",
-                        "description": "**ZONED** Datetime.\nTODO: Can be split into separate datetime + timezene fields\n"
-                    }
-                }
             },
             "SimpleHealthcareProvider": {
                 "title": "SimpleHealthcareProvider",
@@ -1090,22 +1109,6 @@
                     "lng"
                 ]
             },
-            "HealthcareProviderList": {
-                "title": "HealthcareProviderList",
-                "type": "object",
-                "description": "Simplified list of healthcare providers",
-                "properties": {
-                    "healthcareProviders": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/SimpleHealthcareProvider"
-                        }
-                    }
-                },
-                "required": [
-                    "healthcareProviders"
-                ]
-            },
             "HealthcareProviderLastUpdate": {
                 "title": "HealthcareProviderLastUpdate",
                 "type": "object",
@@ -1193,6 +1196,12 @@
                     "lastConfirmedDate": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "points": {
+                        "type": "integer"
+                    },
+                    "badge": {
+                        "$ref": "#/components/schemas/BadgeType"
                     }
                 },
                 "required": [
@@ -1202,7 +1211,9 @@
                     "firstExam",
                     "priority",
                     "state",
-                    "count"
+                    "count",
+                    "points",
+                    "badge"
                 ]
             },
             "SelfExaminationPreventionStatus": {
@@ -1225,11 +1236,19 @@
                         "items": {
                             "$ref": "#/components/schemas/SelfExaminationStatus"
                         }
+                    },
+                    "points": {
+                        "type": "integer"
+                    },
+                    "badge": {
+                        "$ref": "#/components/schemas/BadgeType"
                     }
                 },
                 "required": [
                     "type",
-                    "history"
+                    "history",
+                    "points",
+                    "badge"
                 ]
             },
             "Badge": {
@@ -1327,6 +1346,35 @@
                     "FINDING"
                 ],
                 "default": "OK"
+            },
+            "SelfExaminationCompletionInformation": {
+                "title": "SelfExaminationCompletionInformation",
+                "type": "object",
+                "description": "Information about point and badges after self-examination completion.",
+                "properties": {
+                    "points": {
+                        "type": "integer"
+                    },
+                    "allPoints": {
+                        "type": "integer"
+                    },
+                    "badgeType": {
+                        "$ref": "#/components/schemas/BadgeType"
+                    },
+                    "badgeLevel": {
+                        "type": "integer"
+                    },
+                    "streak": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "points",
+                    "allPoints",
+                    "badgeType",
+                    "badgeLevel",
+                    "streak"
+                ]
             }
         },
         "securitySchemes": {

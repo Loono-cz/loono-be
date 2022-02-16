@@ -1,5 +1,6 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -100,7 +101,9 @@ class PreventionServiceTest {
                     priority = 1,
                     state = ExaminationStatusDto.NEW,
                     count = 0,
-                    plannedDate = now
+                    plannedDate = now,
+                    points = 200,
+                    badge = BadgeTypeDto.COAT
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[5].toString(),
@@ -111,7 +114,9 @@ class PreventionServiceTest {
                     firstExam = true,
                     priority = 6,
                     state = ExaminationStatusDto.CONFIRMED,
-                    count = 1
+                    count = 1,
+                    points = 200,
+                    badge = BadgeTypeDto.GLOVES
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[3].toString(),
@@ -122,7 +127,9 @@ class PreventionServiceTest {
                     priority = 8,
                     state = ExaminationStatusDto.NEW,
                     count = 1,
-                    lastConfirmedDate = LocalDateTime.MIN
+                    lastConfirmedDate = LocalDateTime.MIN,
+                    points = 300,
+                    badge = BadgeTypeDto.HEADBAND
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -132,7 +139,9 @@ class PreventionServiceTest {
                     firstExam = true,
                     priority = 9,
                     state = ExaminationStatusDto.NEW,
-                    count = 0
+                    count = 0,
+                    points = 100,
+                    badge = BadgeTypeDto.GLASSES
                 ),
             ),
             /* actual = */ result.examinations
@@ -214,7 +223,9 @@ class PreventionServiceTest {
                         SelfExaminationStatusDto.MISSED,
                         SelfExaminationStatusDto.COMPLETED,
                         SelfExaminationStatusDto.PLANNED
-                    )
+                    ),
+                    points = 50,
+                    badge = BadgeTypeDto.SHIELD
                 ),
             ),
             /* actual = */ result.selfexaminations
@@ -242,7 +253,9 @@ class PreventionServiceTest {
                     lastExamUuid = null,
                     type = SelfExaminationTypeDto.TESTICULAR,
                     plannedDate = null,
-                    history = emptyList()
+                    history = emptyList(),
+                    points = 50,
+                    badge = BadgeTypeDto.SHIELD
                 ),
             ),
             /* actual = */ result.selfexaminations

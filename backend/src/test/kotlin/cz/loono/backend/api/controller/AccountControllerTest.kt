@@ -64,7 +64,7 @@ class AccountControllerTest(
         val expectedDto = AccountDto(
             UserDto(
                 basicUser.uid, basicUser.email, basicUser.name,
-                existingAccount.userAuxiliary.sex?.let(SexDto::valueOf),
+                existingAccount.userAuxiliary.sex.let(SexDto::valueOf),
                 birthdateMonth = existingAccount.userAuxiliary.birthdate?.monthValue,
                 birthdateYear = existingAccount.userAuxiliary.birthdate?.year,
                 preferredEmail = existingAccount.userAuxiliary.preferredEmail,
@@ -128,7 +128,7 @@ class AccountControllerTest(
         val expectedDto = AccountDto(
             UserDto(
                 basicUser.uid, basicUser.email, basicUser.name,
-                existingAccount.userAuxiliary.sex?.let(SexDto::valueOf),
+                existingAccount.userAuxiliary.sex.let(SexDto::valueOf),
                 birthdateMonth = existingAccount.userAuxiliary.birthdate?.monthValue,
                 birthdateYear = existingAccount.userAuxiliary.birthdate?.year,
                 preferredEmail = existingAccount.userAuxiliary.preferredEmail,

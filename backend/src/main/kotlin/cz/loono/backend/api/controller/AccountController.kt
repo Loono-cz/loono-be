@@ -68,7 +68,7 @@ class AccountController(
         val aux = UserAuxiliary(
             nickname = patch.nickname,
             preferredEmail = patch.preferredEmail,
-            sex = patch.sex?.name,
+            sex = patch.sex!!.name,
             birthdate = let3(patch.birthdateYear, patch.birthdateMonth, 1, LocalDate::of),
             profileImageUrl = patch.profileImageUrl
         )

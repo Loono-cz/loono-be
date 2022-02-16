@@ -1,5 +1,6 @@
 package cz.loono.backend.db.model
 
+import cz.loono.backend.api.dto.SexDto
 import org.hibernate.Hibernate
 import org.hibernate.envers.Audited
 import java.time.LocalDate
@@ -100,7 +101,7 @@ data class UserAuxiliary(
     val preferredEmail: String? = null,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    val sex: String? = null,
+    val sex: String = SexDto.MALE.name,
 
     @Column(nullable = true)
     val birthdate: LocalDate? = null,

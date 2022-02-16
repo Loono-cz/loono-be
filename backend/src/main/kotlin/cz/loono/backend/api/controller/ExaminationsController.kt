@@ -4,8 +4,10 @@ import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
 import cz.loono.backend.api.dto.ExaminationIdDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
-import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.PreventionStatusDto
+import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
+import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
@@ -26,41 +28,45 @@ class ExaminationsController(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService
 ) {
-    @PostMapping("/{type}/confirm")
+    @PostMapping("/confirm")
     fun confirm(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
-        @PathVariable(name = "type")
-        type: String,
-
         @Valid
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        if (type !in getAvailableExaminations()) {
+        recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
+
+    @PostMapping("/{self-type}/self")
+    fun confirmSelf(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser,
+
+        @PathVariable(name = "self-type")
+        type: String,
+
+        @Valid
+        @RequestBody
+        result: SelfExaminationResultDto
+    ): SelfExaminationCompletionInformationDto =
+        if (type !in getAvailableSelfExaminations()) {
             throw LoonoBackendException(HttpStatus.NOT_FOUND)
         } else {
-            recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
+            recordService.confirmSelfExam(SelfExaminationTypeDto.valueOf(type), result, basicUser.uid)
         }
 
-    @PostMapping("/{type}/cancel")
+    @PostMapping("/cancel")
     fun cancel(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
-        @PathVariable(name = "type")
-        type: String,
-
         @Valid
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        if (type !in getAvailableExaminations()) {
-            throw LoonoBackendException(HttpStatus.NOT_FOUND)
-        } else {
-            recordService.cancelExam(examinationIdDto.uuid, basicUser.uid)
-        }
+        recordService.cancelExam(examinationIdDto.uuid, basicUser.uid)
 
     @PostMapping
     fun updateOrCreate(
@@ -78,5 +84,5 @@ class ExaminationsController(
         basicUser: BasicUser
     ): PreventionStatusDto = preventionService.getPreventionStatus(basicUser.uid)
 
-    private fun getAvailableExaminations() = ExaminationTypeDto.values().map(ExaminationTypeDto::name)
+    private fun getAvailableSelfExaminations() = SelfExaminationTypeDto.values().map(SelfExaminationTypeDto::name)
 }
