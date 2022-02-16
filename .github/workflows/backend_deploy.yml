@@ -29,11 +29,6 @@ jobs:
       - name: 'Build Docker image'
         run: |
           docker build -t ${{ env.serviceName }} .
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
-        if: always()
-        with:
-          files: test-results/**/*.xml
       - name: 'Push Docker image to repository'
         run: |
           docker tag ${{ env.serviceName }}:latest ${{ env.repository }}/${{ env.serviceName }}:latest
