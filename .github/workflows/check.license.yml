@@ -1,0 +1,17 @@
+name: 'Check license'
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      #   - it clones the repo into the given `path`
+      #   - it checks out the branch defined at `ref`
+      - name: Clone scancode repo
+        uses: actions/checkout@v2
+        with:
+          repository: nexB/scancode-toolkit
+          path: scancode
