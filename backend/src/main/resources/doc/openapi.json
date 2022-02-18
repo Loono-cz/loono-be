@@ -707,7 +707,7 @@
                 "type": "object",
                 "description": "A examination identification.\n\n`month` and `year` are optional and nullable. If any of them is missing or `null`, API defaults to `LocalDate.now()` - the current year and month.",
                 "properties": {
-                    "uuid": {
+                    "uid": {
                         "type": "string",
                         "description": "Must not be in the future"
                     }
