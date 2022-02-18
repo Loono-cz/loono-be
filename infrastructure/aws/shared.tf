@@ -1,5 +1,5 @@
 terraform {
-  required_version = "= 0.15.4"
+  required_version = "= 1.1.5"
 
   required_providers {
     aws = ">= 3.28.0"
@@ -8,9 +8,9 @@ terraform {
   backend "s3" {
     # For every new deployment this bucket needs to be changed, because AWS bucket names are
     # globally unique.
-    bucket = "loono-terraform-backend"
+    bucket = "loono-cz-terraform-backend-test"
     key    = "terraform.tfstate"
-    region = "eu-north-1"
+    region = "eu-central-1"
   }
 }
 
