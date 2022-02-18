@@ -47,7 +47,6 @@ class ExaminationsController(
         @PathVariable(name = "self-type")
         type: String,
 
-        @Valid
         @RequestBody
         result: SelfExaminationResultDto
     ): SelfExaminationCompletionInformationDto =
@@ -62,7 +61,6 @@ class ExaminationsController(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
-        @Valid
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
