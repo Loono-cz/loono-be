@@ -19,4 +19,12 @@ jobs:
       - name: List files
         run: |
           ls scancode
-          ls scancode-toolkit
+
+      - name: Create Docker
+        run: |
+          cd scancode
+          docker build -t scancode-toolkit .
+
+      - name: Run Docker
+        run: |
+          docker run scancode-toolkit --help
