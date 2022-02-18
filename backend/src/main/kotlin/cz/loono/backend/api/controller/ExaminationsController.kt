@@ -33,11 +33,14 @@ class ExaminationsController(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
-        @Valid
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
+        if (examinationIdDto.uid != null) {
+            recordService.confirmExam(examinationIdDto.uid, basicUser.uid)
+        } else {
+            throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+        }
 
     @PostMapping("/{self-type}/self")
     fun confirmSelf(
@@ -64,7 +67,11 @@ class ExaminationsController(
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        recordService.cancelExam(examinationIdDto.uuid, basicUser.uid)
+        if (examinationIdDto.uid != null) {
+            recordService.cancelExam(examinationIdDto.uid, basicUser.uid)
+        } else {
+            throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+        }
 
     @PostMapping
     fun updateOrCreate(
