@@ -15,3 +15,8 @@ jobs:
         with:
           repository: nexB/scancode-toolkit
           path: scancode
+
+      - name: List files
+        run: |
+          ls scancode
+          ls scancode-toolkit
