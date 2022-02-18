@@ -711,10 +711,7 @@
                         "type": "string",
                         "description": "Must not be in the future"
                     }
-                },
-                "required": [
-                    "uuid"
-                ]
+                }
             },
             "User": {
                 "title": "User",
