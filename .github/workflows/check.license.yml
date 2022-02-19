@@ -18,21 +18,23 @@ jobs:
 
       - name: List files
         run: |
-          ls scancode
+          echo $PWD
+          echo $HOME
+          ls .          
 
-      - name: Create Docker
-        run: |
-          cd scancode
-          docker build -t scancode-toolkit .
+#      - name: Create Docker
+#        run: |
+#          cd scancode
+#          docker build -t scancode-toolkit .
+#
+#      - name: Run Scancode help
+#        run: |
+#          docker run scancode-toolkit --help
 
-      - name: Run Scancode help
-        run: |
-          docker run scancode-toolkit --help
-
-      - name: Run Scancode analysis
-        run: |
-          docker run -v $PWD/:/project scancode-toolkit -clpeui --json-pp /project/result.json /project
-
-      - name: Echo json
-        run: |
-          cat result.json
+#      - name: Run Scancode analysis
+#        run: |
+#          docker run -v $PWD/:/project scancode-toolkit -clpeui --json-pp /project/result.json /project
+#
+#      - name: Echo json
+#        run: |
+#          cat result.json
