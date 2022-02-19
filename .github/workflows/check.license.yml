@@ -7,14 +7,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          path: loono-be
       #   - it clones the repo into the given `path`
       #   - it checks out the branch defined at `ref`
       - name: Clone scancode repo
         uses: actions/checkout@v2
         with:
           repository: nexB/scancode-toolkit
-          path: ../scancode
+          path: scancode
 
       - name: List files
         run: |
