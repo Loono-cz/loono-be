@@ -21,8 +21,6 @@ jobs:
           echo $PWD
           echo $HOME
           ls .
-          echo "=================="
-          ls ~/work/scancode
           
           echo "=================="
           ls ~/work
