@@ -21,6 +21,7 @@ jobs:
           echo $PWD
           echo $HOME
           ls .          
+          ls ../          
 
 #      - name: Create Docker
 #        run: |
