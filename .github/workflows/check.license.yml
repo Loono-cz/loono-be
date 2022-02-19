@@ -19,27 +19,21 @@ jobs:
 
       - name: List files
         run: |
-          echo $PWD
-          echo $HOME
-          echo $GITHUB_WORKSPACE
           ls .
-          
-          echo "=================="
-          ls ../scancode
 
-#      - name: Create Docker
-#        run: |
-#          cd scancode
-#          docker build -t scancode-toolkit .
-#
-#      - name: Run Scancode help
-#        run: |
-#          docker run scancode-toolkit --help
+      - name: Create Docker
+        run: |
+          cd scancode
+          docker build -t scancode-toolkit .
 
-#      - name: Run Scancode analysis
-#        run: |
-#          docker run -v $PWD/:/project scancode-toolkit -clpeui --json-pp /project/result.json /project
-#
-#      - name: Echo json
-#        run: |
-#          cat result.json
+      - name: Run Scancode help
+        run: |
+          docker run scancode-toolkit --help
+
+      - name: Run Scancode analysis
+        run: |
+          docker run -v $PWD/../loono-be:/project scancode-toolkit -clpeui --json-pp /project/result.json /project
+
+      - name: Echo json
+        run: |
+          cat result.json
