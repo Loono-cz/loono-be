@@ -14,14 +14,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: nexB/scancode-toolkit
-          path: scancode
+          path: $HOME/work/scancode
 
       - name: List files
         run: |
           echo $PWD
           echo $HOME
-          ls .          
-          ls ../          
+          ls .
+          echo "=================="
+          ls $HOME/work/scancode
 
 #      - name: Create Docker
 #        run: |
