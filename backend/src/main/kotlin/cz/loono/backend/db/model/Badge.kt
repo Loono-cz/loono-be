@@ -27,6 +27,7 @@ data class Badge(
     @ManyToOne(optional = false)
     @JoinColumns(JoinColumn(name = "account_id", insertable = false, updatable = false))
     val account: Account,
+    @Column(nullable = false)
     val lastUpdateOn: LocalDateTime = LocalDateTime.now()
 )
 

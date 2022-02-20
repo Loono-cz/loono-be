@@ -56,6 +56,7 @@ class AccountController(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
+        @RequestBody
         accountUpdate: AccountUpdateDto
     ): AccountDto {
         val account = accountRepository.findByUid(basicUser.uid)
