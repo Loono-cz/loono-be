@@ -153,7 +153,7 @@ class AccountServiceTest(
         val service = AccountService(repo, firebaseAuthService, examinationRecordService)
         val storedAccount = repo.save(account)
 
-        val accountDto = service.updateAccount(storedAccount.uid, AccountUpdateDto(storedAccount.uid))
+        val accountDto = service.updateAccount(storedAccount.uid, AccountUpdateDto())
 
         assert(
             accountDto == AccountDto(
@@ -180,7 +180,7 @@ class AccountServiceTest(
         val storedAccount = repo.save(account)
 
         val accountDto =
-            service.updateAccount(storedAccount.uid, AccountUpdateDto(storedAccount.uid, nickname = "Boss"))
+            service.updateAccount(storedAccount.uid, AccountUpdateDto(nickname = "Boss"))
 
         assert(
             accountDto == AccountDto(
@@ -209,7 +209,6 @@ class AccountServiceTest(
         val accountDto = service.updateAccount(
             uid,
             AccountUpdateDto(
-                uid,
                 leaderboardAnonymizationOptIn = false,
                 appointmentReminderEmailsOptIn = false,
                 newsletterOptIn = true
@@ -243,7 +242,6 @@ class AccountServiceTest(
         val accountDto = service.updateAccount(
             uid,
             AccountUpdateDto(
-                uid,
                 nickname = "Boss",
                 prefferedEmail = "email",
                 profileImageUrl = "image",
@@ -278,10 +276,7 @@ class AccountServiceTest(
 
         val accountDto = service.updateAccount(
             storedAccount.uid,
-            AccountUpdateDto(
-                storedAccount.uid,
-                profileImageUrl = null
-            )
+            AccountUpdateDto(profileImageUrl = null)
         )
 
         assert(

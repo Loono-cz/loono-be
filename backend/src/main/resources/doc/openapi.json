@@ -714,9 +714,6 @@
                 "title": "Account Update",
                 "description": "Object to able to update the account.",
                 "properties": {
-                    "uid": {
-                        "type": "string"
-                    },
                     "nickname": {
                         "type": "string"
                     },
@@ -737,9 +734,6 @@
                         "type": "boolean"
                     }
                 },
-                "required": [
-                    "uid"
-                ],
                 "readOnly": true
             },
             "AccountOnboarding": {
