@@ -1,15 +1,11 @@
 package cz.loono.backend.db.model
 
-import cz.loono.backend.api.dto.SexDto
-import org.hibernate.Hibernate
 import org.hibernate.envers.Audited
 import java.time.LocalDate
-import java.util.Objects
 import javax.persistence.CascadeType
 import javax.persistence.Column
-import javax.persistence.Embeddable
-import javax.persistence.Embedded
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -26,44 +22,23 @@ data class Account(
     val id: Long = 0,
 
     @Column(nullable = false, columnDefinition = "TEXT", unique = true)
-    val uid: String = "",
+    val uid: String,
 
-    @Embedded
-    val userAuxiliary: UserAuxiliary = UserAuxiliary(),
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val nickname: String,
 
-    @Embedded
-    val settings: Settings = Settings(),
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val preferredEmail: String,
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val sex: String,
 
     @Column(nullable = false)
-    val points: Int = 0,
+    val birthdate: LocalDate,
 
-    @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account")
-    @Column(nullable = false, updatable = true, insertable = true)
-    val examinationRecords: List<ExaminationRecord> = mutableListOf(),
+    @Column(columnDefinition = "TEXT")
+    val profileImageUrl: String? = null,
 
-    @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account")
-    @Column(nullable = true, updatable = true, insertable = true)
-    val badges: Set<Badge> = mutableSetOf()
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Account
-
-        @Suppress("SENSELESS_COMPARISON")
-        return uid != null && uid == other.uid
-    }
-
-    override fun hashCode(): Int = 0
-
-    @Override
-    override fun toString(): String {
-        return this::class.simpleName + "(uid = $uid , userAuxiliary = $userAuxiliary , settings = $settings , points = $points )" // ktlint-disable max-line-length
-    }
-}
-
-@Embeddable
-data class Settings(
     @Column(nullable = false)
     val leaderboardAnonymizationOptIn: Boolean = true,
 
@@ -71,63 +46,36 @@ data class Settings(
     val appointmentReminderEmailsOptIn: Boolean = true,
 
     @Column(nullable = false)
-    val newsletterOptIn: Boolean = false
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Settings
+    val newsletterOptIn: Boolean = false,
 
-        return leaderboardAnonymizationOptIn == other.leaderboardAnonymizationOptIn &&
-            appointmentReminderEmailsOptIn == other.appointmentReminderEmailsOptIn &&
-            newsletterOptIn == other.newsletterOptIn
-    }
+    @Column(nullable = false)
+    val points: Int = 0,
 
-    override fun hashCode(): Int =
-        Objects.hash(leaderboardAnonymizationOptIn, appointmentReminderEmailsOptIn, newsletterOptIn)
+    @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
+    @Column(nullable = false, updatable = true, insertable = true)
+    val examinationRecords: List<ExaminationRecord> = mutableListOf(),
 
-    override fun toString(): String {
-        return this::class.simpleName + "(leaderboardAnonymizationOptIn = $leaderboardAnonymizationOptIn , appointmentReminderEmailsOptIn = $appointmentReminderEmailsOptIn , newsletterOptIn = $newsletterOptIn)" // ktlint-disable max-line-length
-    }
-}
-
-@Embeddable
-data class UserAuxiliary(
-
-    @Column(nullable = true, columnDefinition = "TEXT")
-    val nickname: String? = null,
-
-    @Column(nullable = true, columnDefinition = "TEXT")
-    val preferredEmail: String? = null,
-
-    @Column(nullable = true, columnDefinition = "TEXT")
-    val sex: String = SexDto.MALE.name,
-
-    @Column(nullable = true)
-    val birthdate: LocalDate? = null,
-
-    @Column(columnDefinition = "TEXT")
-    val profileImageUrl: String? = null
+    @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
+    @Column(nullable = true, updatable = true, insertable = true)
+    val badges: Set<Badge> = mutableSetOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as UserAuxiliary
+        other as Account
 
-        if (nickname != other.nickname) return false
-        if (preferredEmail != other.preferredEmail) return false
-        if (sex != other.sex) return false
-        if (birthdate != other.birthdate) return false
-        if (profileImageUrl != other.profileImageUrl) return false
+        if (id != other.id) return false
 
         return true
     }
 
-    override fun hashCode(): Int =
-        Objects.hash(nickname, preferredEmail, sex, birthdate, profileImageUrl)
+    override fun hashCode(): Int = id.hashCode()
 
-    override fun toString(): String {
-        return this::class.simpleName + "(nickname=$nickname, preferredEmail=$preferredEmail, sex=$sex, birthdate=$birthdate, profileImageUrl=$profileImageUrl)"
-    }
+    override fun toString(): String =
+        "Account(id=$id, uid='$uid', nickname=$nickname, preferredEmail=$preferredEmail, sex='$sex', " +
+            "birthdate=$birthdate, profileImageUrl=$profileImageUrl, " +
+            "leaderboardAnonymizationOptIn=$leaderboardAnonymizationOptIn, " +
+            "appointmentReminderEmailsOptIn=$appointmentReminderEmailsOptIn, " +
+            "newsletterOptIn=$newsletterOptIn, points=$points, examinationRecords=$examinationRecords)"
 }

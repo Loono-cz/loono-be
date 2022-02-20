@@ -6,9 +6,9 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.ExaminationInterval
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
+import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.ExaminationRecord
-import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -120,11 +120,9 @@ class ExaminationCancellationTaskTest {
         )
 
     private fun getAccount(): Account =
-        Account(
+        createAccount(
             uid = "2",
-            userAuxiliary = UserAuxiliary(
-                sex = SexDto.MALE.value,
-                birthdate = LocalDate.of(1988, 7, 30)
-            )
+            sex = SexDto.MALE.value,
+            birthday = LocalDate.of(1988, 7, 30)
         )
 }

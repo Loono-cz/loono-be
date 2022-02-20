@@ -9,9 +9,8 @@ import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.db.model.Account
+import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.ExaminationRecord
-import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
@@ -61,7 +60,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `changing state of a non-existing exam`() {
-        accountRepository.save(Account(uid = "101"))
+        accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -89,12 +88,10 @@ class ExaminationRecordServiceTest(
     @Test
     fun `new exam creation`() {
         accountRepository.save(
-            Account(
+            createAccount(
                 uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -119,12 +116,10 @@ class ExaminationRecordServiceTest(
     @Test
     fun `valid changing of state`() {
         val account = accountRepository.save(
-            Account(
+            createAccount(
                 uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -157,12 +152,10 @@ class ExaminationRecordServiceTest(
     @Test
     fun `try to create exam with non-suitable sex`() {
         accountRepository.save(
-            Account(
+            createAccount(
                 uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -185,7 +178,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `confirm exam`() {
-        val account = accountRepository.save(Account(uid = "101"))
+        val account = accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -207,7 +200,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `cancel exam`() {
-        val account = accountRepository.save(Account(uid = "101"))
+        val account = accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -230,7 +223,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `complete first self-exam of incorrect type`() {
         val account =
-            accountRepository.save(Account(uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name)))
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -252,7 +245,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `complete first self-exam`() {
         val account =
-            accountRepository.save(Account(uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.FEMALE.name)))
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -277,10 +270,10 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `complete second self-exam`() {
-        var account =
+        val account =
             accountRepository.save(
-                Account(
-                    uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name), points = 150
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
         val examinationRecordService =
@@ -314,10 +307,10 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `complete 6th self-exam`() {
-        var account =
+        val account =
             accountRepository.save(
-                Account(
-                    uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name), points = 150
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
         val examinationRecordService =

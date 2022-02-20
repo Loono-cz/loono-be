@@ -29,7 +29,7 @@ data class ExaminationRecord(
     val plannedDate: LocalDateTime? = null,
 
     @ManyToOne(optional = false)
-    val account: Account = Account(),
+    val account: Account,
 
     @Column(nullable = false)
     val firstExam: Boolean = true,

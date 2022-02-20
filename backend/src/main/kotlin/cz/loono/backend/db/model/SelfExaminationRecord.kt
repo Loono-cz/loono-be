@@ -29,7 +29,7 @@ data class SelfExaminationRecord(
     val dueDate: LocalDate? = null,
 
     @ManyToOne(optional = false)
-    val account: Account = Account(),
+    val account: Account,
 
     @Column(nullable = true, columnDefinition = "TEXT")
     val result: SelfExaminationResultDto? = null,

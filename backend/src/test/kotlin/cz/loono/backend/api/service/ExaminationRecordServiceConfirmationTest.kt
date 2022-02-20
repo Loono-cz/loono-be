@@ -4,9 +4,8 @@ import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.db.model.Account
+import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.SelfExaminationRecord
-import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
@@ -37,17 +36,14 @@ class ExaminationRecordServiceConfirmationTest {
 
     @Test
     fun `happy case`() {
-        val account = Account(
-            uid = "101",
-            userAuxiliary = UserAuxiliary(sex = SexDto.FEMALE.name)
-        )
+        val account = createAccount(sex = SexDto.FEMALE.name)
         whenever(accountRepository.findByUid("101")).thenReturn(account)
         whenever(
             selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
                 account,
                 SelfExaminationTypeDto.BREAST
             )
-        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now())))
+        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now(), account = account)))
 
         assertDoesNotThrow("Happy case") {
             examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
@@ -56,17 +52,14 @@ class ExaminationRecordServiceConfirmationTest {
 
     @Test
     fun `not-suitable sex`() {
-        val account = Account(
-            uid = "101",
-            userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name)
-        )
+        val account = createAccount(sex = SexDto.MALE.name)
         whenever(accountRepository.findByUid("101")).thenReturn(account)
         whenever(
             selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
                 account,
                 SelfExaminationTypeDto.BREAST
             )
-        ).thenReturn(listOf(SelfExaminationRecord()))
+        ).thenReturn(listOf(SelfExaminationRecord(account = account)))
 
         assertThrows<LoonoBackendException> {
             examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
@@ -75,9 +68,9 @@ class ExaminationRecordServiceConfirmationTest {
 
     @Test
     fun `too early`() {
-        val account = Account(
+        val account = createAccount(
             uid = "101",
-            userAuxiliary = UserAuxiliary(sex = SexDto.FEMALE.name)
+            sex = SexDto.FEMALE.name
         )
         whenever(accountRepository.findByUid("101")).thenReturn(account)
         whenever(
@@ -85,7 +78,7 @@ class ExaminationRecordServiceConfirmationTest {
                 account,
                 SelfExaminationTypeDto.BREAST
             )
-        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().minusDays(3))))
+        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().minusDays(3), account = account)))
 
         assertThrows<LoonoBackendException> {
             examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
@@ -94,9 +87,9 @@ class ExaminationRecordServiceConfirmationTest {
 
     @Test
     fun `too late`() {
-        val account = Account(
+        val account = createAccount(
             uid = "101",
-            userAuxiliary = UserAuxiliary(sex = SexDto.FEMALE.name)
+            sex = SexDto.FEMALE.name
         )
         whenever(accountRepository.findByUid("101")).thenReturn(account)
         whenever(
@@ -104,7 +97,7 @@ class ExaminationRecordServiceConfirmationTest {
                 account,
                 SelfExaminationTypeDto.BREAST
             )
-        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().plusDays(3))))
+        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().plusDays(3), account = account)))
 
         assertThrows<LoonoBackendException> {
             examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")

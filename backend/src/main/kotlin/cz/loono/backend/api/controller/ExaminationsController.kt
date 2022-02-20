@@ -36,8 +36,8 @@ class ExaminationsController(
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        if (examinationIdDto.uid != null) {
-            recordService.confirmExam(examinationIdDto.uid, basicUser.uid)
+        if (examinationIdDto.uuid != null) {
+            recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
         } else {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         }
@@ -67,8 +67,8 @@ class ExaminationsController(
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        if (examinationIdDto.uid != null) {
-            recordService.cancelExam(examinationIdDto.uid, basicUser.uid)
+        if (examinationIdDto.uuid != null) {
+            recordService.cancelExam(examinationIdDto.uuid, basicUser.uid)
         } else {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         }

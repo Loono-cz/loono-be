@@ -58,9 +58,9 @@ class LeaderboardService(
     }
 
     private fun prepareLeaderboardUser(uid: String, account: Account): LeaderboardUserDto = LeaderboardUserDto(
-        name = account.userAuxiliary.nickname,
+        name = account.nickname,
         points = account.points,
-        profileImageUrl = account.userAuxiliary.profileImageUrl,
+        profileImageUrl = account.profileImageUrl,
         isThisMe = uid == account.uid
     )
 }

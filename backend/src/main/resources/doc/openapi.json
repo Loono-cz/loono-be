@@ -47,7 +47,7 @@
                 "tags": [
                     "Account"
                 ],
-                "summary": "GET Account",
+                "summary": "Get Account",
                 "operationId": "getAccount",
                 "description": "GET the account information of the current user.",
                 "responses": {
@@ -125,6 +125,49 @@
                 "tags": [
                     "Account"
                 ]
+            },
+            "post": {
+                "summary": "Update account",
+                "operationId": "post-account",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "description": "Update account",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AccountUpdate"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Account"
+                ]
             }
         },
         "/leaderboard": {
@@ -174,100 +217,6 @@
                 ]
             },
             "parameters": []
-        },
-        "/account/user/update": {
-            "post": {
-                "summary": "Update Account User",
-                "operationId": "updateAccountUser",
-                "responses": {
-                    "200": {
-                        "description": "Returns the updated Account",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Account"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "Change the auxiliary account information. Successful operation returns the whole updated **Account**\n\n**ALL FIELDS ARE ALWAYS UPDATED. BEWARE OF DEFAULT PARAMETERS**",
-                "tags": [
-                    "Account"
-                ],
-                "security": [
-                    {
-                        "Bearer_Auth": []
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UserPatch"
-                            }
-                        }
-                    }
-                }
-            },
-            "parameters": []
-        },
-        "/account/settings/update": {
-            "post": {
-                "summary": "Update Account Settings",
-                "operationId": "updateAccountSettings",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Account"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "Change the settings. Successful operation returns the whole updated **Account**\n\n**ALL FIELDS ARE ALWAYS UPDATED. BEWARE OF DEFAULT PARAMETERS**",
-                "security": [
-                    {
-                        "Bearer_Auth": []
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Settings"
-                            }
-                        }
-                    },
-                    "description": "The whole new settings object. "
-                },
-                "tags": [
-                    "Account"
-                ]
-            }
         },
         "/examinations": {
             "get": {
@@ -653,6 +602,51 @@
                     "Providers"
                 ]
             }
+        },
+        "/account/onboard": {
+            "post": {
+                "summary": "",
+                "operationId": "post-account-onboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "tags": [
+                    "Account"
+                ],
+                "description": "Onboarding / creating an account",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AccountOnboarding"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -662,11 +656,34 @@
                 "title": "Account",
                 "description": "Account information of the current user. Includes the user profile, account settings and points.",
                 "properties": {
-                    "user": {
-                        "$ref": "#/components/schemas/User"
+                    "uid": {
+                        "type": "string"
                     },
-                    "settings": {
-                        "$ref": "#/components/schemas/Settings"
+                    "nickname": {
+                        "type": "string"
+                    },
+                    "prefferedEmail": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "$ref": "#/components/schemas/Sex"
+                    },
+                    "birthdate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "profileImageUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "leaderboardAnonymizationOptIn": {
+                        "type": "boolean"
+                    },
+                    "appointmentReminderEmailsOptIn": {
+                        "type": "boolean"
+                    },
+                    "newsletterOptIn": {
+                        "type": "boolean"
                     },
                     "points": {
                         "type": "integer",
@@ -679,9 +696,83 @@
                     }
                 },
                 "required": [
-                    "user",
-                    "settings",
-                    "points"
+                    "uid",
+                    "nickname",
+                    "prefferedEmail",
+                    "sex",
+                    "birthdate",
+                    "leaderboardAnonymizationOptIn",
+                    "appointmentReminderEmailsOptIn",
+                    "newsletterOptIn",
+                    "points",
+                    "badges"
+                ],
+                "readOnly": true
+            },
+            "AccountUpdate": {
+                "type": "object",
+                "title": "Account Update",
+                "description": "Object to able to update the account.",
+                "properties": {
+                    "uid": {
+                        "type": "string"
+                    },
+                    "nickname": {
+                        "type": "string"
+                    },
+                    "prefferedEmail": {
+                        "type": "string"
+                    },
+                    "profileImageUrl": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "leaderboardAnonymizationOptIn": {
+                        "type": "boolean"
+                    },
+                    "appointmentReminderEmailsOptIn": {
+                        "type": "boolean"
+                    },
+                    "newsletterOptIn": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "uid"
+                ],
+                "readOnly": true
+            },
+            "AccountOnboarding": {
+                "type": "object",
+                "title": "Account Onboarding",
+                "description": "Account information collected during onboarding to create a new account.",
+                "properties": {
+                    "nickname": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "$ref": "#/components/schemas/Sex"
+                    },
+                    "preferredEmail": {
+                        "type": "string"
+                    },
+                    "birthdate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "examinations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ExaminationRecord"
+                        }
+                    }
+                },
+                "required": [
+                    "nickname",
+                    "sex",
+                    "preferredEmail",
+                    "birthdate",
+                    "examinations"
                 ],
                 "readOnly": true
             },
@@ -705,57 +796,12 @@
             "ExaminationId": {
                 "title": "ExaminationId",
                 "type": "object",
-                "description": "A examination identification.\n\n`month` and `year` are optional and nullable. If any of them is missing or `null`, API defaults to `LocalDate.now()` - the current year and month.",
+                "description": "A examination identification.",
                 "properties": {
-                    "uid": {
-                        "type": "string",
-                        "description": "Must not be in the future"
-                    }
-                }
-            },
-            "User": {
-                "title": "User",
-                "description": "Encapsulates basic user profile information: `uid, email, name` etc.\n\nReturned as part of Account.",
-                "type": "object",
-                "properties": {
-                    "uid": {
-                        "type": "string",
-                        "description": "unique user identifier"
-                    },
-                    "email": {
-                        "type": "string",
-                        "description": "The primary registration email."
-                    },
-                    "nickname": {
-                        "type": "string",
-                        "description": ""
-                    },
-                    "sex": {
-                        "$ref": "#/components/schemas/Sex"
-                    },
-                    "birthdateMonth": {
-                        "type": "integer",
-                        "description": "birthdate month of user",
-                        "format": "int32",
-                        "minimum": 1,
-                        "maximum": 12
-                    },
-                    "birthdateYear": {
-                        "type": "integer",
-                        "description": "birthdate year of user",
-                        "format": "int32"
-                    },
-                    "preferredEmail": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "profileImageUrl": {
+                    "uuid": {
                         "type": "string"
                     }
-                },
-                "required": [
-                    "uid"
-                ]
+                }
             },
             "LeaderboardUser": {
                 "title": "Leaderboard user",
@@ -815,43 +861,6 @@
                     "peers",
                     "myOrder"
                 ]
-            },
-            "UserPatch": {
-                "type": "object",
-                "title": "UserPatch",
-                "description": "All fields are always updated, so beware of defaults.",
-                "properties": {
-                    "nickname": {
-                        "type": "string"
-                    },
-                    "sex": {
-                        "$ref": "#/components/schemas/Sex"
-                    },
-                    "birthdateMonth": {
-                        "type": "integer",
-                        "description": "birthdate month of user",
-                        "format": "int32",
-                        "nullable": true,
-                        "writeOnly": true
-                    },
-                    "birthdateYear": {
-                        "type": "integer",
-                        "description": "birthdate year of user",
-                        "format": "int32",
-                        "nullable": true,
-                        "writeOnly": true
-                    },
-                    "preferredEmail": {
-                        "type": "string",
-                        "format": "email",
-                        "nullable": true,
-                        "writeOnly": true
-                    },
-                    "profileImageUrl": {
-                        "type": "string"
-                    }
-                },
-                "writeOnly": true
             },
             "BadgeType": {
                 "type": "string",
@@ -960,31 +969,6 @@
                     "category",
                     "lat",
                     "lng"
-                ]
-            },
-            "Settings": {
-                "title": "Settings",
-                "type": "object",
-                "description": "Account Settings",
-                "properties": {
-                    "leaderboardAnonymizationOptIn": {
-                        "type": "boolean",
-                        "default": true
-                    },
-                    "appointmentReminderEmailsOptIn": {
-                        "type": "boolean",
-                        "description": "",
-                        "default": false
-                    },
-                    "newsletterOptIn": {
-                        "type": "boolean",
-                        "default": false
-                    }
-                },
-                "required": [
-                    "leaderboardAnonymizationOptIn",
-                    "appointmentReminderEmailsOptIn",
-                    "newsletterOptIn"
                 ]
             },
             "UpdateStatusMessage": {

@@ -53,7 +53,7 @@ class ExaminationRecordService(
             "404",
             "The account not found."
         )
-        if (!preventionService.validateSexPrerequisites(type, account.userAuxiliary.sex)) {
+        if (!preventionService.validateSexPrerequisites(type, account.sex)) {
             throw LoonoBackendException(
                 HttpStatus.BAD_REQUEST,
                 "400",
@@ -85,7 +85,8 @@ class ExaminationRecordService(
             saveNewSelfExam(plannedExam)
             count--
         }
-        val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.userAuxiliary.sex))!!
+        val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
+            ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         selfExams.forEach exams@{
             when (it.status) {
                 SelfExaminationStatusDto.COMPLETED -> count++
@@ -147,7 +148,7 @@ class ExaminationRecordService(
 
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto.type, accountUuid)
-        val record = validateUpdateAttempt(examinationRecordDto)
+        val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         return examinationRecordRepository.save(
             ExaminationRecord(
                 id = record.id,
@@ -177,7 +178,7 @@ class ExaminationRecordService(
         }
     }
 
-    private fun validateUpdateAttempt(examinationRecordDto: ExaminationRecordDto): ExaminationRecord =
+    private fun validateUpdateAttempt(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecord =
         if (examinationRecordDto.uuid != null) {
             examinationRecordRepository.findByUuid(examinationRecordDto.uuid)
                 ?: throw LoonoBackendException(
@@ -186,7 +187,7 @@ class ExaminationRecordService(
                     "The given examination identifier not found."
                 )
         } else {
-            ExaminationRecord()
+            ExaminationRecord(account = findAccount(accountUuid))
         }
 
     private fun findAccount(uuid: String): Account =
@@ -204,7 +205,7 @@ class ExaminationRecordService(
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         exam.status = state
         val badgeToPoints =
-            BadgesPointsProvider.getBadgesAndPoints(exam.type, SexDto.valueOf(account.userAuxiliary.sex))
+            BadgesPointsProvider.getBadgesAndPoints(exam.type, SexDto.valueOf(account.sex))
         val updatedAccount = updateWithBadgeAndPoints(badgeToPoints, account)
         updatedAccount.let {
             accountRepository.save(updatedAccount)
