@@ -167,8 +167,8 @@ class ExaminationRecordService(
             "404",
             "The account not found."
         )
-        val plannedExam =
-            examinationRecordRepository.findAllByAccountAndTypeAndStatus(account, record.type, ExaminationStatusDto.NEW)
+        val plannedExam = examinationRecordRepository.findAllByAccount(account)
+            .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
         if (plannedExam.isNotEmpty() && record.uuid == null) {
             throw LoonoBackendException(
                 HttpStatus.CONFLICT,
