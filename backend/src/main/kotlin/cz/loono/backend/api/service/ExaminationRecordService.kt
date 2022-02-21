@@ -3,7 +3,6 @@ package cz.loono.backend.api.service
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
 import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
@@ -147,7 +146,7 @@ class ExaminationRecordService(
         changeState(examUuid, accountUuid, ExaminationStatusDto.CANCELED)
 
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
-        validateAccountPrerequisites(examinationRecordDto.type, accountUuid)
+        validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         return examinationRecordRepository.save(
             ExaminationRecord(
@@ -162,13 +161,22 @@ class ExaminationRecordService(
         ).toExaminationRecordDto()
     }
 
-    private fun validateAccountPrerequisites(type: ExaminationTypeDto, accountUuid: String) {
+    private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
             "404",
             "The account not found."
         )
-        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == type }
+        val plannedExam =
+            examinationRecordRepository.findAllByAccountAndTypeAndStatus(account, record.type, ExaminationStatusDto.NEW)
+        if (plannedExam.isNotEmpty() && record.uuid == null) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT,
+                "409",
+                "The examination of this type already exists."
+            )
+        }
+        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
         intervals.ifEmpty {
             throw LoonoBackendException(
                 HttpStatus.BAD_REQUEST,
@@ -178,7 +186,10 @@ class ExaminationRecordService(
         }
     }
 
-    private fun validateUpdateAttempt(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecord =
+    private fun validateUpdateAttempt(
+        examinationRecordDto: ExaminationRecordDto,
+        accountUuid: String
+    ): ExaminationRecord =
         if (examinationRecordDto.uuid != null) {
             examinationRecordRepository.findByUuid(examinationRecordDto.uuid)
                 ?: throw LoonoBackendException(

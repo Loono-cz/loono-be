@@ -59,6 +59,39 @@ class ExaminationRecordServiceTest(
     }
 
     @Test
+    fun `try to create another new exam of the same type`() {
+        val account = accountRepository.save(
+            createAccount(
+                uid = "101",
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER
+        )
+        examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
+        val secondExam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW,
+            firstExam = false,
+            date = LocalDateTime.MAX
+        )
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.createOrUpdateExam(secondExam, "101")
+        }
+    }
+
+    @Test
     fun `changing state of a non-existing exam`() {
         accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
