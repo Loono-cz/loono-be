@@ -103,4 +103,42 @@ class ExaminationRecordServiceConfirmationTest {
             examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
         }
     }
+
+    @Test
+    fun `invalid result for first one`() {
+        val account = createAccount(
+            uid = "101",
+            sex = SexDto.FEMALE.name
+        )
+        whenever(accountRepository.findByUid("101")).thenReturn(account)
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            )
+        ).thenReturn(emptyList())
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.NOT_OK, "101")
+        }
+    }
+
+    @Test
+    fun `invalid result for second one`() {
+        val account = createAccount(
+            uid = "101",
+            sex = SexDto.FEMALE.name
+        )
+        whenever(accountRepository.findByUid("101")).thenReturn(account)
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            )
+        ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().plusDays(3), account = account)))
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.NOT_OK, "101")
+        }
+    }
 }

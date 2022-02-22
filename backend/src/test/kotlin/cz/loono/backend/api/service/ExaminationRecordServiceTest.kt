@@ -299,6 +299,44 @@ class ExaminationRecordServiceTest(
         assert(result.streak == 1)
         assert(result.badgeLevel == 1)
         assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            ).first().waitingTo == null
+        )
+    }
+
+    @Test
+    fun `complete first self-exam with finding`() {
+        val account =
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+
+        val result = examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.BREAST,
+            SelfExaminationResultDto.FINDING,
+            account.uid
+        )
+
+        assert(result.points == 50)
+        assert(result.allPoints == 50)
+        assert(result.streak == 1)
+        assert(result.badgeLevel == 1)
+        assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            ).first().waitingTo == LocalDate.now().plusDays(56)
+        )
     }
 
     @Test
@@ -319,7 +357,50 @@ class ExaminationRecordServiceTest(
             )
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto.OK,
+            account.uid
+        )
+        val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
+        selfExaminationRecordRepository.save(exam.copy(dueDate = LocalDate.now()))
+
+        val result = examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.TESTICULAR,
+            SelfExaminationResultDto.OK,
+            account.uid
+        )
+
+        assert(result.points == 50)
+        assert(result.allPoints == 250)
+        assert(result.streak == 2)
+        assert(result.badgeLevel == 1)
+        assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.TESTICULAR
+            ).first().waitingTo == null
+        )
+    }
+
+    @Test
+    fun `complete second self-exam with finding`() {
+        val account =
+            accountRepository.save(
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
+                )
+            )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.TESTICULAR,
+            SelfExaminationResultDto.OK,
             account.uid
         )
         val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -336,6 +417,12 @@ class ExaminationRecordServiceTest(
         assert(result.streak == 2)
         assert(result.badgeLevel == 1)
         assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.TESTICULAR
+            )[1].waitingTo == LocalDate.now().plusDays(56)
+        )
     }
 
     @Test
@@ -357,7 +444,7 @@ class ExaminationRecordServiceTest(
         repeat(5) {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.TESTICULAR,
-                SelfExaminationResultDto.FINDING,
+                SelfExaminationResultDto.OK,
                 account.uid
             )
             val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -366,7 +453,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto.OK,
             account.uid
         )
 

@@ -35,6 +35,7 @@ class ExaminationRecordService(
     companion object {
         private const val STARTING_LEVEL = 1
         private const val SELF_EXAM_LEVEL_COUNT = 3
+        private const val SELF_FINDING_CHECK_INTERVAL = 56L // no. days waiting for finding verification
     }
 
     @Synchronized
@@ -62,27 +63,71 @@ class ExaminationRecordService(
         var count = 1
         val selfExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
         if (selfExams.isEmpty()) {
-            val firstRecord = selfExaminationRecordRepository.save(
-                SelfExaminationRecord(
-                    type = type,
-                    dueDate = LocalDate.now(),
-                    account = account,
-                    result = result,
-                    status = SelfExaminationStatusDto.COMPLETED
-                )
-            )
-            saveNewSelfExam(firstRecord)
+            when (result) {
+                SelfExaminationResultDto.OK -> {
+                    val firstRecord = selfExaminationRecordRepository.save(
+                        SelfExaminationRecord(
+                            type = type,
+                            dueDate = LocalDate.now(),
+                            account = account,
+                            result = result,
+                            status = SelfExaminationStatusDto.COMPLETED
+                        )
+                    )
+                    saveNewSelfExam(firstRecord)
+                }
+                SelfExaminationResultDto.FINDING -> {
+                    val today = LocalDate.now()
+                    selfExaminationRecordRepository.save(
+                        SelfExaminationRecord(
+                            type = type,
+                            dueDate = today,
+                            account = account,
+                            result = result,
+                            status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
+                            waitingTo = today.plusDays(SELF_FINDING_CHECK_INTERVAL)
+                        )
+                    )
+                }
+                else -> {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "400",
+                        "Invalid result of self-examination."
+                    )
+                }
+            }
         } else {
             val plannedExam = selfExams.first { it.status == SelfExaminationStatusDto.PLANNED }
             validateSelfExamConfirmation(plannedExam.dueDate)
-            selfExaminationRecordRepository.save(
-                plannedExam.copy(
-                    result = result,
-                    status = SelfExaminationStatusDto.COMPLETED
-                )
-            )
-            saveNewSelfExam(plannedExam)
-            count--
+            when (result) {
+                SelfExaminationResultDto.OK -> {
+                    selfExaminationRecordRepository.save(
+                        plannedExam.copy(
+                            result = result,
+                            status = SelfExaminationStatusDto.COMPLETED
+                        )
+                    )
+                    saveNewSelfExam(plannedExam)
+                    count--
+                }
+                SelfExaminationResultDto.FINDING -> {
+                    selfExaminationRecordRepository.save(
+                        plannedExam.copy(
+                            result = result,
+                            status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
+                            waitingTo = plannedExam.dueDate!!.plusDays(SELF_FINDING_CHECK_INTERVAL)
+                        )
+                    )
+                }
+                else -> {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "400",
+                        "Invalid result of self-examination."
+                    )
+                }
+            }
         }
         val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
             ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)

@@ -38,7 +38,10 @@ data class SelfExaminationRecord(
     var status: SelfExaminationStatusDto = SelfExaminationStatusDto.PLANNED,
 
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
-    val uuid: String = UUID.randomUUID().toString()
+    val uuid: String = UUID.randomUUID().toString(),
+
+    @Column
+    val waitingTo: LocalDate? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

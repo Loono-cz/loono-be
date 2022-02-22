@@ -7,13 +7,15 @@ import org.springframework.stereotype.Component
 class LoonoTaskScheduler(
     private val examinationCancellationTask: ExaminationCancellationTask,
     private val badgeDowngradeTask: BadgeDowngradeTask,
-    private val selfExaminationIntervalClosingTask: SelfExaminationIntervalClosingTask
+    private val selfExaminationIntervalClosingTask: SelfExaminationIntervalClosingTask,
+    private val selfExaminationWaitingTask: SelfExaminationWaitingTask
 ) {
 
     @Scheduled(cron = "\${scheduler.cron.daily-task}") // each day at 3AM
     fun executeDailyTasks() {
         examinationCancellationTask.run()
         selfExaminationIntervalClosingTask.run()
+        selfExaminationWaitingTask.run()
     }
 
     @Scheduled(cron = "\${scheduler.cron.badge-downgrade}") // each day at midnight

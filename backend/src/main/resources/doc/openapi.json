@@ -1308,7 +1308,9 @@
                 "enum": [
                     "PLANNED",
                     "COMPLETED",
-                    "MISSED"
+                    "MISSED",
+                    "WAITING_FOR_CHECKUP",
+                    "WAITING_FOR_RESULT"
                 ],
                 "default": "PLANNED"
             },
@@ -1317,8 +1319,9 @@
                 "title": "SelfExaminationResult",
                 "description": "",
                 "enum": [
-                    "OK",
-                    "FINDING"
+                    "FINDING",
+                    "NOT_OK",
+                    "OK"
                 ],
                 "default": "OK"
             },
