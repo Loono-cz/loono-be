@@ -4,6 +4,7 @@ import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
+import cz.loono.backend.api.dto.SelfExaminationFindingResponseDto
 import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
@@ -36,6 +37,7 @@ class ExaminationRecordService(
         private const val STARTING_LEVEL = 1
         private const val SELF_EXAM_LEVEL_COUNT = 3
         private const val SELF_FINDING_CHECK_INTERVAL = 56L // no. days waiting for finding verification
+        private const val INVALID_RESULT_MSG = "Invalid result of self-examination."
     }
 
     @Synchronized
@@ -48,18 +50,7 @@ class ExaminationRecordService(
         result: SelfExaminationResultDto,
         accountUuid: String
     ): SelfExaminationCompletionInformationDto {
-        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
-            HttpStatus.NOT_FOUND,
-            "404",
-            "The account not found."
-        )
-        if (!preventionService.validateSexPrerequisites(type, account.sex)) {
-            throw LoonoBackendException(
-                HttpStatus.BAD_REQUEST,
-                "400",
-                "This type of examination cannot applied for the account."
-            )
-        }
+        val account = prerequisitesValidation(accountUuid, type)
         var count = 1
         val selfExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
         if (selfExams.isEmpty()) {
@@ -93,7 +84,7 @@ class ExaminationRecordService(
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
-                        "Invalid result of self-examination."
+                        INVALID_RESULT_MSG
                     )
                 }
             }
@@ -102,13 +93,7 @@ class ExaminationRecordService(
             validateSelfExamConfirmation(plannedExam.dueDate)
             when (result) {
                 SelfExaminationResultDto.OK -> {
-                    selfExaminationRecordRepository.save(
-                        plannedExam.copy(
-                            result = result,
-                            status = SelfExaminationStatusDto.COMPLETED
-                        )
-                    )
-                    saveNewSelfExam(plannedExam)
+                    completeSelfExamAsOK(plannedExam)
                     count--
                 }
                 SelfExaminationResultDto.FINDING -> {
@@ -124,7 +109,7 @@ class ExaminationRecordService(
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
-                        "Invalid result of self-examination."
+                        INVALID_RESULT_MSG
                     )
                 }
             }
@@ -157,6 +142,32 @@ class ExaminationRecordService(
         )
     }
 
+    private fun completeSelfExamAsOK(exam: SelfExaminationRecord) {
+        selfExaminationRecordRepository.save(
+            exam.copy(
+                result = SelfExaminationResultDto.OK,
+                status = SelfExaminationStatusDto.COMPLETED
+            )
+        )
+        saveNewSelfExam(exam)
+    }
+
+    private fun prerequisitesValidation(accountUuid: String, type: SelfExaminationTypeDto): Account {
+        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
+            HttpStatus.NOT_FOUND,
+            "404",
+            "The account not found."
+        )
+        if (!preventionService.validateSexPrerequisites(type, account.sex)) {
+            throw LoonoBackendException(
+                HttpStatus.BAD_REQUEST,
+                "400",
+                "This type of examination cannot applied for the account."
+            )
+        }
+        return account
+    }
+
     private fun validateSelfExamConfirmation(dueDate: LocalDate?) {
         if (dueDate == null) {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST)
@@ -174,15 +185,54 @@ class ExaminationRecordService(
     }
 
     private fun saveNewSelfExam(previousExam: SelfExaminationRecord) {
+        val dueDate = previousExam.dueDate ?: LocalDate.now()
         selfExaminationRecordRepository.save(
             SelfExaminationRecord(
                 type = previousExam.type,
-                dueDate = previousExam.dueDate!!.plusMonths(1),
+                dueDate = dueDate.plusMonths(1),
                 account = previousExam.account,
                 result = null,
                 status = SelfExaminationStatusDto.PLANNED
             )
         )
+    }
+
+    fun processFindingResult(
+        type: SelfExaminationTypeDto,
+        result: SelfExaminationResultDto,
+        uid: String
+    ): SelfExaminationFindingResponseDto {
+        val account = prerequisitesValidation(uid, type)
+        val examWaitingForResult =
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
+                .first { it.status == SelfExaminationStatusDto.WAITING_FOR_RESULT }
+        when (result) {
+            SelfExaminationResultDto.OK -> {
+                completeSelfExamAsOK(examWaitingForResult)
+                return SelfExaminationFindingResponseDto(
+                    message = "Result completed as OK."
+                )
+            }
+            SelfExaminationResultDto.NOT_OK -> {
+                selfExaminationRecordRepository.save(
+                    examWaitingForResult.copy(
+                        result = result,
+                        status = SelfExaminationStatusDto.COMPLETED
+                    )
+                )
+                // TODO turn off notification related to the self-exams
+                return SelfExaminationFindingResponseDto(
+                    message = "The examination marked as NOT OK. Notifications are turned off."
+                )
+            }
+            else -> {
+                throw LoonoBackendException(
+                    HttpStatus.BAD_REQUEST,
+                    "400",
+                    "Invalid result of self-examination."
+                )
+            }
+        }
     }
 
     @Synchronized

@@ -404,6 +404,64 @@
                 }
             ]
         },
+        "/examinations/{self-type}/result": {
+            "post": {
+                "summary": "Self-Examination result finding",
+                "operationId": "resultSelfExamination",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SelfExaminationFindingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Examinations"
+                ],
+                "description": "Sending result of the finding.",
+                "security": [
+                    {
+                        "Bearer_Auth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelfExaminationResult"
+                            }
+                        }
+                    },
+                    "description": ""
+                }
+            },
+            "parameters": [
+                {
+                    "schema": {
+                        "type": "string"
+                    },
+                    "name": "self-type",
+                    "in": "path",
+                    "required": true,
+                    "description": "One of the `SelfExaminationType` values"
+                }
+            ]
+        },
         "/examinations/cancel": {
             "post": {
                 "summary": "Cancel Examination",
@@ -1353,6 +1411,19 @@
                     "badgeLevel",
                     "streak"
                 ]
+            },
+            "SelfExaminationFindingResponse": {
+                "title": "SelfExaminationFindingResponse",
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "message"
+                ],
+                "description": "Return message after sending the finding status."
             }
         },
         "securitySchemes": {
