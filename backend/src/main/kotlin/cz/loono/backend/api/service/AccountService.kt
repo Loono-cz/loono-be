@@ -112,6 +112,8 @@ class AccountService(
             appointmentReminderEmailsOptIn = account.appointmentReminderEmailsOptIn,
             leaderboardAnonymizationOptIn = account.leaderboardAnonymizationOptIn,
             newsletterOptIn = account.newsletterOptIn,
-            badges = account.badges.map { BadgeDto(type = BadgeTypeDto.valueOf(it.type), level = it.level) }
+            badges = account.badges
+                .map { BadgeDto(type = BadgeTypeDto.valueOf(it.type), level = it.level) }
+                .sortedBy(BadgeDto::type)
         )
 }

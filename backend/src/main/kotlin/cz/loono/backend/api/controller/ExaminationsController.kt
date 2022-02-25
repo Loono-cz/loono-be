@@ -37,11 +37,9 @@ class ExaminationsController(
         @RequestBody
         examinationIdDto: ExaminationIdDto
     ): ExaminationRecordDto =
-        if (examinationIdDto.uuid != null) {
+        examinationIdDto.uuid?.let {
             recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
-        } else {
-            throw LoonoBackendException(HttpStatus.BAD_REQUEST)
-        }
+        } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
     @PostMapping("/{self-type}/self")
     fun confirmSelf(

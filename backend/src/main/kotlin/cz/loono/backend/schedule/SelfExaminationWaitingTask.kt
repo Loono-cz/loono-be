@@ -8,7 +8,7 @@ import java.time.LocalDate
 @Component
 class SelfExaminationWaitingTask(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository
-) : SchedulerTask {
+) : DailySchedulerTask {
 
     override fun run() {
         selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.WAITING_FOR_CHECKUP).forEach {

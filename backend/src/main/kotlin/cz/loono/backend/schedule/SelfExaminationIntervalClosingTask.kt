@@ -9,7 +9,7 @@ import java.time.LocalDate
 @Component
 class SelfExaminationIntervalClosingTask(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository
-) : SchedulerTask {
+) : DailySchedulerTask {
 
     override fun run() {
         val now = LocalDate.now()

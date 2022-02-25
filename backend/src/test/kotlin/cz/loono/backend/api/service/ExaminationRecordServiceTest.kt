@@ -14,6 +14,7 @@ import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
@@ -119,10 +120,11 @@ class ExaminationRecordServiceTest(
     }
 
     @Test
-    fun `new exam creation`() {
+    fun `Should add badges and points upon account creation`() {
+        val uid = "101"
         accountRepository.save(
             createAccount(
-                uid = "101",
+                uid = uid,
                 sex = SexDto.MALE.value,
                 birthday = LocalDate.of(1990, 9, 9)
             )
@@ -136,14 +138,16 @@ class ExaminationRecordServiceTest(
                 clock
             )
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeDto.GENERAL_PRACTITIONER
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now()
         )
 
-        val result = examinationRecordService.createOrUpdateExam(exam, "101")
+        examinationRecordService.createOrUpdateExam(exam, uid)
+        val actual = accountRepository.findByUid(uid)
 
-        assert(result.type == exam.type)
-        assert(result.status == exam.status)
-        assert(result.firstExam == exam.firstExam)
+        assertThat(actual?.points).isEqualTo(200)
+        assertThat(actual?.badges).hasSize(1)
+        assertThat(actual?.badges?.first()?.type).isEqualTo("COAT")
     }
 
     @Test

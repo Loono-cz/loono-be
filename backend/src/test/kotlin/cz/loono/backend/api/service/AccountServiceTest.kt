@@ -3,6 +3,8 @@ package cz.loono.backend.api.service
 import cz.loono.backend.api.dto.AccountDto
 import cz.loono.backend.api.dto.AccountOnboardingDto
 import cz.loono.backend.api.dto.AccountUpdateDto
+import cz.loono.backend.api.dto.BadgeDto
+import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -10,6 +12,7 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
@@ -84,7 +87,7 @@ class AccountServiceTest(
     }
 
     @Test
-    fun `onboard account with different types of exams`() {
+    fun `onboard account with different types of exams and should add badges and points`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
         val service = AccountService(repo, firebaseAuthService, examinationRecordService)
@@ -132,8 +135,8 @@ class AccountServiceTest(
                 sex = SexDto.valueOf(account.sex),
                 prefferedEmail = account.preferredEmail,
                 birthdate = account.birthdate,
-                points = 0,
-                badges = emptyList(),
+                points = 500,
+                badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
                 newsletterOptIn = false,
                 appointmentReminderEmailsOptIn = true,
                 leaderboardAnonymizationOptIn = true,
@@ -308,5 +311,97 @@ class AccountServiceTest(
 
         // Assert
         assert(repo.findByUid(existingAccount.uid) == null)
+    }
+
+    @Test
+    fun `Should add badges and points for exams which are within expected interval`() {
+        val uid = UUID.randomUUID().toString()
+        val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
+        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+
+        val actual = service.onboardAccount(
+            uid,
+            account = AccountOnboardingDto(
+                nickname = account.nickname,
+                sex = SexDto.valueOf(account.sex),
+                preferredEmail = account.preferredEmail,
+                birthdate = account.birthdate,
+                examinations = listOf(
+                    ExaminationRecordDto(
+                        date = LocalDateTime.now().minusYears(3),
+                        type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                        status = ExaminationStatusDto.CONFIRMED,
+                        firstExam = true
+                    ),
+                    ExaminationRecordDto(
+                        date = LocalDateTime.now(),
+                        type = ExaminationTypeDto.DENTIST,
+                        status = ExaminationStatusDto.UNKNOWN,
+                        firstExam = true
+                    ),
+                )
+            )
+        )
+
+        val expected = AccountDto(
+            uid = account.uid,
+            nickname = account.nickname,
+            sex = SexDto.valueOf(account.sex),
+            prefferedEmail = account.preferredEmail,
+            birthdate = account.birthdate,
+            points = 300,
+            badges = listOf(BadgeDto(BadgeTypeDto.HEADBAND, 1)),
+            newsletterOptIn = false,
+            appointmentReminderEmailsOptIn = true,
+            leaderboardAnonymizationOptIn = true,
+            profileImageUrl = null
+        )
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `Should add badges and points respecting statuses`() {
+        val uid = UUID.randomUUID().toString()
+        val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
+        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+
+        val actual = service.onboardAccount(
+            uid,
+            account = AccountOnboardingDto(
+                nickname = account.nickname,
+                sex = SexDto.valueOf(account.sex),
+                preferredEmail = account.preferredEmail,
+                birthdate = account.birthdate,
+                examinations = listOf(
+                    ExaminationRecordDto(
+                        date = LocalDateTime.now(),
+                        type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                        status = ExaminationStatusDto.CONFIRMED,
+                        firstExam = true
+                    ),
+                    ExaminationRecordDto(
+                        date = LocalDateTime.now(),
+                        type = ExaminationTypeDto.DENTIST,
+                        status = ExaminationStatusDto.NEW,
+                        firstExam = true
+                    ),
+                )
+            )
+        )
+
+        val expected = AccountDto(
+            uid = account.uid,
+            nickname = account.nickname,
+            sex = SexDto.valueOf(account.sex),
+            prefferedEmail = account.preferredEmail,
+            birthdate = account.birthdate,
+            points = 200,
+            badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1)),
+            newsletterOptIn = false,
+            appointmentReminderEmailsOptIn = true,
+            leaderboardAnonymizationOptIn = true,
+            profileImageUrl = null
+        )
+        assertThat(actual).isEqualTo(expected)
     }
 }
