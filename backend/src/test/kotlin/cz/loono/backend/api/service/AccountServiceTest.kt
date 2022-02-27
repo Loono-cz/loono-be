@@ -328,7 +328,7 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(3),
+                        date = LocalDateTime.now().minusYears(2).plusDays(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
@@ -349,14 +349,68 @@ class AccountServiceTest(
             sex = SexDto.valueOf(account.sex),
             prefferedEmail = account.preferredEmail,
             birthdate = account.birthdate,
-            points = 300,
-            badges = listOf(BadgeDto(BadgeTypeDto.HEADBAND, 1)),
+            points = 500,
+            badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
             newsletterOptIn = false,
             appointmentReminderEmailsOptIn = true,
             leaderboardAnonymizationOptIn = true,
             profileImageUrl = null
         )
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `Exams which are out of expected interval more than 2 year`() {
+        val uid = UUID.randomUUID().toString()
+        val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
+        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+
+        assertThrows<LoonoBackendException> {
+            service.onboardAccount(
+                uid,
+                account = AccountOnboardingDto(
+                    nickname = account.nickname,
+                    sex = SexDto.valueOf(account.sex),
+                    preferredEmail = account.preferredEmail,
+                    birthdate = account.birthdate,
+                    examinations = listOf(
+                        ExaminationRecordDto(
+                            date = LocalDateTime.now().minusYears(3),
+                            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                            status = ExaminationStatusDto.CONFIRMED,
+                            firstExam = true
+                        )
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Exams which are out of expected interval in future`() {
+        val uid = UUID.randomUUID().toString()
+        val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
+        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+
+        assertThrows<LoonoBackendException> {
+            service.onboardAccount(
+                uid,
+                account = AccountOnboardingDto(
+                    nickname = account.nickname,
+                    sex = SexDto.valueOf(account.sex),
+                    preferredEmail = account.preferredEmail,
+                    birthdate = account.birthdate,
+                    examinations = listOf(
+                        ExaminationRecordDto(
+                            date = LocalDateTime.now().plusDays(1),
+                            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                            status = ExaminationStatusDto.CONFIRMED,
+                            firstExam = true
+                        )
+                    )
+                )
+            )
+        }
     }
 
     @Test

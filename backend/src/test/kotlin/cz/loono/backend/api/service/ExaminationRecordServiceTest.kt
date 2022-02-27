@@ -138,8 +138,9 @@ class ExaminationRecordServiceTest(
                 clock
             )
         val exam = ExaminationRecordDto(
+            firstExam = true,
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            date = LocalDateTime.now()
+            date = LocalDateTime.now().minusDays(1)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -148,6 +149,64 @@ class ExaminationRecordServiceTest(
         assertThat(actual?.points).isEqualTo(200)
         assertThat(actual?.badges).hasSize(1)
         assertThat(actual?.badges?.first()?.type).isEqualTo("COAT")
+    }
+
+    @Test
+    fun `Create correct future exam`() {
+        val uid = "101"
+        accountRepository.save(
+            createAccount(
+                uid = uid,
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now().plusYears(2)
+        )
+
+        examinationRecordService.createOrUpdateExam(exam, uid)
+        val actual = accountRepository.findByUid(uid)
+
+        assertThat(actual?.points).isEqualTo(0)
+        assertThat(actual?.badges).isEmpty()
+    }
+
+    @Test
+    fun `Create a new exam in past`() {
+        val uid = "101"
+        accountRepository.save(
+            createAccount(
+                uid = uid,
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now().minusDays(1)
+        )
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.createOrUpdateExam(exam, uid)
+        }
     }
 
     @Test

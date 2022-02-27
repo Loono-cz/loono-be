@@ -23,7 +23,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.LocalDateTime.now
+import java.time.temporal.ChronoUnit
 
 @Service
 class ExaminationRecordService(
@@ -244,6 +245,7 @@ class ExaminationRecordService(
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
+        validateDateInterval(examinationRecordDto)
         addRewardIfEligible(examinationRecordDto, accountUuid)
         return examinationRecordRepository.save(
             ExaminationRecord(
@@ -258,6 +260,22 @@ class ExaminationRecordService(
         ).toExaminationRecordDto()
     }
 
+    private fun validateDateInterval(record: ExaminationRecordDto) =
+        record.date?.let {
+            record.firstExam?.let { isFirstExam ->
+                val today = now()
+                if (
+                    (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
+                    !isFirstExam && it.isBefore(today)
+                ) {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "404",
+                        "Unsupported date interval."
+                    )
+                }
+            }
+        }
     private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
@@ -349,9 +367,11 @@ class ExaminationRecordService(
         }
     }
 
-    private fun isEligibleForReward(examinationRecordDto: ExaminationRecordDto) =
-        (examinationRecordDto.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-            examinationRecordDto.date?.plusYears(2)?.isAfter(LocalDateTime.now()) ?: false
+    private fun isEligibleForReward(erd: ExaminationRecordDto) =
+        now().let { now ->
+            (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+                (erd.date?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.date) < 2)
+        }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
