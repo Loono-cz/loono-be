@@ -340,7 +340,7 @@ class ExaminationRecordServiceTest(
         assertThrows<LoonoBackendException>("This type of examination cannot applied for the account.") {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.BREAST,
-                SelfExaminationResultDto.OK,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
                 account.uid
             )
         }
@@ -361,7 +361,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.BREAST,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 
@@ -393,7 +393,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.BREAST,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.FINDING),
             account.uid
         )
 
@@ -428,7 +428,7 @@ class ExaminationRecordServiceTest(
             )
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
         val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -436,7 +436,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 
@@ -471,7 +471,7 @@ class ExaminationRecordServiceTest(
             )
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
         val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -479,7 +479,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.FINDING),
             account.uid
         )
 
@@ -515,7 +515,7 @@ class ExaminationRecordServiceTest(
         repeat(5) {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.TESTICULAR,
-                SelfExaminationResultDto.OK,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
                 account.uid
             )
             val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -524,7 +524,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 

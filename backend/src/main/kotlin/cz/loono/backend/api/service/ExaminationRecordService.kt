@@ -57,27 +57,27 @@ class ExaminationRecordService(
         var count = 1
         val selfExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
         if (selfExams.isEmpty()) {
-            when (result) {
-                SelfExaminationResultDto.OK -> {
+            when (result.result) {
+                SelfExaminationResultDto.Result.OK -> {
                     val firstRecord = selfExaminationRecordRepository.save(
                         SelfExaminationRecord(
                             type = type,
                             dueDate = LocalDate.now(),
                             account = account,
-                            result = result,
+                            result = SelfExaminationResultDto.Result.OK,
                             status = SelfExaminationStatusDto.COMPLETED
                         )
                     )
                     saveNewSelfExam(firstRecord)
                 }
-                SelfExaminationResultDto.FINDING -> {
+                SelfExaminationResultDto.Result.FINDING -> {
                     val today = LocalDate.now()
                     selfExaminationRecordRepository.save(
                         SelfExaminationRecord(
                             type = type,
                             dueDate = today,
                             account = account,
-                            result = result,
+                            result = SelfExaminationResultDto.Result.FINDING,
                             status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
                             waitingTo = today.plusDays(SELF_FINDING_CHECK_INTERVAL)
                         )
@@ -94,15 +94,15 @@ class ExaminationRecordService(
         } else {
             val plannedExam = selfExams.first { it.status == SelfExaminationStatusDto.PLANNED }
             validateSelfExamConfirmation(plannedExam.dueDate)
-            when (result) {
-                SelfExaminationResultDto.OK -> {
+            when (result.result) {
+                SelfExaminationResultDto.Result.OK -> {
                     completeSelfExamAsOK(plannedExam)
                     count--
                 }
-                SelfExaminationResultDto.FINDING -> {
+                SelfExaminationResultDto.Result.FINDING -> {
                     selfExaminationRecordRepository.save(
                         plannedExam.copy(
-                            result = result,
+                            result = SelfExaminationResultDto.Result.FINDING,
                             status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
                             waitingTo = plannedExam.dueDate!!.plusDays(SELF_FINDING_CHECK_INTERVAL)
                         )
@@ -148,7 +148,7 @@ class ExaminationRecordService(
     private fun completeSelfExamAsOK(exam: SelfExaminationRecord) {
         selfExaminationRecordRepository.save(
             exam.copy(
-                result = SelfExaminationResultDto.OK,
+                result = SelfExaminationResultDto.Result.OK,
                 status = SelfExaminationStatusDto.COMPLETED
             )
         )
@@ -209,17 +209,17 @@ class ExaminationRecordService(
         val examWaitingForResult =
             selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
                 .first { it.status == SelfExaminationStatusDto.WAITING_FOR_RESULT }
-        when (result) {
-            SelfExaminationResultDto.OK -> {
+        when (result.result) {
+            SelfExaminationResultDto.Result.OK -> {
                 completeSelfExamAsOK(examWaitingForResult)
                 return SelfExaminationFindingResponseDto(
                     message = "Result completed as OK."
                 )
             }
-            SelfExaminationResultDto.NOT_OK -> {
+            SelfExaminationResultDto.Result.NOT_OK -> {
                 selfExaminationRecordRepository.save(
                     examWaitingForResult.copy(
-                        result = result,
+                        result = SelfExaminationResultDto.Result.NOT_OK,
                         status = SelfExaminationStatusDto.COMPLETED
                     )
                 )

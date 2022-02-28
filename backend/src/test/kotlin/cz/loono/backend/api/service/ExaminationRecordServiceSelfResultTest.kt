@@ -56,7 +56,7 @@ class ExaminationRecordServiceSelfResultTest {
 
         val result = examinationRecordService.processFindingResult(
             SelfExaminationTypeDto.BREAST,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             "101"
         )
 
@@ -84,7 +84,7 @@ class ExaminationRecordServiceSelfResultTest {
 
         val result = examinationRecordService.processFindingResult(
             SelfExaminationTypeDto.BREAST,
-            SelfExaminationResultDto.NOT_OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.NOT_OK),
             "101"
         )
 
@@ -99,7 +99,7 @@ class ExaminationRecordServiceSelfResultTest {
         assertThrows<LoonoBackendException> {
             examinationRecordService.processFindingResult(
                 SelfExaminationTypeDto.BREAST,
-                SelfExaminationResultDto.NOT_OK,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.NOT_OK),
                 "101"
             )
         }
@@ -113,7 +113,7 @@ class ExaminationRecordServiceSelfResultTest {
         assertThrows<LoonoBackendException> {
             examinationRecordService.processFindingResult(
                 SelfExaminationTypeDto.BREAST,
-                SelfExaminationResultDto.NOT_OK,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.NOT_OK),
                 "101"
             )
         }
@@ -134,7 +134,11 @@ class ExaminationRecordServiceSelfResultTest {
         ).thenReturn(listOf(SelfExaminationRecord(dueDate = null, account = account)))
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.FINDING, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.FINDING),
+                "101"
+            )
         }
     }
 }

@@ -32,7 +32,7 @@ data class SelfExaminationRecord(
     val account: Account,
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    val result: SelfExaminationResultDto? = null,
+    val result: SelfExaminationResultDto.Result? = null,
 
     @Column(nullable = false, columnDefinition = "TEXT")
     var status: SelfExaminationStatusDto = SelfExaminationStatusDto.PLANNED,

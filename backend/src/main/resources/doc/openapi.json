@@ -1373,15 +1373,20 @@
                 "default": "PLANNED"
             },
             "SelfExaminationResult": {
-                "type": "string",
+                "type": "object",
                 "title": "SelfExaminationResult",
                 "description": "",
-                "enum": [
-                    "FINDING",
-                    "NOT_OK",
-                    "OK"
-                ],
-                "default": "OK"
+                "properties": {
+                    "result": {
+                        "type": "string",
+                        "enum": [
+                            "FINDING",
+                            "NOT_OK",
+                            "OK"
+                        ],
+                        "default": "OK"
+                    }
+                }
             },
             "SelfExaminationCompletionInformation": {
                 "title": "SelfExaminationCompletionInformation",

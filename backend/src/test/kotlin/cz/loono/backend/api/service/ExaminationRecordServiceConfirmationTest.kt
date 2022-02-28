@@ -46,7 +46,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now(), account = account)))
 
         assertDoesNotThrow("Happy case") {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+                "101"
+            )
         }
     }
 
@@ -62,7 +66,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(listOf(SelfExaminationRecord(account = account)))
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+                "101"
+            )
         }
     }
 
@@ -81,7 +89,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().minusDays(3), account = account)))
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+                "101"
+            )
         }
     }
 
@@ -100,7 +112,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().plusDays(3), account = account)))
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+                "101"
+            )
         }
     }
 
@@ -119,7 +135,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(emptyList())
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.NOT_OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.NOT_OK),
+                "101"
+            )
         }
     }
 
@@ -138,7 +158,11 @@ class ExaminationRecordServiceConfirmationTest {
         ).thenReturn(listOf(SelfExaminationRecord(dueDate = LocalDate.now().plusDays(3), account = account)))
 
         assertThrows<LoonoBackendException> {
-            examinationRecordService.confirmSelfExam(SelfExaminationTypeDto.BREAST, SelfExaminationResultDto.NOT_OK, "101")
+            examinationRecordService.confirmSelfExam(
+                SelfExaminationTypeDto.BREAST,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.NOT_OK),
+                "101"
+            )
         }
     }
 }

@@ -182,7 +182,7 @@ class PreventionServiceTest {
                     dueDate = now.minusMonths(2L),
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.COMPLETED,
-                    result = SelfExaminationResultDto.FINDING,
+                    result = SelfExaminationResultDto.Result.FINDING,
                     uuid = examsUUIDs[3]!!,
                     account = account
                 ),
@@ -200,7 +200,7 @@ class PreventionServiceTest {
                     dueDate = now,
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.COMPLETED,
-                    result = SelfExaminationResultDto.OK,
+                    result = SelfExaminationResultDto.Result.OK,
                     uuid = examsUUIDs[1]!!,
                     account = account
                 ),
