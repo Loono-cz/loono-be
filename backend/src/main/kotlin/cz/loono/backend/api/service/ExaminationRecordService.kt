@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.time.temporal.ChronoUnit
 
@@ -244,8 +245,9 @@ class ExaminationRecordService(
 
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
+        val account = findAccount(accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
-        validateDateInterval(examinationRecordDto)
+        validateDateInterval(examinationRecordDto, account)
         addRewardIfEligible(examinationRecordDto, accountUuid)
         return examinationRecordRepository.save(
             ExaminationRecord(
@@ -253,29 +255,48 @@ class ExaminationRecordService(
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
                 plannedDate = examinationRecordDto.date,
-                account = findAccount(accountUuid),
+                account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
             )
         ).toExaminationRecordDto()
     }
 
-    private fun validateDateInterval(record: ExaminationRecordDto) =
+    private fun validateDateInterval(
+        record: ExaminationRecordDto,
+        account: Account
+    ) =
         record.date?.let {
             record.firstExam?.let { isFirstExam ->
                 val today = now()
                 if (
                     (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
-                    !isFirstExam && it.isBefore(today)
+                    (!isFirstExam && plannedDateInAcceptedInterval(it, account, record))
                 ) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
-                        "404",
+                        "400",
                         "Unsupported date interval."
                     )
                 }
             }
         }
+
+    private fun plannedDateInAcceptedInterval(date: LocalDateTime, account: Account, record: ExaminationRecordDto): Boolean {
+        val interval =
+            preventionService.getExaminationRequests(account).first { it.examinationType == record.type }
+        val lastConfirmed = examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
+            .filter {
+                it.type == record.type &&
+                    (
+                        it.status == ExaminationStatusDto.CONFIRMED ||
+                            (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+                        )
+            }
+        lastConfirmed.ifEmpty { return false }
+        return date.isBefore(lastConfirmed.first().plannedDate!!.plusYears(interval.intervalYears.toLong()))
+    }
+
     private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,

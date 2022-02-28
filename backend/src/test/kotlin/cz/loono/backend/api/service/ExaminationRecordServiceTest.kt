@@ -184,7 +184,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `Create a new exam in past`() {
         val uid = "101"
-        accountRepository.save(
+        val account = accountRepository.save(
             createAccount(
                 uid = uid,
                 sex = SexDto.MALE.value,
@@ -199,6 +199,14 @@ class ExaminationRecordServiceTest(
                 preventionService,
                 clock
             )
+        examinationRecordRepository.save(
+            ExaminationRecord(
+                type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                status = ExaminationStatusDto.CONFIRMED,
+                plannedDate = LocalDateTime.now().minusYears(1),
+                account = account
+            )
+        )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             date = LocalDateTime.now().minusDays(1)
