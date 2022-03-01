@@ -34,9 +34,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.google.firebase:firebase-admin:8.1.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
-    implementation("org.slf4j:slf4j-api:2.0.0-alpha6")
+    implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
 
