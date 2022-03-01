@@ -19,6 +19,7 @@ import org.mockito.kotlin.mock
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -408,6 +409,26 @@ class AccountServiceTest(
                             firstExam = true
                         )
                     )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `The age of the user has to be 18 and more`() {
+        val uid = UUID.randomUUID().toString()
+        val account = createAccount(uid = uid, birthday = LocalDate.now())
+        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+
+        assertThrows<LoonoBackendException> {
+            service.onboardAccount(
+                uid,
+                account = AccountOnboardingDto(
+                    nickname = account.nickname,
+                    sex = SexDto.valueOf(account.sex),
+                    preferredEmail = account.preferredEmail,
+                    birthdate = account.birthdate,
+                    examinations = emptyList()
                 )
             )
         }

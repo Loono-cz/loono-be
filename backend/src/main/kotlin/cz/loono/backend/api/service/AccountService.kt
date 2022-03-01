@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.Period
 
 @Service
 class AccountService(
@@ -28,6 +30,7 @@ class AccountService(
         if (accountRepository.existsByUid(uuid)) {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST, "400", "Account already exists.")
         }
+        validateAgeRequirement(account)
         val storedAccount = accountRepository.save(
             Account(
                 uid = uuid,
@@ -52,6 +55,18 @@ class AccountService(
                 "Account not found."
             )
         )
+    }
+
+    private fun validateAgeRequirement(account: AccountOnboardingDto) {
+        val today = LocalDate.now()
+        val period = Period.between(account.birthdate, today)
+        if (period.years < 18) {
+            throw LoonoBackendException(
+                HttpStatus.BAD_REQUEST,
+                "400",
+                "The user is not 18 and above years old."
+            )
+        }
     }
 
     @Transactional(rollbackFor = [Exception::class])
