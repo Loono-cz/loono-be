@@ -8,6 +8,8 @@ import java.time.LocalDate
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -22,6 +24,7 @@ data class SelfExaminationRecord(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
     val type: SelfExaminationTypeDto = SelfExaminationTypeDto.BREAST,
 
@@ -31,9 +34,11 @@ data class SelfExaminationRecord(
     @ManyToOne(optional = false)
     val account: Account,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = true, columnDefinition = "TEXT")
     val result: SelfExaminationResultDto.Result? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
     var status: SelfExaminationStatusDto = SelfExaminationStatusDto.PLANNED,
 
