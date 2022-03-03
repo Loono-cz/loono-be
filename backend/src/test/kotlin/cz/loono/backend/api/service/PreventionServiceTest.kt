@@ -182,7 +182,7 @@ class PreventionServiceTest {
                     dueDate = now.minusMonths(2L),
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.COMPLETED,
-                    result = SelfExaminationResultDto.Result.FINDING,
+                    result = SelfExaminationResultDto.Result.OK,
                     uuid = examsUUIDs[3]!!,
                     account = account
                 ),
@@ -229,6 +229,50 @@ class PreventionServiceTest {
                         SelfExaminationStatusDto.MISSED,
                         SelfExaminationStatusDto.COMPLETED,
                         SelfExaminationStatusDto.PLANNED
+                    ),
+                    points = 50,
+                    badge = BadgeTypeDto.SHIELD
+                ),
+            ),
+            /* actual = */ result.selfexaminations
+        )
+    }
+
+    @Test
+    fun `get self-examinations for patient in case of finding`() {
+        val uuid = UUID.randomUUID().toString()
+        val examsUUID = UUID.randomUUID().toString()
+        val age: Long = 45
+        val now = LocalDate.now()
+        val account = createAccount(
+            sex = "FEMALE",
+            birthday = LocalDate.now().minusYears(age)
+        )
+
+        whenever(accountRepository.findByUid(uuid)).thenReturn(account)
+        whenever(selfExaminationRecordRepository.findAllByAccount(account)).thenReturn(
+            setOf(
+                SelfExaminationRecord(
+                    id = 3,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.BREAST,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.FINDING,
+                    uuid = examsUUID,
+                    account = account
+                )
+            )
+        )
+
+        val result = preventionService.getPreventionStatus(uuid)
+        assertEquals(
+            /* expected = */ listOf(
+                SelfExaminationPreventionStatusDto(
+                    lastExamUuid = examsUUID,
+                    type = SelfExaminationTypeDto.BREAST,
+                    plannedDate = now.minusMonths(1L),
+                    history = listOf(
+                        SelfExaminationStatusDto.COMPLETED
                     ),
                     points = 50,
                     badge = BadgeTypeDto.SHIELD

@@ -5,6 +5,7 @@ import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.PreventionStatusDto
 import cz.loono.backend.api.dto.SelfExaminationPreventionStatusDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
@@ -80,7 +81,8 @@ class PreventionService(
         // 3) Find the largest or return null if the list is empty
         val lastConfirmedDate = confirmedExamsOfCurrentType?.mapNotNull(ExaminationRecord::plannedDate)?.maxOrNull()
         val totalCountOfConfirmedExams = confirmedExamsOfCurrentType?.size ?: 0
-        val rewards = BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(account.sex))
+        val rewards =
+            BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(account.sex))
 
         ExaminationPreventionStatusDto(
             uuid = sortedExamsOfType[0].uuid,
@@ -101,15 +103,20 @@ class PreventionService(
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
         val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
-            val filteredExams = selfExams.filter { exam -> exam.type == type }
+            val filteredExams =
+                selfExams.filter { exam -> exam.type == type && exam.result != SelfExaminationResultDto.Result.NOT_OK }
             val rewards = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
-                    val plannedExam = filteredExams.first { exam -> exam.status == SelfExaminationStatusDto.PLANNED }
+                    val activeExam =
+                        filteredExams.first { exam ->
+                            exam.status == SelfExaminationStatusDto.PLANNED ||
+                                exam.result == SelfExaminationResultDto.Result.FINDING
+                        }
                     result.add(
                         SelfExaminationPreventionStatusDto(
-                            lastExamUuid = plannedExam.uuid,
-                            plannedDate = plannedExam.dueDate,
+                            lastExamUuid = activeExam.uuid,
+                            plannedDate = activeExam.dueDate,
                             type = type,
                             history = filteredExams.map(SelfExaminationRecord::status),
                             points = rewards.second,
