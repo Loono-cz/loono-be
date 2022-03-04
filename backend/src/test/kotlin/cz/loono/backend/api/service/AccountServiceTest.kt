@@ -12,6 +12,8 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -27,7 +29,9 @@ import java.util.UUID
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class AccountServiceTest(
     private val repo: AccountRepository,
-    private val examinationRecordService: ExaminationRecordService
+    private val examinationRecordService: ExaminationRecordService,
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
 ) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
@@ -36,7 +40,13 @@ class AccountServiceTest(
     fun `onboard account`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         val accountDto = service.onboardAccount(
             uid,
@@ -71,7 +81,13 @@ class AccountServiceTest(
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
         repo.save(account)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         assertThrows<LoonoBackendException> {
             service.onboardAccount(
@@ -91,7 +107,13 @@ class AccountServiceTest(
     fun `onboard account with different types of exams and should add badges and points`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         val accountDto = service.onboardAccount(
             uid,
@@ -154,7 +176,13 @@ class AccountServiceTest(
     fun `update account without values`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val storedAccount = repo.save(account)
 
         val accountDto = service.updateAccount(storedAccount.uid, AccountUpdateDto())
@@ -180,7 +208,13 @@ class AccountServiceTest(
     fun `update account single change`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val storedAccount = repo.save(account)
 
         val accountDto =
@@ -207,7 +241,13 @@ class AccountServiceTest(
     fun `update account settings`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         repo.save(account)
 
         val accountDto = service.updateAccount(
@@ -240,7 +280,13 @@ class AccountServiceTest(
     fun `update account all values`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         repo.save(account)
 
         val accountDto = service.updateAccount(
@@ -275,7 +321,13 @@ class AccountServiceTest(
     @Test
     fun `update account remove image`() {
         val account = createAccount(uid = "102", profileImageUrl = "image")
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val storedAccount = repo.save(account)
 
         val accountDto = service.updateAccount(
@@ -303,7 +355,13 @@ class AccountServiceTest(
     @Test
     fun `delete existing account`() {
         // Arrange
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val existingAccount = createAccount("toDelete")
         repo.save(existingAccount)
 
@@ -318,7 +376,13 @@ class AccountServiceTest(
     fun `Should add badges and points for exams which are within expected interval`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         val actual = service.onboardAccount(
             uid,
@@ -364,7 +428,13 @@ class AccountServiceTest(
     fun `Exams which are out of expected interval more than 2 year`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         assertThrows<LoonoBackendException> {
             service.onboardAccount(
@@ -391,7 +461,13 @@ class AccountServiceTest(
     fun `Exams which are out of expected interval in future`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         assertThrows<LoonoBackendException> {
             service.onboardAccount(
@@ -418,7 +494,13 @@ class AccountServiceTest(
     fun `The age of the user has to be 18 and more`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, birthday = LocalDate.now())
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         assertThrows<LoonoBackendException> {
             service.onboardAccount(
@@ -438,7 +520,13 @@ class AccountServiceTest(
     fun `Should add badges and points respecting statuses`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
 
         val actual = service.onboardAccount(
             uid,

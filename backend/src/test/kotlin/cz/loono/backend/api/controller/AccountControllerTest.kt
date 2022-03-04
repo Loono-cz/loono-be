@@ -9,6 +9,8 @@ import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.createAccount
 import cz.loono.backend.createBasicUser
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -23,7 +25,9 @@ import org.springframework.http.HttpStatus
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class AccountControllerTest(
     private val repo: AccountRepository,
-    private val examinationRecordService: ExaminationRecordService
+    private val examinationRecordService: ExaminationRecordService,
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
 ) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
@@ -45,7 +49,13 @@ class AccountControllerTest(
     @Test
     fun `getAccount with existing account`() {
         // Arrange
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
         val existingAccount = createAccount()
@@ -74,7 +84,13 @@ class AccountControllerTest(
     @Test
     fun `delete non-existing account`() {
         // Arrange
-        val service = AccountService(repo, firebaseAuthService, examinationRecordService)
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService
+        )
         val controller = AccountController(service, repo)
 
         // Act

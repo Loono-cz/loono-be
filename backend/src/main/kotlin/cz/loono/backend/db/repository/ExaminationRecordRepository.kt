@@ -11,4 +11,5 @@ interface ExaminationRecordRepository : JpaRepository<ExaminationRecord, Long> {
     fun findAllByAccountOrderByPlannedDateDesc(account: Account): List<ExaminationRecord>
     fun findByUuidAndAccount(uuid: String, account: Account): ExaminationRecord
     fun findAllByAccount(account: Account): Set<ExaminationRecord>
+    fun deleteAllByAccount(account: Account)
 }

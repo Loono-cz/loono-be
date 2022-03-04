@@ -10,6 +10,8 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -20,6 +22,8 @@ import java.time.Period
 @Service
 class AccountService(
     private val accountRepository: AccountRepository,
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val selfRecordRepository: SelfExaminationRecordRepository,
     private val firebaseAuthService: FirebaseAuthService,
     private val examinationRecordService: ExaminationRecordService
 ) {
@@ -76,6 +80,8 @@ class AccountService(
             errorCode = "404",
             errorMessage = "The account not found."
         )
+        examinationRecordRepository.deleteAllByAccount(account)
+        selfRecordRepository.deleteAllByAccount(account)
         accountRepository.delete(account)
         firebaseAuthService.deleteAccount(uid)
     }
