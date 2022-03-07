@@ -86,10 +86,14 @@ fun setUpOpenApiGenerator() {
         dependsOn("openApiGenerate")
     }
 
+    tasks.openApiGenerate.configure {
+        dependsOn("downloadOpenApiSpec")
+    }
+
     val localSpecFile = projectDir.toPath().resolve("src/main/resources/doc/openapi.json")
 
     tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadOpenApiSpec") {
-        src("https://stoplight.io/api/v1/projects/okarmazin/loono/nodes/openapi.json")
+        src("https://raw.githubusercontent.com/cesko-digital/loono-api/main/openapi.json")
         dest(localSpecFile.toFile())
     }
 
