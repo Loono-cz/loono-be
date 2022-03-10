@@ -19,7 +19,7 @@ provider "aws" {
 }
 
 # ----------------
-# VPC
+# VPC test
 # ----------------
 
 resource "aws_vpc" "vpc" {
