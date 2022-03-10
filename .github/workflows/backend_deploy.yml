@@ -1,45 +1,41 @@
 name: 'Deploy backend to ECS'
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
+    paths-ignore:
+      - '.github/**'
+      - '.gitignore'
+      - 'README.md'
+      - 'LICENSE'
+
+env:
+  region: ${{ secrets.AWS_REGION }}
+  repository: ${{ secrets.AWS_REPOSITORY }}
+  serviceName: 'loono-backend'
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2
-
-      - name: 'Configure AWS credentials'
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, tag, and push the image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: latest
+        uses: actions/checkout@v1
+      - name: 'Login to Repository'
         run: |
-          # Build a docker container and push it to ECR 
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          echo "Pushing image to ECR..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-      - name: 'Redeploy to ECS'
-        run: |
-          aws ecs update-service --cluster $ECR_REPOSITORY --service $ECR_REPOSITORY --force-new-deployment
+          aws ecr get-login-password --region ${{ env.region }} | docker login --username AWS --password-stdin ${{ env.repository }}/${{ env.serviceName }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: latest
+      - name: 'Build Docker image'
+        run: |
+          docker build -t ${{ env.serviceName }} .
+      - name: 'Push Docker image to repository'
+        run: |
+          docker tag ${{ env.serviceName }}:latest ${{ env.repository }}/${{ env.serviceName }}:latest
+          docker push ${{ env.repository }}/${{ env.serviceName }}:latest
+      - name: 'Redeploy to ECS'
+        run: |
+          aws --region ${{ env.region }} ecs update-service --cluster ${{ env.serviceName }} --service ${{ env.serviceName }} --force-new-deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
