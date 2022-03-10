@@ -12,7 +12,7 @@ class ExaminationCancellationTask(
     private val preventionService: PreventionService,
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository
-) : SchedulerTask {
+) : DailySchedulerTask {
 
     override fun run() {
         val exams = examinationRecordRepository.findAll()

@@ -1,12 +1,16 @@
+val logbackVersion = "1.2.10"
+val hibernateVersion = "5.6.5.Final"
+
 plugins {
-    id("org.springframework.boot") version "2.5.7"
+    id("org.springframework.boot") version "2.6.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
-    id("org.openapi.generator") version "5.3.0"
-    id("de.undercouch.download") version "4.1.2"
-    id("org.jetbrains.kotlin.plugin.jpa") version "1.6.10"
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.spring") version "1.6.10"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.openapi.generator") version "5.4.0"
+    id("de.undercouch.download") version "5.0.1"
+    id("org.owasp.dependencycheck") version "6.5.3"
+    kotlin("jvm") version "1.6.20-RC"
+    kotlin("plugin.spring") version "1.6.20-RC"
+    kotlin("plugin.jpa") version "1.6.20-RC"
     jacoco
 }
 
@@ -32,13 +36,13 @@ dependencies {
     implementation("com.google.firebase:firebase-admin:8.1.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
-    implementation("org.slf4j:slf4j-api:1.7.32")
-    implementation("ch.qos.logback:logback-classic:1.2.9")
-    implementation("ch.qos.logback:logback-core:1.2.9")
+    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("ch.qos.logback:logback-core:$logbackVersion")
 
     runtimeOnly("org.postgresql:postgresql")
-    implementation("org.hibernate:hibernate-envers:5.4.32.Final")
-    implementation("org.hibernate:hibernate-entitymanager:5.4.32.Final")
+    implementation("org.hibernate:hibernate-envers:$hibernateVersion")
+    implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
 
     testRuntimeOnly("com.h2database:h2")
 
@@ -82,10 +86,14 @@ fun setUpOpenApiGenerator() {
         dependsOn("openApiGenerate")
     }
 
+    tasks.openApiGenerate.configure {
+        dependsOn("downloadOpenApiSpec")
+    }
+
     val localSpecFile = projectDir.toPath().resolve("src/main/resources/doc/openapi.json")
 
     tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadOpenApiSpec") {
-        src("https://stoplight.io/api/v1/projects/okarmazin/loono/nodes/openapi.json")
+        src("https://raw.githubusercontent.com/cesko-digital/loono-api/main/openapi.json")
         dest(localSpecFile.toFile())
     }
 
@@ -123,4 +131,8 @@ fun setUpOpenApiGenerator() {
         inputSpec.set(localSpecFile.toString())
         typeMappings.put("java.time.OffsetDateTime", "java.time.LocalDateTime")
     }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 0.0f
 }

@@ -21,7 +21,7 @@ More information <a href="https://firebase.google.com/docs/admin/setup#initializ
 </p>
 <h3>System environment variables</h3>
 <ul>
-<li>POSTGRE_URL: host:port/db (i.e. localhost:5432/loono</li>
+<li>POSTGRE_URL: host:port/db (i.e. localhost:5432/loono)</li>
 <li>POSTGRE_USER: database owner</li>
 <li>POSTGRE_PWD: database password</li>
 <li>GOOGLE_APPLICATION_CREDENTIALS: a content of the file with service account credentials to the Firebase</li>

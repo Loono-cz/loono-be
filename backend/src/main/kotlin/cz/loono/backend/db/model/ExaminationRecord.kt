@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -22,6 +24,7 @@ data class ExaminationRecord(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long = 0,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
     val type: ExaminationTypeDto = ExaminationTypeDto.GENERAL_PRACTITIONER,
 
@@ -29,11 +32,12 @@ data class ExaminationRecord(
     val plannedDate: LocalDateTime? = null,
 
     @ManyToOne(optional = false)
-    val account: Account = Account(),
+    val account: Account,
 
     @Column(nullable = false)
     val firstExam: Boolean = true,
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
     var status: ExaminationStatusDto = ExaminationStatusDto.NEW,
 

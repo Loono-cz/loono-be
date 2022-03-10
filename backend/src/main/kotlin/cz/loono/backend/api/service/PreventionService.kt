@@ -5,6 +5,7 @@ import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.PreventionStatusDto
 import cz.loono.backend.api.dto.SelfExaminationPreventionStatusDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
@@ -29,13 +30,10 @@ class PreventionService(
 
     fun getExaminationRequests(account: Account): List<ExaminationInterval> {
 
-        val birthDate = account.userAuxiliary.birthdate ?: throw LoonoBackendException(
-            HttpStatus.UNPROCESSABLE_ENTITY, "birthdate not known"
-        )
-        val age = ChronoUnit.YEARS.between(birthDate, LocalDate.now()).toInt()
+        val age = ChronoUnit.YEARS.between(account.birthdate, LocalDate.now()).toInt()
 
         return ExaminationIntervalProvider.findExaminationRequests(
-            Patient(age, SexDto.valueOf(account.userAuxiliary.sex))
+            Patient(age, SexDto.valueOf(account.sex))
         )
     }
 
@@ -56,7 +54,7 @@ class PreventionService(
         val examinations = prepareExaminationStatuses(
             examinationRequests,
             examinationTypesToRecords,
-            account.userAuxiliary.sex
+            account
         )
 
         val selfExamsList = prepareSelfExaminationsStatuses(account)
@@ -66,7 +64,7 @@ class PreventionService(
     private fun prepareExaminationStatuses(
         examinationRequests: List<ExaminationInterval>,
         examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>>,
-        sex: String
+        account: Account
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
         val sortedExamsOfType = examsOfType
@@ -75,7 +73,7 @@ class PreventionService(
                     it.status != ExaminationStatusDto.CONFIRMED ||
                     it.status != ExaminationStatusDto.CANCELED
             }
-            ?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(ExaminationRecord())
+            ?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(ExaminationRecord(account = account))
 
         val confirmedExamsOfCurrentType = examsOfType?.filter { it.status == ExaminationStatusDto.CONFIRMED }
         // 1) Filter all the confirmed records
@@ -83,7 +81,8 @@ class PreventionService(
         // 3) Find the largest or return null if the list is empty
         val lastConfirmedDate = confirmedExamsOfCurrentType?.mapNotNull(ExaminationRecord::plannedDate)?.maxOrNull()
         val totalCountOfConfirmedExams = confirmedExamsOfCurrentType?.size ?: 0
-        val rewards = BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(sex))
+        val rewards =
+            BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(account.sex))
 
         ExaminationPreventionStatusDto(
             uuid = sortedExamsOfType[0].uuid,
@@ -104,15 +103,20 @@ class PreventionService(
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
         val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
-            val filteredExams = selfExams.filter { exam -> exam.type == type }
-            val rewards = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.userAuxiliary.sex))
+            val filteredExams =
+                selfExams.filter { exam -> exam.type == type && exam.result != SelfExaminationResultDto.Result.NOT_OK }
+            val rewards = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
-                    val plannedExam = filteredExams.first { exam -> exam.status == SelfExaminationStatusDto.PLANNED }
+                    val activeExam =
+                        filteredExams.first { exam ->
+                            exam.status == SelfExaminationStatusDto.PLANNED ||
+                                exam.result == SelfExaminationResultDto.Result.FINDING
+                        }
                     result.add(
                         SelfExaminationPreventionStatusDto(
-                            lastExamUuid = plannedExam.uuid,
-                            plannedDate = plannedExam.dueDate,
+                            lastExamUuid = activeExam.uuid,
+                            plannedDate = activeExam.dueDate,
                             type = type,
                             history = filteredExams.map(SelfExaminationRecord::status),
                             points = rewards.second,

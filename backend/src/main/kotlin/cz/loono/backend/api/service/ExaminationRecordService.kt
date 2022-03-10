@@ -3,8 +3,8 @@ package cz.loono.backend.api.service
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
+import cz.loono.backend.api.dto.SelfExaminationFindingResponseDto
 import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalDateTime.now
+import java.time.temporal.ChronoUnit
 
 @Service
 class ExaminationRecordService(
@@ -36,6 +39,8 @@ class ExaminationRecordService(
     companion object {
         private const val STARTING_LEVEL = 1
         private const val SELF_EXAM_LEVEL_COUNT = 3
+        private const val SELF_FINDING_CHECK_INTERVAL = 56L // no. days waiting for finding verification
+        private const val INVALID_RESULT_MSG = "Invalid result of self-examination."
     }
 
     @Synchronized
@@ -48,44 +53,72 @@ class ExaminationRecordService(
         result: SelfExaminationResultDto,
         accountUuid: String
     ): SelfExaminationCompletionInformationDto {
-        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
-            HttpStatus.NOT_FOUND,
-            "404",
-            "The account not found."
-        )
-        if (!preventionService.validateSexPrerequisites(type, account.userAuxiliary.sex)) {
-            throw LoonoBackendException(
-                HttpStatus.BAD_REQUEST,
-                "400",
-                "This type of examination cannot applied for the account."
-            )
-        }
+        val account = prerequisitesValidation(accountUuid, type)
         var count = 1
         val selfExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
         if (selfExams.isEmpty()) {
-            val firstRecord = selfExaminationRecordRepository.save(
-                SelfExaminationRecord(
-                    type = type,
-                    dueDate = LocalDate.now(),
-                    account = account,
-                    result = result,
-                    status = SelfExaminationStatusDto.COMPLETED
-                )
-            )
-            saveNewSelfExam(firstRecord)
+            when (result.result) {
+                SelfExaminationResultDto.Result.OK -> {
+                    val firstRecord = selfExaminationRecordRepository.save(
+                        SelfExaminationRecord(
+                            type = type,
+                            dueDate = LocalDate.now(),
+                            account = account,
+                            result = SelfExaminationResultDto.Result.OK,
+                            status = SelfExaminationStatusDto.COMPLETED
+                        )
+                    )
+                    saveNewSelfExam(firstRecord)
+                }
+                SelfExaminationResultDto.Result.FINDING -> {
+                    val today = LocalDate.now()
+                    selfExaminationRecordRepository.save(
+                        SelfExaminationRecord(
+                            type = type,
+                            dueDate = today,
+                            account = account,
+                            result = SelfExaminationResultDto.Result.FINDING,
+                            status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
+                            waitingTo = today.plusDays(SELF_FINDING_CHECK_INTERVAL)
+                        )
+                    )
+                }
+                else -> {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "400",
+                        INVALID_RESULT_MSG
+                    )
+                }
+            }
         } else {
             val plannedExam = selfExams.first { it.status == SelfExaminationStatusDto.PLANNED }
             validateSelfExamConfirmation(plannedExam.dueDate)
-            selfExaminationRecordRepository.save(
-                plannedExam.copy(
-                    result = result,
-                    status = SelfExaminationStatusDto.COMPLETED
-                )
-            )
-            saveNewSelfExam(plannedExam)
-            count--
+            when (result.result) {
+                SelfExaminationResultDto.Result.OK -> {
+                    completeSelfExamAsOK(plannedExam)
+                    count--
+                }
+                SelfExaminationResultDto.Result.FINDING -> {
+                    selfExaminationRecordRepository.save(
+                        plannedExam.copy(
+                            result = SelfExaminationResultDto.Result.FINDING,
+                            status = SelfExaminationStatusDto.WAITING_FOR_CHECKUP,
+                            waitingTo = plannedExam.dueDate!!.plusDays(SELF_FINDING_CHECK_INTERVAL)
+                        )
+                    )
+                }
+                else -> {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "400",
+                        INVALID_RESULT_MSG
+                    )
+                }
+            }
         }
-        val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.userAuxiliary.sex))!!
+        val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
+            ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         selfExams.forEach exams@{
             when (it.status) {
                 SelfExaminationStatusDto.COMPLETED -> count++
@@ -112,6 +145,32 @@ class ExaminationRecordService(
         )
     }
 
+    private fun completeSelfExamAsOK(exam: SelfExaminationRecord) {
+        selfExaminationRecordRepository.save(
+            exam.copy(
+                result = SelfExaminationResultDto.Result.OK,
+                status = SelfExaminationStatusDto.COMPLETED
+            )
+        )
+        saveNewSelfExam(exam)
+    }
+
+    private fun prerequisitesValidation(accountUuid: String, type: SelfExaminationTypeDto): Account {
+        val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
+            HttpStatus.NOT_FOUND,
+            "404",
+            "The account not found."
+        )
+        if (!preventionService.validateSexPrerequisites(type, account.sex)) {
+            throw LoonoBackendException(
+                HttpStatus.BAD_REQUEST,
+                "400",
+                "This type of examination cannot applied for the account."
+            )
+        }
+        return account
+    }
+
     private fun validateSelfExamConfirmation(dueDate: LocalDate?) {
         if (dueDate == null) {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST)
@@ -129,15 +188,54 @@ class ExaminationRecordService(
     }
 
     private fun saveNewSelfExam(previousExam: SelfExaminationRecord) {
+        val dueDate = previousExam.dueDate ?: LocalDate.now()
         selfExaminationRecordRepository.save(
             SelfExaminationRecord(
                 type = previousExam.type,
-                dueDate = previousExam.dueDate!!.plusMonths(1),
+                dueDate = dueDate.plusMonths(1),
                 account = previousExam.account,
                 result = null,
                 status = SelfExaminationStatusDto.PLANNED
             )
         )
+    }
+
+    fun processFindingResult(
+        type: SelfExaminationTypeDto,
+        result: SelfExaminationResultDto,
+        uid: String
+    ): SelfExaminationFindingResponseDto {
+        val account = prerequisitesValidation(uid, type)
+        val examWaitingForResult =
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
+                .first { it.status == SelfExaminationStatusDto.WAITING_FOR_RESULT }
+        when (result.result) {
+            SelfExaminationResultDto.Result.OK -> {
+                completeSelfExamAsOK(examWaitingForResult)
+                return SelfExaminationFindingResponseDto(
+                    message = "Result completed as OK."
+                )
+            }
+            SelfExaminationResultDto.Result.NOT_OK -> {
+                selfExaminationRecordRepository.save(
+                    examWaitingForResult.copy(
+                        result = SelfExaminationResultDto.Result.NOT_OK,
+                        status = SelfExaminationStatusDto.COMPLETED
+                    )
+                )
+                // TODO turn off notification related to the self-exams
+                return SelfExaminationFindingResponseDto(
+                    message = "The examination marked as NOT OK. Notifications are turned off."
+                )
+            }
+            else -> {
+                throw LoonoBackendException(
+                    HttpStatus.BAD_REQUEST,
+                    "400",
+                    "Invalid result of self-examination."
+                )
+            }
+        }
     }
 
     @Synchronized
@@ -146,28 +244,75 @@ class ExaminationRecordService(
         changeState(examUuid, accountUuid, ExaminationStatusDto.CANCELED)
 
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
-        validateAccountPrerequisites(examinationRecordDto.type, accountUuid)
-        val record = validateUpdateAttempt(examinationRecordDto)
+        validateAccountPrerequisites(examinationRecordDto, accountUuid)
+        val account = findAccount(accountUuid)
+        val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
+        validateDateInterval(examinationRecordDto, account)
+        addRewardIfEligible(examinationRecordDto, accountUuid)
         return examinationRecordRepository.save(
             ExaminationRecord(
                 id = record.id,
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
                 plannedDate = examinationRecordDto.date,
-                account = findAccount(accountUuid),
+                account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
             )
         ).toExaminationRecordDto()
     }
 
-    private fun validateAccountPrerequisites(type: ExaminationTypeDto, accountUuid: String) {
+    private fun validateDateInterval(
+        record: ExaminationRecordDto,
+        account: Account
+    ) =
+        record.date?.let {
+            record.firstExam?.let { isFirstExam ->
+                val today = now()
+                if (
+                    (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
+                    (!isFirstExam && plannedDateInAcceptedInterval(it, account, record))
+                ) {
+                    throw LoonoBackendException(
+                        HttpStatus.BAD_REQUEST,
+                        "400",
+                        "Unsupported date interval."
+                    )
+                }
+            }
+        }
+
+    private fun plannedDateInAcceptedInterval(date: LocalDateTime, account: Account, record: ExaminationRecordDto): Boolean {
+        val interval =
+            preventionService.getExaminationRequests(account).first { it.examinationType == record.type }
+        val lastConfirmed = examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
+            .filter {
+                it.type == record.type &&
+                    (
+                        it.status == ExaminationStatusDto.CONFIRMED ||
+                            (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+                        )
+            }
+        lastConfirmed.ifEmpty { return false }
+        return date.isBefore(lastConfirmed.first().plannedDate!!.plusYears(interval.intervalYears.toLong()))
+    }
+
+    private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
             "404",
             "The account not found."
         )
-        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == type }
+        val plannedExam = examinationRecordRepository.findAllByAccount(account)
+            .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
+        if (plannedExam.isNotEmpty() && record.uuid == null) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT,
+                "409",
+                "The examination of this type already exists."
+            )
+        }
+        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
         intervals.ifEmpty {
             throw LoonoBackendException(
                 HttpStatus.BAD_REQUEST,
@@ -177,7 +322,10 @@ class ExaminationRecordService(
         }
     }
 
-    private fun validateUpdateAttempt(examinationRecordDto: ExaminationRecordDto): ExaminationRecord =
+    private fun validateUpdateAttempt(
+        examinationRecordDto: ExaminationRecordDto,
+        accountUuid: String
+    ): ExaminationRecord =
         if (examinationRecordDto.uuid != null) {
             examinationRecordRepository.findByUuid(examinationRecordDto.uuid)
                 ?: throw LoonoBackendException(
@@ -186,7 +334,7 @@ class ExaminationRecordService(
                     "The given examination identifier not found."
                 )
         } else {
-            ExaminationRecord()
+            ExaminationRecord(account = findAccount(accountUuid))
         }
 
     private fun findAccount(uuid: String): Account =
@@ -204,11 +352,10 @@ class ExaminationRecordService(
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         exam.status = state
         val badgeToPoints =
-            BadgesPointsProvider.getBadgesAndPoints(exam.type, SexDto.valueOf(account.userAuxiliary.sex))
+            BadgesPointsProvider.getBadgesAndPoints(exam.type, SexDto.valueOf(account.sex))
         val updatedAccount = updateWithBadgeAndPoints(badgeToPoints, account)
-        updatedAccount.let {
-            accountRepository.save(updatedAccount)
-        }
+        accountRepository.save(updatedAccount)
+
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
 
@@ -230,6 +377,22 @@ class ExaminationRecordService(
 
         return account.copy(badges = badgesToCopy, points = account.points + points)
     }
+
+    private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, accountUuid: String) {
+        if (isEligibleForReward(examinationRecordDto)) {
+            // Null validation done before this function called, thus using double-bang operator
+            val acc = accountRepository.findByUid(accountUuid)!!
+            val reward = BadgesPointsProvider.getBadgesAndPoints(examinationRecordDto.type, SexDto.valueOf(acc.sex))
+            val updatedAccount = updateWithBadgeAndPoints(reward, acc)
+            accountRepository.save(updatedAccount)
+        }
+    }
+
+    private fun isEligibleForReward(erd: ExaminationRecordDto) =
+        now().let { now ->
+            (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+                (erd.date?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.date) < 2)
+        }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(

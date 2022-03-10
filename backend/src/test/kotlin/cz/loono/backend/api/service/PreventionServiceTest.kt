@@ -8,10 +8,9 @@ import cz.loono.backend.api.dto.SelfExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
-import cz.loono.backend.db.model.Account
+import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.model.SelfExaminationRecord
-import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
@@ -41,51 +40,55 @@ class PreventionServiceTest {
         val age: Long = 45
         val now = LocalDateTime.now()
         val lastVisit = now.minusYears(1)
-        val account = Account(
-            userAuxiliary = UserAuxiliary(
-                sex = "MALE",
-                birthdate = LocalDate.now().minusYears(age)
-            )
+        val account = createAccount(
+            sex = "MALE",
+            birthday = LocalDate.now().minusYears(age)
         )
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
         whenever(examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)).thenReturn(
-            setOf(
+            listOf(
                 ExaminationRecord(
                     id = 1,
                     plannedDate = now,
                     type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-                    uuid = examsUUIDs[0]!!
+                    uuid = examsUUIDs[0]!!,
+                    account = account
                 ),
                 ExaminationRecord(
                     id = 2,
                     type = ExaminationTypeDto.OPHTHALMOLOGIST,
-                    uuid = examsUUIDs[1]!!
+                    uuid = examsUUIDs[1]!!,
+                    account = account
                 ), // is only planned
                 ExaminationRecord(
                     id = 3,
                     plannedDate = lastVisit,
                     type = ExaminationTypeDto.COLONOSCOPY,
-                    uuid = examsUUIDs[2]!!
+                    uuid = examsUUIDs[2]!!,
+                    account = account
                 ), // is not required
                 ExaminationRecord(
                     id = 4,
                     type = ExaminationTypeDto.DENTIST,
-                    uuid = examsUUIDs[3]!!
+                    uuid = examsUUIDs[3]!!,
+                    account = account
                 ),
                 ExaminationRecord(
                     id = 5,
                     type = ExaminationTypeDto.DENTIST,
                     plannedDate = LocalDateTime.MIN,
                     status = ExaminationStatusDto.CONFIRMED,
-                    uuid = examsUUIDs[4]!!
+                    uuid = examsUUIDs[4]!!,
+                    account = account
                 ),
                 ExaminationRecord(
                     id = 6,
                     type = ExaminationTypeDto.DERMATOLOGIST,
                     plannedDate = LocalDateTime.MIN,
                     status = ExaminationStatusDto.CONFIRMED,
-                    uuid = examsUUIDs[5]!!
+                    uuid = examsUUIDs[5]!!,
+                    account = account
                 )
             )
         )
@@ -157,11 +160,9 @@ class PreventionServiceTest {
         }
         val age: Long = 45
         val now = LocalDate.now()
-        val account = Account(
-            userAuxiliary = UserAuxiliary(
-                sex = "FEMALE",
-                birthdate = LocalDate.now().minusYears(age)
-            )
+        val account = createAccount(
+            sex = "FEMALE",
+            birthday = LocalDate.now().minusYears(age)
         )
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
@@ -173,15 +174,17 @@ class PreventionServiceTest {
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.MISSED,
                     result = null,
-                    uuid = examsUUIDs[2]!!
+                    uuid = examsUUIDs[2]!!,
+                    account = account
                 ),
                 SelfExaminationRecord(
                     id = 4,
                     dueDate = now.minusMonths(2L),
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.COMPLETED,
-                    result = SelfExaminationResultDto.FINDING,
-                    uuid = examsUUIDs[3]!!
+                    result = SelfExaminationResultDto.Result.OK,
+                    uuid = examsUUIDs[3]!!,
+                    account = account
                 ),
                 SelfExaminationRecord(
                     id = 5,
@@ -189,15 +192,17 @@ class PreventionServiceTest {
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.MISSED,
                     result = null,
-                    uuid = examsUUIDs[4]!!
+                    uuid = examsUUIDs[4]!!,
+                    account = account
                 ),
                 SelfExaminationRecord(
                     id = 2,
                     dueDate = now,
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.COMPLETED,
-                    result = SelfExaminationResultDto.OK,
-                    uuid = examsUUIDs[1]!!
+                    result = SelfExaminationResultDto.Result.OK,
+                    uuid = examsUUIDs[1]!!,
+                    account = account
                 ),
                 SelfExaminationRecord(
                     id = 1,
@@ -205,7 +210,8 @@ class PreventionServiceTest {
                     type = SelfExaminationTypeDto.BREAST,
                     status = SelfExaminationStatusDto.PLANNED,
                     result = null,
-                    uuid = examsUUIDs[0]!!
+                    uuid = examsUUIDs[0]!!,
+                    account = account
                 )
             )
         )
@@ -233,14 +239,56 @@ class PreventionServiceTest {
     }
 
     @Test
+    fun `get self-examinations for patient in case of finding`() {
+        val uuid = UUID.randomUUID().toString()
+        val examsUUID = UUID.randomUUID().toString()
+        val age: Long = 45
+        val now = LocalDate.now()
+        val account = createAccount(
+            sex = "FEMALE",
+            birthday = LocalDate.now().minusYears(age)
+        )
+
+        whenever(accountRepository.findByUid(uuid)).thenReturn(account)
+        whenever(selfExaminationRecordRepository.findAllByAccount(account)).thenReturn(
+            setOf(
+                SelfExaminationRecord(
+                    id = 3,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.BREAST,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.FINDING,
+                    uuid = examsUUID,
+                    account = account
+                )
+            )
+        )
+
+        val result = preventionService.getPreventionStatus(uuid)
+        assertEquals(
+            /* expected = */ listOf(
+                SelfExaminationPreventionStatusDto(
+                    lastExamUuid = examsUUID,
+                    type = SelfExaminationTypeDto.BREAST,
+                    plannedDate = now.minusMonths(1L),
+                    history = listOf(
+                        SelfExaminationStatusDto.COMPLETED
+                    ),
+                    points = 50,
+                    badge = BadgeTypeDto.SHIELD
+                ),
+            ),
+            /* actual = */ result.selfexaminations
+        )
+    }
+
+    @Test
     fun `get first empty suitable self-examinations`() {
         val uuid = UUID.randomUUID().toString()
         val age: Long = 45
-        val account = Account(
-            userAuxiliary = UserAuxiliary(
-                sex = "MALE",
-                birthdate = LocalDate.now().minusYears(age)
-            )
+        val account = createAccount(
+            sex = "MALE",
+            birthday = LocalDate.now().minusYears(age)
         )
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)

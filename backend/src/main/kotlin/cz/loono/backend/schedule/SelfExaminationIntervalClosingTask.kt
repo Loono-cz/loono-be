@@ -9,12 +9,12 @@ import java.time.LocalDate
 @Component
 class SelfExaminationIntervalClosingTask(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository
-) : SchedulerTask {
+) : DailySchedulerTask {
 
     override fun run() {
         val now = LocalDate.now()
         selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).forEach {
-            if (it.dueDate?.isBefore(now) == true) {
+            if (it.dueDate?.isAfter(now) == true) {
                 selfExaminationRecordRepository.save(it.copy(status = SelfExaminationStatusDto.MISSED))
                 selfExaminationRecordRepository.save(
                     SelfExaminationRecord(

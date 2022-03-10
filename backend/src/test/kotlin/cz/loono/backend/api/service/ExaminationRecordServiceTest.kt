@@ -9,12 +9,12 @@ import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.db.model.Account
+import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.ExaminationRecord
-import cz.loono.backend.db.model.UserAuxiliary
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
@@ -60,8 +60,41 @@ class ExaminationRecordServiceTest(
     }
 
     @Test
+    fun `try to create another new exam of the same type`() {
+        val account = accountRepository.save(
+            createAccount(
+                uid = "101",
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER
+        )
+        examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
+        val secondExam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            status = ExaminationStatusDto.NEW,
+            firstExam = false,
+            date = LocalDateTime.MAX
+        )
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.createOrUpdateExam(secondExam, "101")
+        }
+    }
+
+    @Test
     fun `changing state of a non-existing exam`() {
-        accountRepository.save(Account(uid = "101"))
+        accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -87,14 +120,13 @@ class ExaminationRecordServiceTest(
     }
 
     @Test
-    fun `new exam creation`() {
+    fun `Should add badges and points upon account creation`() {
+        val uid = "101"
         accountRepository.save(
-            Account(
-                uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+            createAccount(
+                uid = uid,
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -106,25 +138,92 @@ class ExaminationRecordServiceTest(
                 clock
             )
         val exam = ExaminationRecordDto(
-            type = ExaminationTypeDto.GENERAL_PRACTITIONER
+            firstExam = true,
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now().minusDays(1)
         )
 
-        val result = examinationRecordService.createOrUpdateExam(exam, "101")
+        examinationRecordService.createOrUpdateExam(exam, uid)
+        val actual = accountRepository.findByUid(uid)
 
-        assert(result.type == exam.type)
-        assert(result.status == exam.status)
-        assert(result.firstExam == exam.firstExam)
+        assertThat(actual?.points).isEqualTo(200)
+        assertThat(actual?.badges).hasSize(1)
+        assertThat(actual?.badges?.first()?.type).isEqualTo("COAT")
+    }
+
+    @Test
+    fun `Create correct future exam`() {
+        val uid = "101"
+        accountRepository.save(
+            createAccount(
+                uid = uid,
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now().plusYears(2)
+        )
+
+        examinationRecordService.createOrUpdateExam(exam, uid)
+        val actual = accountRepository.findByUid(uid)
+
+        assertThat(actual?.points).isEqualTo(0)
+        assertThat(actual?.badges).isEmpty()
+    }
+
+    @Test
+    fun `Create a new exam in past`() {
+        val uid = "101"
+        val account = accountRepository.save(
+            createAccount(
+                uid = uid,
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        examinationRecordRepository.save(
+            ExaminationRecord(
+                type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                status = ExaminationStatusDto.CONFIRMED,
+                plannedDate = LocalDateTime.now().minusYears(1),
+                account = account
+            )
+        )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            date = LocalDateTime.now().minusDays(1)
+        )
+
+        assertThrows<LoonoBackendException> {
+            examinationRecordService.createOrUpdateExam(exam, uid)
+        }
     }
 
     @Test
     fun `valid changing of state`() {
         val account = accountRepository.save(
-            Account(
+            createAccount(
                 uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -157,12 +256,10 @@ class ExaminationRecordServiceTest(
     @Test
     fun `try to create exam with non-suitable sex`() {
         accountRepository.save(
-            Account(
+            createAccount(
                 uid = "101",
-                userAuxiliary = UserAuxiliary(
-                    sex = SexDto.MALE.value,
-                    birthdate = LocalDate.of(1990, 9, 9)
-                )
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
             )
         )
         val examinationRecordService =
@@ -185,7 +282,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `confirm exam`() {
-        val account = accountRepository.save(Account(uid = "101"))
+        val account = accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -207,7 +304,7 @@ class ExaminationRecordServiceTest(
 
     @Test
     fun `cancel exam`() {
-        val account = accountRepository.save(Account(uid = "101"))
+        val account = accountRepository.save(createAccount(uid = "101"))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -230,7 +327,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `complete first self-exam of incorrect type`() {
         val account =
-            accountRepository.save(Account(uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name)))
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -243,7 +340,7 @@ class ExaminationRecordServiceTest(
         assertThrows<LoonoBackendException>("This type of examination cannot applied for the account.") {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.BREAST,
-                SelfExaminationResultDto.OK,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
                 account.uid
             )
         }
@@ -252,7 +349,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `complete first self-exam`() {
         val account =
-            accountRepository.save(Account(uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.FEMALE.name)))
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
         val examinationRecordService =
             ExaminationRecordService(
                 accountRepository,
@@ -264,7 +361,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.BREAST,
-            SelfExaminationResultDto.OK,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 
@@ -273,14 +370,52 @@ class ExaminationRecordServiceTest(
         assert(result.streak == 1)
         assert(result.badgeLevel == 1)
         assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            ).first().waitingTo == null
+        )
+    }
+
+    @Test
+    fun `complete first self-exam with finding`() {
+        val account =
+            accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+
+        val result = examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.BREAST,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.FINDING),
+            account.uid
+        )
+
+        assert(result.points == 50)
+        assert(result.allPoints == 50)
+        assert(result.streak == 1)
+        assert(result.badgeLevel == 1)
+        assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            ).first().waitingTo == LocalDate.now().plusDays(56)
+        )
     }
 
     @Test
     fun `complete second self-exam`() {
-        var account =
+        val account =
             accountRepository.save(
-                Account(
-                    uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name), points = 150
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
         val examinationRecordService =
@@ -293,7 +428,7 @@ class ExaminationRecordServiceTest(
             )
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
         val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -301,7 +436,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 
@@ -310,14 +445,63 @@ class ExaminationRecordServiceTest(
         assert(result.streak == 2)
         assert(result.badgeLevel == 1)
         assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.TESTICULAR
+            ).first().waitingTo == null
+        )
+    }
+
+    @Test
+    fun `complete second self-exam with finding`() {
+        val account =
+            accountRepository.save(
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
+                )
+            )
+        val examinationRecordService =
+            ExaminationRecordService(
+                accountRepository,
+                examinationRecordRepository,
+                selfExaminationRecordRepository,
+                preventionService,
+                clock
+            )
+        examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.TESTICULAR,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+            account.uid
+        )
+        val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
+        selfExaminationRecordRepository.save(exam.copy(dueDate = LocalDate.now()))
+
+        val result = examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.TESTICULAR,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.FINDING),
+            account.uid
+        )
+
+        assert(result.points == 50)
+        assert(result.allPoints == 250)
+        assert(result.streak == 2)
+        assert(result.badgeLevel == 1)
+        assert(result.badgeType == BadgeTypeDto.SHIELD)
+        assert(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.TESTICULAR
+            )[1].waitingTo == LocalDate.now().plusDays(56)
+        )
     }
 
     @Test
     fun `complete 6th self-exam`() {
-        var account =
+        val account =
             accountRepository.save(
-                Account(
-                    uid = "101", userAuxiliary = UserAuxiliary(sex = SexDto.MALE.name), points = 150
+                createAccount(
+                    uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
         val examinationRecordService =
@@ -331,7 +515,7 @@ class ExaminationRecordServiceTest(
         repeat(5) {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.TESTICULAR,
-                SelfExaminationResultDto.FINDING,
+                SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
                 account.uid
             )
             val exam = selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.PLANNED).first()
@@ -340,7 +524,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto.FINDING,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
             account.uid
         )
 

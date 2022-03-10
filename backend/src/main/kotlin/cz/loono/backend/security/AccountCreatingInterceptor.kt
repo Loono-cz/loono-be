@@ -3,7 +3,6 @@ package cz.loono.backend.security
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.api.service.AccountService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -15,16 +14,13 @@ import javax.servlet.http.HttpServletResponse
  * An interceptor that ensures an account exists
  */
 @Component
-class AccountCreatingInterceptor(
-    private val accountService: AccountService,
-) : HandlerInterceptor {
+class AccountCreatingInterceptor : HandlerInterceptor {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val jwtData = request.getAttribute(Attributes.ATTR_BASIC_USER)
 
-        when (jwtData) {
+        when (val jwtData = request.getAttribute(Attributes.ATTR_BASIC_USER)) {
             null -> {
                 val error = "HTTP request does not contain required attribute: ${Attributes.ATTR_BASIC_USER}.\n" +
                     "Probable cause: CreateUserInterceptor was ordered before authenticator."
@@ -40,10 +36,6 @@ class AccountCreatingInterceptor(
                 throw LoonoBackendException(HttpStatus.INTERNAL_SERVER_ERROR)
             }
         }
-
-        val uid = (jwtData as BasicUser).uid
-
-        accountService.ensureAccountExists(uid)
 
         return true
     }

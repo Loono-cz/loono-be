@@ -26,7 +26,7 @@ class BadgeDowngradeTask(
     private val accountRepository: AccountRepository,
     private val preventionService: PreventionService,
     private val clock: Clock,
-) : SchedulerTask {
+) : DailySchedulerTask {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
