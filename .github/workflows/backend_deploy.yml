@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v1
       - name: 'Login to Repository'
         run: |
+          aws ecr get-login-password --region ${{ env.region }}
           aws ecr get-login-password --region ${{ env.region }} | docker login --username AWS --password-stdin ${{ env.repository }}/${{ env.serviceName }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
