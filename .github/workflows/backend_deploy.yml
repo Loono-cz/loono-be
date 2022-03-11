@@ -4,19 +4,13 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '.github/**'
-      - '.gitignore'
-      - 'README.md'
-      - 'LICENSE'
-
 env:
   region: ${{ secrets.AWS_REGION }}
   repository: ${{ secrets.AWS_REPOSITORY }}
   serviceName: 'loono-backend'
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v1
