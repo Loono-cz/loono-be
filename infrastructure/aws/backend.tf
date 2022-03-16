@@ -44,6 +44,30 @@ resource "aws_security_group" "backend-sg" {
       "0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "udp"
+    cidr_blocks = [
+      "0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -119,9 +143,12 @@ resource "aws_ecs_service" "backend" {
 
   network_configuration {
     security_groups = [
-      aws_security_group.private-default-sg.id]
+      aws_security_group.private-default-sg.id,
+      aws_security_group.backend-sg
+    ]
     subnets         = [
-      aws_subnet.private.id
+      aws_subnet.private.id,
+      aws_subnet.public.id
     ]
   }
 
@@ -145,7 +172,7 @@ resource "aws_lb" "backend-lb" {
   internal           = false
   load_balancer_type = "application"
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   subnets         = [
     aws_subnet.public.id,
@@ -158,6 +185,17 @@ resource "aws_lb_listener" "backend-elb-listener" {
   load_balancer_arn = aws_lb.backend-lb.arn
   port              = "443"
   protocol          = "HTTPS"
+  certificate_arn   = var.certificate-arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend-tg.arn
+  }
+}
+resource "aws_lb_listener" "backend-elb-listener" {
+  load_balancer_arn = aws_lb.backend-lb.arn
+  port              = "22"
+  protocol          = "TCP"
   certificate_arn   = var.certificate-arn
 
   default_action {

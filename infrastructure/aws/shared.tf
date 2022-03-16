@@ -98,13 +98,16 @@ resource "aws_eip_association" "nat-gateway" {
 
 resource "aws_instance" "nat-gateway" {
   ami                     = data.aws_ami.nat-gateway.id
+  key_name                = "aws_key_pair.mykeypair.key_name"
   instance_type           = "t3.micro"
   subnet_id               = aws_subnet.public.id
   source_dest_check       = false
   disable_api_termination = false
   availability_zone       = "${var.aws-region}a"
   vpc_security_group_ids  = [
-    aws_security_group.private-default-sg.id]
+    aws_security_group.private-default-sg.id,
+    aws_security_group.backend-sg
+  ]
 
   tags = {
     Name = "NAT"

@@ -29,7 +29,8 @@ resource "aws_db_instance" "database" {
   password = var.database-password
 
   vpc_security_group_ids = [
-    aws_security_group.private-default-sg.id
+    aws_security_group.private-default-sg.id,
+    aws_security_group.backend-sg
   ]
   db_subnet_group_name   = aws_db_subnet_group.database.name
   publicly_accessible    = false
