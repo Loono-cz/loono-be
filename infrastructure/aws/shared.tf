@@ -98,7 +98,7 @@ resource "aws_eip_association" "nat-gateway" {
 
 resource "aws_instance" "nat-gateway" {
   ami                     = data.aws_ami.nat-gateway.id
-  key_name                = "aws_key_pair.mykeypair.key_name"
+  key_name                = aws_key_pair.mykeypair.key_name
   instance_type           = "t3.micro"
   subnet_id               = aws_subnet.public.id
   source_dest_check       = false

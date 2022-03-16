@@ -192,17 +192,6 @@ resource "aws_lb_listener" "backend-elb-listener" {
     target_group_arn = aws_lb_target_group.backend-tg.arn
   }
 }
-resource "aws_lb_listener" "backend-elb-ssh-listener" {
-  load_balancer_arn = aws_lb.backend-lb.arn
-  port              = "22"
-  protocol          = "TCP"
-  certificate_arn   = var.certificate-arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.backend-tg.arn
-  }
-}
 
 resource "aws_lb_listener" "backend-http-redirect" {
   load_balancer_arn = aws_lb.backend-lb.arn
