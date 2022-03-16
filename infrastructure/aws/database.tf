@@ -30,7 +30,7 @@ resource "aws_db_instance" "database" {
 
   vpc_security_group_ids = [
     aws_security_group.private-default-sg.id,
-    aws_security_group.backend-sg
+    aws_security_group.backend-sg.id
   ]
   db_subnet_group_name   = aws_db_subnet_group.database.name
   publicly_accessible    = false

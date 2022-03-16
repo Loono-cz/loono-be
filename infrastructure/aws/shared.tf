@@ -106,7 +106,7 @@ resource "aws_instance" "nat-gateway" {
   availability_zone       = "${var.aws-region}a"
   vpc_security_group_ids  = [
     aws_security_group.private-default-sg.id,
-    aws_security_group.backend-sg
+    aws_security_group.backend-sg.id
   ]
 
   tags = {
