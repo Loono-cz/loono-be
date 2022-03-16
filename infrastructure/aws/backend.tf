@@ -144,7 +144,7 @@ resource "aws_ecs_service" "backend" {
   network_configuration {
     security_groups = [
       aws_security_group.private-default-sg.id,
-      aws_security_group.backend-sg
+      aws_security_group.backend-sg.id
     ]
     subnets         = [
       aws_subnet.private.id,
