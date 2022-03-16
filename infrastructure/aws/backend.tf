@@ -192,7 +192,7 @@ resource "aws_lb_listener" "backend-elb-listener" {
     target_group_arn = aws_lb_target_group.backend-tg.arn
   }
 }
-resource "aws_lb_listener" "backend-elb-listener" {
+resource "aws_lb_listener" "backend-elb-ssh-listener" {
   load_balancer_arn = aws_lb.backend-lb.arn
   port              = "22"
   protocol          = "TCP"
