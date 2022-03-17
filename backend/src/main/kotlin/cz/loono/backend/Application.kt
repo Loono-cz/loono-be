@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @SpringBootApplication
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @EnableScheduling
 class Application
 
-//change to trigger github action
+// change to trigger github action
 fun main(args: Array<String>) {
     runApplication<Application>(*args)
 }
@@ -35,6 +36,8 @@ class Config(
         "/actuator/health",
         "/error",
         "/providers/update",
+        "/favicon.ico",
+        "/notification/*",
         // Temporary Auth disabled for endpoints bellow
         "/providers/all",
         "/providers/details",
@@ -49,5 +52,9 @@ class Config(
         registry.addInterceptor(accountCreatingInterceptor)
             .excludePathPatterns(unauthenticatedEndpoints)
             .order(1)
+    }
+
+    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:static/")
     }
 }

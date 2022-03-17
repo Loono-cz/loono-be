@@ -2,6 +2,7 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
+import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.BadgesPointsProvider.BADGES_TO_EXAMS
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.db.model.Account
@@ -10,9 +11,6 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.extensions.toLocalDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import java.time.Clock
 import java.time.LocalDateTime
@@ -24,21 +22,18 @@ class BadgeDowngradeTask(
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
     private val accountRepository: AccountRepository,
+    private val accountService: AccountService,
     private val preventionService: PreventionService,
     private val clock: Clock,
 ) : DailySchedulerTask {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    companion object {
-        private val FIELDS_TO_SORT_BY = arrayOf("id")
-    }
-
     override fun run() {
         logger.info(
             "BadgeDowngradeTask executed with the following settings 'toleranceMonths '$toleranceMonths', pageSize '$pageSize'"
         )
-        paginateOverAccounts { nextPage ->
+        accountService.paginateOverAccounts { nextPage ->
             val accountsToUpdate = nextPage.mapNotNull { account ->
                 val now = clock.instant().toLocalDateTime()
                 val userBadges = account.badges
@@ -80,17 +75,6 @@ class BadgeDowngradeTask(
         lastUpdatedDate: LocalDateTime,
         plannedDate: LocalDateTime?
     ) = now.isAfter(lastUpdatedDate) && (plannedDate == null || now.isAfter(plannedDate))
-
-    private fun paginateOverAccounts(transformPage: (List<Account>) -> Unit) {
-        var page: Pageable = PageRequest.of(0, pageSize, Sort.by(*FIELDS_TO_SORT_BY))
-
-        do {
-            val accountsPage = accountRepository.findAll(page)
-            val accountsFromPage = accountsPage.content
-            transformPage(accountsFromPage)
-            page = accountsPage.nextPageable()
-        } while (accountsPage.hasNext())
-    }
 
     private fun removeZeroLevelBadges(accounts: List<Account>) =
         accounts.map { account -> account.copy(badges = account.badges.filter { it.level > 0 }.toSet()) }

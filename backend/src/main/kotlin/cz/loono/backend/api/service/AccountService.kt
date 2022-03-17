@@ -13,6 +13,10 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,9 +29,15 @@ class AccountService(
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val selfRecordRepository: SelfExaminationRecordRepository,
     private val firebaseAuthService: FirebaseAuthService,
-    private val examinationRecordService: ExaminationRecordService
+    private val examinationRecordService: ExaminationRecordService,
+    @Value("\${task.badge-downgrade.page-size}")
+    private val pageSize: Int,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
+
+    companion object {
+        private val FIELDS_TO_SORT_BY = arrayOf("id")
+    }
 
     @Transactional(rollbackFor = [Exception::class])
     fun onboardAccount(uuid: String, account: AccountOnboardingDto): AccountDto {
@@ -137,4 +147,15 @@ class AccountService(
                 .map { BadgeDto(type = BadgeTypeDto.valueOf(it.type), level = it.level) }
                 .sortedBy(BadgeDto::type)
         )
+
+    fun paginateOverAccounts(transformPage: (List<Account>) -> Unit) {
+        var page: Pageable = PageRequest.of(0, pageSize, Sort.by(*FIELDS_TO_SORT_BY))
+
+        do {
+            val accountsPage = accountRepository.findAll(page)
+            val accountsFromPage = accountsPage.content
+            transformPage(accountsFromPage)
+            page = accountsPage.nextPageable()
+        } while (accountsPage.hasNext())
+    }
 }

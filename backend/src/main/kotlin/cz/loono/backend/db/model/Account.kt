@@ -57,7 +57,10 @@ data class Account(
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = true, updatable = true, insertable = true)
-    val badges: Set<Badge> = mutableSetOf()
+    val badges: Set<Badge> = mutableSetOf(),
+
+    @Column(nullable = false)
+    val created: LocalDate = LocalDate.now()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -75,7 +75,10 @@ class PreventionService(
             }
             ?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(ExaminationRecord(account = account))
 
-        val confirmedExamsOfCurrentType = examsOfType?.filter { it.status == ExaminationStatusDto.CONFIRMED }
+        val confirmedExamsOfCurrentType = examsOfType?.filter {
+            it.status == ExaminationStatusDto.CONFIRMED ||
+                (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+        }
         // 1) Filter all the confirmed records
         // 2) Map all non-nullable lastExamination records
         // 3) Find the largest or return null if the list is empty

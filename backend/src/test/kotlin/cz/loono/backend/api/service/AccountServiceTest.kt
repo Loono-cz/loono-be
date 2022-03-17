@@ -18,6 +18,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
@@ -31,7 +32,9 @@ class AccountServiceTest(
     private val repo: AccountRepository,
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    @Value("\${task.badge-downgrade.page-size}")
+    private val pageSize: Int,
 ) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
@@ -45,7 +48,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize,
         )
 
         val accountDto = service.onboardAccount(
@@ -86,7 +90,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -112,7 +117,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val accountDto = service.onboardAccount(
@@ -181,7 +187,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -213,7 +220,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -246,7 +254,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         repo.save(account)
 
@@ -285,7 +294,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         repo.save(account)
 
@@ -326,7 +336,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -360,7 +371,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val existingAccount = createAccount("toDelete")
         repo.save(existingAccount)
@@ -381,7 +393,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val actual = service.onboardAccount(
@@ -433,7 +446,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -466,7 +480,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -499,7 +514,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -525,7 +541,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val actual = service.onboardAccount(
