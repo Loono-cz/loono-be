@@ -185,7 +185,8 @@ class HealthcareProvidersService(
     @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     fun findPage(page: Int): List<SimpleHealthcareProviderDto> =
         healthcareProviderRepository.findAll(PageRequest.of(page, batchSize))
-            .filter { it.lat != null && it.lng != null }.toSet()
+            .filter { (it.lat != null && it.lng != null) || (it.correctedLat != null && it.correctedLng != null) }
+            .toSet()
             .map { it.simplify() }
             .filter { it.category.isNotEmpty() }
 
@@ -249,6 +250,7 @@ class HealthcareProvidersService(
             )
         )
 
+    @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.simplify(): SimpleHealthcareProviderDto =
         SimpleHealthcareProviderDto(
             locationId = locationId,
@@ -258,12 +260,15 @@ class HealthcareProvidersService(
             houseNumber = houseNumber,
             city = city,
             postalCode = postalCode,
-            category = category.map(HealthcareCategory::value).filter { !removedCategories.contains(it) },
+            category = category.map(HealthcareCategory::value)
+                .ifEmpty { correctedCategory.map(HealthcareCategory::value) }
+                .filterNot(removedCategories::contains),
             specialization = specialization,
-            lat = lat!!,
-            lng = lng!!
+            lat = lat ?: correctedLat!!,
+            lng = lng ?: correctedLng!!
         )
 
+    @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto =
         HealthcareProviderDetailDto(
             locationId = locationId,
@@ -274,17 +279,19 @@ class HealthcareProvidersService(
             houseNumber = houseNumber,
             city = city,
             postalCode = postalCode,
-            phoneNumber = phoneNumber,
+            phoneNumber = phoneNumber ?: correctedPhoneNumber,
             fax = fax,
             email = email,
-            website = website,
+            website = website ?: correctedWebsite,
             ico = ico,
-            category = category.map(HealthcareCategory::value).filter { !removedCategories.contains(it) },
+            category = category.map(HealthcareCategory::value)
+                .ifEmpty { correctedCategory.map(HealthcareCategory::value) }
+                .filterNot(removedCategories::contains),
             specialization = specialization,
             careForm = careForm,
             careType = careType,
             substitute = substitute,
-            lat = lat!!,
-            lng = lng!!
+            lat = lat ?: correctedLat!!,
+            lng = lng ?: correctedLng!!
         )
 }

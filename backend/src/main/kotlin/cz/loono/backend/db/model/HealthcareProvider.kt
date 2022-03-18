@@ -142,7 +142,32 @@ data class HealthcareProvider(
     val lat: Double? = null,
 
     @Column
-    val lng: Double? = null
+    val lng: Double? = null,
+
+    // Data correction fields
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinTable(
+        name = "corrected_healthcare_provider_category",
+        joinColumns = [
+            JoinColumn(name = "location_id", referencedColumnName = "location_id"),
+            JoinColumn(name = "institution_id", referencedColumnName = "institution_id")
+        ],
+        inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "id")]
+    )
+    val correctedCategory: Set<HealthcareCategory> = mutableSetOf(),
+
+    @Column(columnDefinition = "TEXT")
+    val correctedPhoneNumber: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val correctedWebsite: String? = null,
+
+    @Column
+    val correctedLat: Double? = null,
+
+    @Column
+    val correctedLng: Double? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
