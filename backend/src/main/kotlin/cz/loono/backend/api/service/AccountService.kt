@@ -109,8 +109,8 @@ class AccountService(
         accountUpdate.nickname?.let {
             updatedAccount = accountRepository.save(updatedAccount.copy(nickname = accountUpdate.nickname))
         }
-        accountUpdate.prefferedEmail?.let {
-            updatedAccount = accountRepository.save(updatedAccount.copy(preferredEmail = accountUpdate.prefferedEmail))
+        accountUpdate.preferredEmail?.let {
+            updatedAccount = accountRepository.save(updatedAccount.copy(preferredEmail = accountUpdate.preferredEmail))
         }
         accountUpdate.leaderboardAnonymizationOptIn?.let {
             updatedAccount =
@@ -139,7 +139,7 @@ class AccountService(
             birthdate = account.birthdate,
             profileImageUrl = account.profileImageUrl,
             points = account.points,
-            prefferedEmail = account.preferredEmail,
+            preferredEmail = account.preferredEmail,
             appointmentReminderEmailsOptIn = account.appointmentReminderEmailsOptIn,
             leaderboardAnonymizationOptIn = account.leaderboardAnonymizationOptIn,
             newsletterOptIn = account.newsletterOptIn,

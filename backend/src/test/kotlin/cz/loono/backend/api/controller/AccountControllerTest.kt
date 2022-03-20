@@ -74,7 +74,7 @@ class AccountControllerTest(
             nickname = existingAccount.nickname,
             sex = existingAccount.sex.let(SexDto::valueOf),
             birthdate = existingAccount.birthdate,
-            prefferedEmail = existingAccount.preferredEmail,
+            preferredEmail = existingAccount.preferredEmail,
             profileImageUrl = existingAccount.profileImageUrl,
             leaderboardAnonymizationOptIn = existingAccount.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = existingAccount.appointmentReminderEmailsOptIn,

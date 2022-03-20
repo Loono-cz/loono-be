@@ -2,6 +2,7 @@ package cz.loono.backend.db.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.envers.Audited
+import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -143,6 +144,9 @@ data class HealthcareProvider(
 
     @Column
     val lng: Double? = null,
+
+    @Column(nullable = false)
+    val lastUpdated: LocalDateTime = LocalDateTime.now(),
 
     // Data correction fields
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
