@@ -67,23 +67,30 @@ class PreventionService(
         account: Account
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
-        val sortedExamsOfType = examsOfType
-            ?.filter { it ->
-                it.plannedDate != null ||
-                    it.status != ExaminationStatusDto.CONFIRMED ||
-                    it.status != ExaminationStatusDto.CANCELED
-            }
-            ?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(ExaminationRecord(account = account))
+        val sortedExamsOfType = examsOfType?.filter {
+            it.plannedDate != null ||
+                it.status != ExaminationStatusDto.CONFIRMED ||
+                it.status != ExaminationStatusDto.CANCELED
+        }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
+            ExaminationRecord(
+                account = account,
+                uuid = "",
+                firstExam = false,
+                status = ExaminationStatusDto.UNKNOWN
+            )
+        )
 
         val confirmedExamsOfCurrentType = examsOfType?.filter {
             it.status == ExaminationStatusDto.CONFIRMED ||
                 (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
-        }
+        } ?: emptyList()
+
         // 1) Filter all the confirmed records
         // 2) Map all non-nullable lastExamination records
         // 3) Find the largest or return null if the list is empty
-        val lastConfirmedDate = confirmedExamsOfCurrentType?.mapNotNull(ExaminationRecord::plannedDate)?.maxOrNull()
-        val totalCountOfConfirmedExams = confirmedExamsOfCurrentType?.size ?: 0
+        val lastConfirmedDate = confirmedExamsOfCurrentType.mapNotNull(ExaminationRecord::plannedDate).maxOrNull()
+        val totalCountOfConfirmedExams = confirmedExamsOfCurrentType.size
+
         val rewards =
             BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(account.sex))
 
