@@ -42,7 +42,7 @@ data class ExaminationRecord(
     var status: ExaminationStatusDto = ExaminationStatusDto.NEW,
 
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
-    val uuid: String = UUID.randomUUID().toString()
+    val uuid: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

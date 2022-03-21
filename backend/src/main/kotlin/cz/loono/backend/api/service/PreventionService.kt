@@ -74,9 +74,9 @@ class PreventionService(
         }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
             ExaminationRecord(
                 account = account,
-                uuid = "",
+                uuid = null,
                 firstExam = false,
-                status = ExaminationStatusDto.UNKNOWN
+                status = ExaminationStatusDto.NEW
             )
         )
 

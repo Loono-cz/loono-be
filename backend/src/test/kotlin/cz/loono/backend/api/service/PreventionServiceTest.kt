@@ -200,14 +200,14 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.COAT
                 ),
                 ExaminationPreventionStatusDto(
-                    uuid = "",
+                    uuid = null,
                     examinationType = ExaminationTypeDto.DERMATOLOGIST,
                     intervalYears = 1,
                     plannedDate = null,
                     lastConfirmedDate = null,
                     firstExam = false,
                     priority = 6,
-                    state = ExaminationStatusDto.UNKNOWN,
+                    state = ExaminationStatusDto.NEW,
                     count = 0,
                     points = 200,
                     badge = BadgeTypeDto.GLOVES
@@ -226,13 +226,13 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.HEADBAND
                 ),
                 ExaminationPreventionStatusDto(
-                    uuid = "",
+                    uuid = null,
                     examinationType = ExaminationTypeDto.OPHTHALMOLOGIST,
                     intervalYears = 4,
                     plannedDate = null,
                     firstExam = false,
                     priority = 9,
-                    state = ExaminationStatusDto.UNKNOWN,
+                    state = ExaminationStatusDto.NEW,
                     count = 0,
                     points = 100,
                     badge = BadgeTypeDto.GLASSES

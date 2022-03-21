@@ -24,7 +24,9 @@ class ExaminationCancellationTask(
                 .first { exam.type == it.examinationType }.intervalYears
             val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
             if (now.isAfter(deadline)) {
-                examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
+                exam.uuid?.let {
+                    examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
+                }
             }
         }
     }
