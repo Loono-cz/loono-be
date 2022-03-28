@@ -21,7 +21,7 @@ import javax.persistence.Table
 @Audited
 data class SelfExaminationRecord(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Enumerated(EnumType.STRING)

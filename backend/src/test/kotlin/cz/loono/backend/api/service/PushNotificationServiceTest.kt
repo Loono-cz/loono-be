@@ -11,21 +11,23 @@ import cz.loono.backend.notification.NotificationData
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
 
-@DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
 class PushNotificationServiceTest(
     private val accountRepository: AccountRepository
 ) {
 
     private val pushNotificationService = PushNotificationService()
 
+    @AfterEach
+    fun setUp() {
+        accountRepository.deleteAll()
+    }
     companion object {
 
         private val notifications = mutableListOf<String>()

@@ -12,22 +12,24 @@ import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.utils.SequenceResetExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 
-@DataJpaTest
+@SpringBootTest(properties = ["spring.profiles.active=test"])
 @Import(
     BadgeDowngradeTask::class,
     PreventionService::class,
@@ -36,11 +38,17 @@ import java.time.LocalDateTime
     FirebaseAuthService::class,
     ExaminationRecordService::class
 )
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@Transactional
+@ExtendWith(SequenceResetExtension::class)
 class BadgeDowngradeTaskTest(
     private val badgeDowngradeTask: BadgeDowngradeTask,
     private val accountRepository: AccountRepository
 ) {
+
+    @AfterEach
+    fun setUp() {
+        accountRepository.deleteAll()
+    }
 
     @Test
     fun `Should correctly downgrade badges`() {

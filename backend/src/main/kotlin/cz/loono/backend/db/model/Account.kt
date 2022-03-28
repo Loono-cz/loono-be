@@ -18,7 +18,7 @@ import javax.persistence.Table
 data class Account(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false, columnDefinition = "TEXT", unique = true)
@@ -82,3 +82,4 @@ data class Account(
             "appointmentReminderEmailsOptIn=$appointmentReminderEmailsOptIn, " +
             "newsletterOptIn=$newsletterOptIn, points=$points, examinationRecords=$examinationRecords)"
 }
+// psql -h database.internal.loono.ceskodigital.net -p 5432 -U loono -d loonodevelopment -f data_dump.sql\
