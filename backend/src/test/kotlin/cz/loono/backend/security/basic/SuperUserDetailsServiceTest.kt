@@ -4,12 +4,11 @@ import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 
-@DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
+@Transactional
 class SuperUserDetailsServiceTest(
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) {
@@ -31,6 +30,7 @@ class SuperUserDetailsServiceTest(
 
     @Test
     fun `server properties not set`() {
+        serverPropertiesRepository.deleteAll()
         val superUserDetailsService = SuperUserDetailsService(serverPropertiesRepository)
 
         assertThrows<NullPointerException> { superUserDetailsService.loadUserByUsername("loonoAdmin") }

@@ -7,10 +7,12 @@ import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Profile("!test")
 class DataLoader(
     private val serverPropertiesRepository: ServerPropertiesRepository,
     private val healthcareProvidersService: HealthcareProvidersService

@@ -3,18 +3,21 @@ package cz.loono.backend.api.service
 import cz.loono.backend.api.dto.LeaderboardUserDto
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
 
-@DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
 class LeaderboardServiceTest(
     private val accountRepo: AccountRepository
 ) {
 
     private val leaderboardService = LeaderboardService(accountRepo)
+
+    @AfterEach
+    fun tearDown() {
+        accountRepo.deleteAll()
+    }
 
     @Test
     fun `empty db`() {
