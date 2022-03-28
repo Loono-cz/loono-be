@@ -271,7 +271,7 @@ class ExaminationRecordService(
                 val today = now()
                 if (
                     (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
-                    (!isFirstExam && plannedDateInAcceptedInterval(it, account, record))
+                    (!isFirstExam && it.isBefore(today) && plannedDateInAcceptedInterval(it, account, record))
                 ) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
