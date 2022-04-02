@@ -5,18 +5,17 @@ import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import org.springframework.http.HttpStatus
-import java.io.FileInputStream
 import java.util.Properties
 
 class NotificationTextManager {
 
     companion object {
-        private val propertiesFile = this::class.java.getResource("/texts/notification.properties").file
+        private val propertiesFileStream = this::class.java.getResourceAsStream("/texts/notification.properties")
         private val properties = Properties()
     }
 
     init {
-        FileInputStream(propertiesFile).use {
+        propertiesFileStream.use {
             properties.load(it)
         }
     }
