@@ -22,14 +22,15 @@ resource "aws_db_instance" "database" {
   engine                  = "postgres"
   engine_version          = "12.7"
   instance_class          = "db.t3.micro"
-  name                    = "${var.codename}development"
+  db_name                    = "${var.codename}development"
   backup_retention_period = 7
 
   username = var.database-username
   password = var.database-password
 
   vpc_security_group_ids = [
-    aws_security_group.private-default-sg.id
+    aws_security_group.private-default-sg.id,
+    aws_security_group.backend-sg.id
   ]
   db_subnet_group_name   = aws_db_subnet_group.database.name
   publicly_accessible    = false

@@ -1,5 +1,5 @@
 terraform {
-  required_version = "= 0.15.4"
+  required_version = "= 1.1.6"
 
   required_providers {
     aws = ">= 3.28.0"
@@ -8,9 +8,9 @@ terraform {
   backend "s3" {
     # For every new deployment this bucket needs to be changed, because AWS bucket names are
     # globally unique.
-    bucket = "loono-terraform-backend"
+    bucket = "loono-cz-terraform-backend-test"
     key    = "terraform.tfstate"
-    region = "eu-north-1"
+    region = "eu-central-1"
   }
 }
 
@@ -19,8 +19,9 @@ provider "aws" {
 }
 
 # ----------------
-# VPC
+# VPC test
 # ----------------
+# Trigger test
 
 resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
@@ -97,13 +98,16 @@ resource "aws_eip_association" "nat-gateway" {
 
 resource "aws_instance" "nat-gateway" {
   ami                     = data.aws_ami.nat-gateway.id
+  key_name                = aws_key_pair.mykeypair.key_name
   instance_type           = "t3.micro"
   subnet_id               = aws_subnet.public.id
   source_dest_check       = false
   disable_api_termination = false
   availability_zone       = "${var.aws-region}a"
   vpc_security_group_ids  = [
-    aws_security_group.private-default-sg.id]
+    aws_security_group.private-default-sg.id,
+    aws_security_group.backend-sg.id
+  ]
 
   tags = {
     Name = "NAT"

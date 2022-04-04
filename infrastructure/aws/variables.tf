@@ -1,6 +1,6 @@
 variable "aws-region" {
   type    = string
-  default = "eu-west-3"
+  default = "eu-central-1"
 }
 
 variable "codename" {
@@ -34,4 +34,8 @@ variable "google-app-credentials" {
 
 variable "onesignal-api-key" {
   type = string
+}
+
+variable "PATH_TO_PUBLIC_KEY" {
+  default = "ed25519-key.pub"
 }

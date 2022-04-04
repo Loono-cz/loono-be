@@ -6,7 +6,7 @@ on:
     paths:
       - 'infrastructure/aws/**'
 env:
-  tf_version: '0.15.4'
+  tf_version: '1.1.6'
   tf_working_dir: 'infrastructure/aws'
   TF_VAR_database-password: ${{ secrets.DATABASE_PASSWORD }}
   TF_VAR_certificate-arn: ${{ secrets.CERTIFICATE_ARN }}
