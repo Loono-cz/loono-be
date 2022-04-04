@@ -16,18 +16,20 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
+import org.springframework.transaction.annotation.Transactional
 
-@SpringBootTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
+@Transactional
 class AccountControllerTest(
     private val repo: AccountRepository,
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    @Value("\${task.badge-downgrade.page-size}")
+    private val pageSize: Int,
 ) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
@@ -54,7 +56,8 @@ class AccountControllerTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val controller = AccountController(service, repo)
         val basicUser = createBasicUser()
@@ -70,7 +73,7 @@ class AccountControllerTest(
             nickname = existingAccount.nickname,
             sex = existingAccount.sex.let(SexDto::valueOf),
             birthdate = existingAccount.birthdate,
-            prefferedEmail = existingAccount.preferredEmail,
+            preferredEmail = existingAccount.preferredEmail,
             profileImageUrl = existingAccount.profileImageUrl,
             leaderboardAnonymizationOptIn = existingAccount.leaderboardAnonymizationOptIn,
             appointmentReminderEmailsOptIn = existingAccount.appointmentReminderEmailsOptIn,
@@ -89,7 +92,8 @@ class AccountControllerTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val controller = AccountController(service, repo)
 

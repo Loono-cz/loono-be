@@ -21,7 +21,7 @@ import javax.persistence.Table
 @Audited
 data class ExaminationRecord(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Enumerated(EnumType.STRING)
@@ -42,7 +42,7 @@ data class ExaminationRecord(
     var status: ExaminationStatusDto = ExaminationStatusDto.NEW,
 
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
-    val uuid: String = UUID.randomUUID().toString()
+    val uuid: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

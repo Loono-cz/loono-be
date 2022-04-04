@@ -206,19 +206,31 @@ class ExaminationRecordService(
         uid: String
     ): SelfExaminationFindingResponseDto {
         val account = prerequisitesValidation(uid, type)
-        val examWaitingForResult =
+        var examWaitingForResult =
             selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
-                .first { it.status == SelfExaminationStatusDto.WAITING_FOR_RESULT }
+                .filter { it.status == SelfExaminationStatusDto.WAITING_FOR_RESULT }
+        examWaitingForResult.ifEmpty {
+            examWaitingForResult =
+                selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
+                    .filter { it.status == SelfExaminationStatusDto.WAITING_FOR_CHECKUP }
+        }
+        examWaitingForResult.ifEmpty {
+            throw throw LoonoBackendException(
+                HttpStatus.CONFLICT,
+                "400",
+                "Result cannot be processed."
+            )
+        }
         when (result.result) {
             SelfExaminationResultDto.Result.OK -> {
-                completeSelfExamAsOK(examWaitingForResult)
+                completeSelfExamAsOK(examWaitingForResult.first())
                 return SelfExaminationFindingResponseDto(
                     message = "Result completed as OK."
                 )
             }
             SelfExaminationResultDto.Result.NOT_OK -> {
                 selfExaminationRecordRepository.save(
-                    examWaitingForResult.copy(
+                    examWaitingForResult.first().copy(
                         result = SelfExaminationResultDto.Result.NOT_OK,
                         status = SelfExaminationStatusDto.COMPLETED
                     )
@@ -271,7 +283,7 @@ class ExaminationRecordService(
                 val today = now()
                 if (
                     (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
-                    (!isFirstExam && plannedDateInAcceptedInterval(it, account, record))
+                    (!isFirstExam && it.isBefore(today) && plannedDateInAcceptedInterval(it, account, record))
                 ) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
@@ -282,7 +294,11 @@ class ExaminationRecordService(
             }
         }
 
-    private fun plannedDateInAcceptedInterval(date: LocalDateTime, account: Account, record: ExaminationRecordDto): Boolean {
+    private fun plannedDateInAcceptedInterval(
+        date: LocalDateTime,
+        account: Account,
+        record: ExaminationRecordDto
+    ): Boolean {
         val interval =
             preventionService.getExaminationRequests(account).first { it.examinationType == record.type }
         val lastConfirmed = examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)

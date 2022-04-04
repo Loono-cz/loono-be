@@ -16,6 +16,8 @@ jobs:
           distribution: 'adopt'
 
       - name: Build with Gradle
+        env:
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
         run: |
           ./gradlew build
 

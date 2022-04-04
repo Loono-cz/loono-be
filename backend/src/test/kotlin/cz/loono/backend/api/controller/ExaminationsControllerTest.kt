@@ -15,20 +15,18 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 
-@DataJpaTest
+@SpringBootTest(properties = ["spring.profiles.active=test"])
 @Import(ExaminationRecordService::class, PreventionService::class)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class ExaminationsControllerTest(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService,
@@ -36,6 +34,7 @@ class ExaminationsControllerTest(
 ) {
 
     @Test
+    @Transactional
     fun `Should add badge and points`() {
         val controller = ExaminationsController(recordService, preventionService)
         val basicUser = createBasicUser()

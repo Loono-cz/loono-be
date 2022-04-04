@@ -152,6 +152,97 @@ class PreventionServiceTest {
     }
 
     @Test
+    fun `get examinations without first record`() {
+        val uuid = UUID.randomUUID().toString()
+        val examsUUIDs: MutableMap<Int, String> = mutableMapOf()
+        repeat(2) {
+            examsUUIDs[it] = UUID.randomUUID().toString()
+        }
+        val age: Long = 45
+        val now = LocalDateTime.now()
+        val account = createAccount(
+            sex = "MALE",
+            birthday = LocalDate.now().minusYears(age)
+        )
+
+        whenever(accountRepository.findByUid(uuid)).thenReturn(account)
+        whenever(examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)).thenReturn(
+            listOf(
+                ExaminationRecord(
+                    id = 1,
+                    plannedDate = now,
+                    type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                    uuid = examsUUIDs[0]!!,
+                    account = account
+                ),
+                ExaminationRecord(
+                    id = 4,
+                    type = ExaminationTypeDto.DENTIST,
+                    uuid = examsUUIDs[1]!!,
+                    account = account
+                )
+            )
+        )
+
+        val result = preventionService.getPreventionStatus(uuid)
+        assertEquals(
+            /* expected = */ listOf(
+                ExaminationPreventionStatusDto(
+                    uuid = examsUUIDs[0].toString(),
+                    examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                    intervalYears = 2,
+                    firstExam = true,
+                    priority = 1,
+                    state = ExaminationStatusDto.NEW,
+                    count = 0,
+                    plannedDate = now,
+                    points = 200,
+                    badge = BadgeTypeDto.COAT
+                ),
+                ExaminationPreventionStatusDto(
+                    uuid = null,
+                    examinationType = ExaminationTypeDto.DERMATOLOGIST,
+                    intervalYears = 1,
+                    plannedDate = null,
+                    lastConfirmedDate = null,
+                    firstExam = false,
+                    priority = 6,
+                    state = ExaminationStatusDto.NEW,
+                    count = 0,
+                    points = 200,
+                    badge = BadgeTypeDto.GLOVES
+                ),
+                ExaminationPreventionStatusDto(
+                    uuid = examsUUIDs[1].toString(),
+                    examinationType = ExaminationTypeDto.DENTIST,
+                    intervalYears = 1,
+                    plannedDate = null,
+                    firstExam = true,
+                    priority = 8,
+                    state = ExaminationStatusDto.NEW,
+                    count = 0,
+                    lastConfirmedDate = null,
+                    points = 300,
+                    badge = BadgeTypeDto.HEADBAND
+                ),
+                ExaminationPreventionStatusDto(
+                    uuid = null,
+                    examinationType = ExaminationTypeDto.OPHTHALMOLOGIST,
+                    intervalYears = 4,
+                    plannedDate = null,
+                    firstExam = false,
+                    priority = 9,
+                    state = ExaminationStatusDto.NEW,
+                    count = 0,
+                    points = 100,
+                    badge = BadgeTypeDto.GLASSES
+                ),
+            ),
+            /* actual = */ result.examinations
+        )
+    }
+
+    @Test
     fun `get self-examinations for patient`() {
         val uuid = UUID.randomUUID().toString()
         val examsUUIDs: MutableMap<Int, String> = mutableMapOf()

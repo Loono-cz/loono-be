@@ -8,6 +8,8 @@ plugins {
     id("org.openapi.generator") version "5.4.0"
     id("de.undercouch.download") version "5.0.1"
     id("org.owasp.dependencycheck") version "6.5.3"
+    id("com.avast.gradle.docker-compose") version "0.15.1"
+    id("org.flywaydb.flyway") version "8.5.2"
     kotlin("jvm") version "1.6.20-RC"
     kotlin("plugin.spring") version "1.6.20-RC"
     kotlin("plugin.jpa") version "1.6.20-RC"
@@ -43,6 +45,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.hibernate:hibernate-envers:$hibernateVersion")
     implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.flywaydb:flyway-core:8.5.1")
 
     testRuntimeOnly("com.h2database:h2")
 
@@ -135,4 +139,19 @@ fun setUpOpenApiGenerator() {
 
 dependencyCheck {
     failBuildOnCVSS = 0.0f
+    suppressionFile = "cve-suppress.xml"
+}
+
+dockerCompose {
+    useComposeFiles.set(
+        listOf("../docker-compose.yml")
+    )
+    isRequiredBy(tasks.test)
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/postgres"
+    user = "postgres"
+    password = "postgres"
+    locations = arrayOf("classpath:db/migration")
 }

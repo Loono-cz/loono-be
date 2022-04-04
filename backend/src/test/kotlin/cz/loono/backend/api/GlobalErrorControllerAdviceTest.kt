@@ -10,7 +10,7 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest
 
-internal class GlobalErrorControllerAdviceTest {
+class GlobalErrorControllerAdviceTest {
 
     @Test
     fun `LoonoBackendException fills in code and message`() {

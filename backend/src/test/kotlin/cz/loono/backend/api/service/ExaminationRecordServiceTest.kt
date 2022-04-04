@@ -17,15 +17,14 @@ import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
+@Transactional
 class ExaminationRecordServiceTest(
     private val accountRepository: AccountRepository,
     private val examinationRecordRepository: ExaminationRecordRepository,
@@ -297,7 +296,7 @@ class ExaminationRecordServiceTest(
         )
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
-        val result = examinationRecordService.confirmExam(storedExam.uuid, "101")
+        val result = examinationRecordService.confirmExam(storedExam.uuid!!, "101")
 
         assert(result.status == ExaminationStatusDto.CONFIRMED)
     }
@@ -319,7 +318,7 @@ class ExaminationRecordServiceTest(
         )
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
-        val result = examinationRecordService.cancelExam(storedExam.uuid, "101")
+        val result = examinationRecordService.cancelExam(storedExam.uuid!!, "101")
 
         assert(result.status == ExaminationStatusDto.CANCELED)
     }

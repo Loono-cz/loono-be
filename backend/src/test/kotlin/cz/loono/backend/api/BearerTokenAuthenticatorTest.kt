@@ -19,8 +19,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 import java.net.URL
 import javax.servlet.http.HttpServletResponse
 
-internal class BearerTokenAuthenticatorTest {
-
+class BearerTokenAuthenticatorTest {
     @Test
     fun `missing authorization throws 401`() {
         val response = mock<HttpServletResponse>(defaultAnswer = { fail("Shouldn't touch the response.") })

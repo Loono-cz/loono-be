@@ -3,34 +3,52 @@ package cz.loono.backend.schedule
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
+import cz.loono.backend.api.service.AccountService
+import cz.loono.backend.api.service.ExaminationRecordService
+import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.configuration.ClockConfiguration
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.utils.SequenceResetExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 
-@DataJpaTest
-@Import(BadgeDowngradeTask::class, PreventionService::class, ClockConfiguration::class)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
+@Import(
+    BadgeDowngradeTask::class,
+    PreventionService::class,
+    ClockConfiguration::class,
+    AccountService::class,
+    FirebaseAuthService::class,
+    ExaminationRecordService::class
+)
+@Transactional
+@ExtendWith(SequenceResetExtension::class)
 class BadgeDowngradeTaskTest(
     private val badgeDowngradeTask: BadgeDowngradeTask,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: AccountRepository
 ) {
+
+    @AfterEach
+    fun setUp() {
+        accountRepository.deleteAll()
+    }
 
     @Test
     fun `Should correctly downgrade badges`() {

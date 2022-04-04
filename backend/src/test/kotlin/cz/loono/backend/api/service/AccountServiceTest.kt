@@ -15,26 +15,34 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-@SpringBootTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
 class AccountServiceTest(
     private val repo: AccountRepository,
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    @Value("\${task.badge-downgrade.page-size}")
+    private val pageSize: Int,
 ) {
 
     private val firebaseAuthService: FirebaseAuthService = mock()
+
+    @AfterEach
+    fun setUp() {
+        repo.deleteAll()
+        examinationRecordRepository.deleteAll()
+        selfExaminationRecordRepository.deleteAll()
+    }
 
     @Test
     fun `onboard account`() {
@@ -45,7 +53,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize,
         )
 
         val accountDto = service.onboardAccount(
@@ -64,7 +73,7 @@ class AccountServiceTest(
                 uid = account.uid,
                 nickname = account.nickname,
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -86,7 +95,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -112,7 +122,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val accountDto = service.onboardAccount(
@@ -156,7 +167,7 @@ class AccountServiceTest(
                 uid = account.uid,
                 nickname = account.nickname,
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 500,
                 badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
@@ -181,7 +192,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -192,7 +204,7 @@ class AccountServiceTest(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -213,7 +225,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -225,7 +238,7 @@ class AccountServiceTest(
                 uid = storedAccount.uid,
                 nickname = "Boss",
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -246,7 +259,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         repo.save(account)
 
@@ -264,7 +278,7 @@ class AccountServiceTest(
                 uid = account.uid,
                 nickname = account.nickname,
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -285,7 +299,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         repo.save(account)
 
@@ -293,7 +308,7 @@ class AccountServiceTest(
             uid,
             AccountUpdateDto(
                 nickname = "Boss",
-                prefferedEmail = "email",
+                preferredEmail = "email",
                 profileImageUrl = "image",
                 leaderboardAnonymizationOptIn = false,
                 appointmentReminderEmailsOptIn = false,
@@ -306,7 +321,7 @@ class AccountServiceTest(
                 uid = account.uid,
                 nickname = "Boss",
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = "email",
+                preferredEmail = "email",
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -326,7 +341,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val storedAccount = repo.save(account)
 
@@ -340,7 +356,7 @@ class AccountServiceTest(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
                 sex = SexDto.valueOf(account.sex),
-                prefferedEmail = account.preferredEmail,
+                preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
                 badges = emptyList(),
@@ -360,7 +376,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
         val existingAccount = createAccount("toDelete")
         repo.save(existingAccount)
@@ -381,7 +398,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val actual = service.onboardAccount(
@@ -412,7 +430,7 @@ class AccountServiceTest(
             uid = account.uid,
             nickname = account.nickname,
             sex = SexDto.valueOf(account.sex),
-            prefferedEmail = account.preferredEmail,
+            preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 500,
             badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
@@ -433,7 +451,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -466,7 +485,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -499,7 +519,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         assertThrows<LoonoBackendException> {
@@ -525,7 +546,8 @@ class AccountServiceTest(
             examinationRecordRepository,
             selfExaminationRecordRepository,
             firebaseAuthService,
-            examinationRecordService
+            examinationRecordService,
+            pageSize
         )
 
         val actual = service.onboardAccount(
@@ -556,7 +578,7 @@ class AccountServiceTest(
             uid = account.uid,
             nickname = account.nickname,
             sex = SexDto.valueOf(account.sex),
-            prefferedEmail = account.preferredEmail,
+            preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 200,
             badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1)),

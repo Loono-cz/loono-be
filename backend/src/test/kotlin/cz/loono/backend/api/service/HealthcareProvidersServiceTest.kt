@@ -13,9 +13,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
 import java.time.LocalDate
 import kotlin.io.path.deleteExisting
@@ -23,8 +22,8 @@ import kotlin.io.path.exists
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 
-@DataJpaTest
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@SpringBootTest(properties = ["spring.profiles.active=test"])
+@Transactional
 class HealthcareProvidersServiceTest(
     private val healthcareProviderRepository: HealthcareProviderRepository,
     private val healthcareCategoryRepository: HealthcareCategoryRepository,

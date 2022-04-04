@@ -18,7 +18,7 @@ import javax.persistence.Table
 data class Account(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false, columnDefinition = "TEXT", unique = true)
@@ -57,7 +57,10 @@ data class Account(
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = true, updatable = true, insertable = true)
-    val badges: Set<Badge> = mutableSetOf()
+    val badges: Set<Badge> = mutableSetOf(),
+
+    @Column(nullable = false)
+    val created: LocalDate = LocalDate.now()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -79,3 +82,4 @@ data class Account(
             "appointmentReminderEmailsOptIn=$appointmentReminderEmailsOptIn, " +
             "newsletterOptIn=$newsletterOptIn, points=$points, examinationRecords=$examinationRecords)"
 }
+// psql -h database.internal.loono.ceskodigital.net -p 5432 -U loono -d loonodevelopment -f data_dump.sql\
