@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - devel
+      - production
 env:
   region: ${{ secrets.DEVEL_AWS_REGION }}
   repository: ${{ secrets.DEVEL_AWS_REPOSITORY }}

@@ -2,7 +2,7 @@ name: 'Terraform Apply on push'
 on:
   push:
     branches:
-      - devel
+      - production
     paths:
       - 'infrastructure/aws/**'
 env:
