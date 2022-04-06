@@ -12,7 +12,7 @@ variable "codename" {
 # to comply with best practices => it ensures the internal domain names are globally unique.
 variable "codename-domain" {
   type    = string
-  default = "devel.loono.cz"
+  default = "prod.loono.cz"
 }
 
 variable "database-username" {
