@@ -1,5 +1,6 @@
 package cz.loono.backend.db.model
 
+import cz.loono.backend.api.dto.SexDto
 import org.hibernate.envers.Audited
 import java.time.LocalDate
 import javax.persistence.CascadeType
@@ -62,6 +63,8 @@ data class Account(
     @Column(nullable = false)
     val created: LocalDate = LocalDate.now()
 ) {
+    fun getSexAsEnum() = SexDto.valueOf(this.sex)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

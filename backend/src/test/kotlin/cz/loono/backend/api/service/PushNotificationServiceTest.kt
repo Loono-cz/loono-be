@@ -152,7 +152,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendFirstSelfExamNotification(setOf(account), SexDto.valueOf(account.sex))
+            pushNotificationService.sendFirstSelfExamNotification(setOf(account), account.getSexAsEnum())
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -168,7 +168,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamNotification(setOf(account), SexDto.valueOf(account.sex))
+            pushNotificationService.sendSelfExamNotification(setOf(account), account.getSexAsEnum())
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -184,7 +184,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account), SexDto.valueOf(account.sex))
+            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account), account.getSexAsEnum())
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)

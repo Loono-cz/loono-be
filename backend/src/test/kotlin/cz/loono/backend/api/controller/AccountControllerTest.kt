@@ -1,7 +1,6 @@
 package cz.loono.backend.api.controller
 
 import cz.loono.backend.api.dto.AccountDto
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.ExaminationRecordService
@@ -71,7 +70,7 @@ class AccountControllerTest(
         val expectedDto = AccountDto(
             uid = basicUser.uid,
             nickname = existingAccount.nickname,
-            sex = existingAccount.sex.let(SexDto::valueOf),
+            sex = existingAccount.getSexAsEnum(),
             birthdate = existingAccount.birthdate,
             preferredEmail = existingAccount.preferredEmail,
             profileImageUrl = existingAccount.profileImageUrl,

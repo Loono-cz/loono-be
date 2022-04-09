@@ -8,7 +8,7 @@ import cz.loono.backend.api.exception.LoonoBackendException
 import org.springframework.http.HttpStatus
 
 object BadgesPointsProvider {
-    fun getBadgesAndPoints(examType: ExaminationTypeDto, sex: SexDto) =
+    fun getGeneralBadgesAndPoints(examType: ExaminationTypeDto, sex: SexDto) =
         when {
             examType == ExaminationTypeDto.OPHTHALMOLOGIST -> BadgeTypeDto.GLASSES to 100
             examType == ExaminationTypeDto.GENERAL_PRACTITIONER -> BadgeTypeDto.COAT to 200
@@ -27,14 +27,21 @@ object BadgesPointsProvider {
             )
         }
 
-    fun getBadgesAndPoints(selfExamType: SelfExaminationTypeDto, sex: SexDto): Pair<BadgeTypeDto, Int>? =
+    fun getSelfExaminationBadgesAndPoints(selfExamType: SelfExaminationTypeDto, sex: SexDto): Pair<BadgeTypeDto, Int>? =
         when {
             selfExamType == SelfExaminationTypeDto.BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.SHIELD to 50
             selfExamType == SelfExaminationTypeDto.TESTICULAR && sex == SexDto.MALE -> BadgeTypeDto.SHIELD to 50
             else -> null
         }
 
-    val BADGES_TO_EXAMS = mapOf(
+    fun getSelfExaminationType(badgeTypeDto: BadgeTypeDto, sex: SexDto) =
+        badgeTypeDto.takeIf {
+            badgeTypeDto == BadgeTypeDto.SHIELD
+        }?.let {
+            if (sex == SexDto.FEMALE) SelfExaminationTypeDto.BREAST else SelfExaminationTypeDto.TESTICULAR
+        }
+
+    val GENERAL_BADGES_TO_EXAMS = mapOf(
         BadgeTypeDto.GLASSES to ExaminationTypeDto.OPHTHALMOLOGIST,
         BadgeTypeDto.COAT to ExaminationTypeDto.GENERAL_PRACTITIONER,
         BadgeTypeDto.GLOVES to ExaminationTypeDto.DERMATOLOGIST,

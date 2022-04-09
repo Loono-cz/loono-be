@@ -61,7 +61,7 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = emptyList()
@@ -72,7 +72,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -104,7 +104,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = emptyList()
@@ -130,7 +130,7 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
@@ -166,7 +166,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 500,
@@ -203,7 +203,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -237,7 +237,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = "Boss",
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -277,7 +277,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -320,7 +320,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = "Boss",
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = "email",
                 birthdate = account.birthdate,
                 points = 0,
@@ -355,7 +355,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -406,7 +406,7 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
@@ -429,7 +429,7 @@ class AccountServiceTest(
         val expected = AccountDto(
             uid = account.uid,
             nickname = account.nickname,
-            sex = SexDto.valueOf(account.sex),
+            sex = account.getSexAsEnum(),
             preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 500,
@@ -460,7 +460,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = listOf(
@@ -494,7 +494,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = listOf(
@@ -528,7 +528,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = emptyList()
@@ -554,7 +554,7 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
@@ -577,7 +577,7 @@ class AccountServiceTest(
         val expected = AccountDto(
             uid = account.uid,
             nickname = account.nickname,
-            sex = SexDto.valueOf(account.sex),
+            sex = account.getSexAsEnum(),
             preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 200,

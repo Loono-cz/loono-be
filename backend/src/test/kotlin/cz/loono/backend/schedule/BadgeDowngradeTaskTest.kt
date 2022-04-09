@@ -3,6 +3,8 @@ package cz.loono.backend.schedule
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
+import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.FirebaseAuthService
@@ -12,6 +14,8 @@ import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.toLocalDateTime
 import cz.loono.backend.utils.SequenceResetExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -27,6 +31,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
@@ -42,11 +47,13 @@ import java.time.LocalDateTime
 @ExtendWith(SequenceResetExtension::class)
 class BadgeDowngradeTaskTest(
     private val badgeDowngradeTask: BadgeDowngradeTask,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val examinationRecordService: ExaminationRecordService,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
 ) {
 
     @AfterEach
-    fun setUp() {
+    fun tearDown() {
         accountRepository.deleteAll()
     }
 
@@ -148,6 +155,44 @@ class BadgeDowngradeTaskTest(
             )
         )
         accountRepository.save(withBadgesAndRecords)
+
+        badgeDowngradeTask.run()
+
+        val actual = accountRepository.findByUid("uuid1")!!.badges
+
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    fun `Should downgrade self examination badge`() {
+        val account = createAccount("uuid1")
+        accountRepository.save(account)
+        examinationRecordService.confirmSelfExam(
+            SelfExaminationTypeDto.TESTICULAR,
+            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
+            "uuid1"
+        )
+
+        val toUpdate = selfExaminationRecordRepository.findAllByAccount(account).map {
+            it.copy(dueDate = LocalDate.of(2022, 2, 11))
+        }
+        selfExaminationRecordRepository.saveAll(toUpdate)
+        accountRepository.findByUid("uuid1")?.let {
+            accountRepository.save(
+                it.copy(
+                    badges = it.badges.map { badge ->
+                        badge.copy(
+                            lastUpdateOn = Instant.parse("2022-02-11T17:14:06.00Z").toLocalDateTime()
+                        )
+                    }.toSet()
+                )
+            )
+        }
+
+        selfExaminationRecordRepository.findFirstByAccountAndTypeOrderByDueDateDesc(
+            account,
+            SelfExaminationTypeDto.TESTICULAR
+        )
 
         badgeDowngradeTask.run()
 
