@@ -234,7 +234,7 @@ class ExaminationRecordService(
                         status = SelfExaminationStatusDto.COMPLETED
                     )
                 )
-                // TODO turn off notification related to the self-exams
+                accountRepository.save(account.copy(notify = false))
                 return SelfExaminationFindingResponseDto(
                     message = "The examination marked as NOT OK. Notifications are turned off."
                 )

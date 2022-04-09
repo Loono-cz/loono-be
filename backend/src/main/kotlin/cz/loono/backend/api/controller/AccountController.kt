@@ -74,4 +74,16 @@ class AccountController(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ) = accountService.deleteAccount(basicUser.uid)
+
+    @GetMapping("/login")
+    fun login(
+        @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser
+    ) = accountService.login(basicUser.uid)
+
+    @GetMapping("/logout")
+    fun logout(
+        @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser
+    ) = accountService.logout(basicUser.uid)
 }

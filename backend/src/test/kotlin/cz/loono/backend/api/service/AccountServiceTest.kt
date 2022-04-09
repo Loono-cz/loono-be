@@ -390,6 +390,48 @@ class AccountServiceTest(
     }
 
     @Test
+    fun `login account`() {
+        // Arrange
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService,
+            pageSize
+        )
+        val existingAccount = createAccount("uid")
+        repo.save(existingAccount)
+
+        // Act
+        service.login(uid = existingAccount.uid)
+
+        // Assert
+        assert(repo.findByUid(existingAccount.uid)!!.active)
+    }
+
+    @Test
+    fun `logout account`() {
+        // Arrange
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService,
+            pageSize
+        )
+        val existingAccount = createAccount("uid")
+        repo.save(existingAccount)
+
+        // Act
+        service.logout(uid = existingAccount.uid)
+
+        // Assert
+        assert(!repo.findByUid(existingAccount.uid)!!.active)
+    }
+
+    @Test
     fun `Should add badges and points for exams which are within expected interval`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
