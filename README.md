@@ -13,6 +13,7 @@ The application provides REST API and a Swagger / Open API documentation.
 <li>JDK 17</li>
 <li>IDE with git and gradle (or installed separately)</li>
 <li>Service account credentials to the Firebase</li>
+<li>Docker & docker-compose</li>
 </ul>
 <h3>Firebase Admin SDK</h3>
 <p>

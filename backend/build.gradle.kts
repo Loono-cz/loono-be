@@ -2,7 +2,7 @@ val logbackVersion = "1.2.10"
 val hibernateVersion = "5.6.5.Final"
 
 plugins {
-    id("org.springframework.boot") version "2.6.4"
+    id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("org.openapi.generator") version "5.4.0"
