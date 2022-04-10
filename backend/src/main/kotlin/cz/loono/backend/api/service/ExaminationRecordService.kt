@@ -265,7 +265,7 @@ class ExaminationRecordService(
                 id = record.id,
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
-                plannedDate = examinationRecordDto.date,
+                plannedDate = examinationRecordDto.plannedDate,
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
@@ -277,7 +277,7 @@ class ExaminationRecordService(
         record: ExaminationRecordDto,
         account: Account
     ) =
-        record.date?.let {
+        record.plannedDate?.let {
             record.firstExam?.let { isFirstExam ->
                 val today = now()
                 if (
@@ -406,14 +406,14 @@ class ExaminationRecordService(
     private fun isEligibleForReward(erd: ExaminationRecordDto) =
         now().let { now ->
             (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (erd.date?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.date) < 2)
+                (erd.plannedDate?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
         }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
             uuid = uuid,
             type = type,
-            date = plannedDate,
+            plannedDate = plannedDate,
             firstExam = firstExam,
             status = status
         )

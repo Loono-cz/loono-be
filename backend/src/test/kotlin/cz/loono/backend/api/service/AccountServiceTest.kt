@@ -135,13 +135,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(1),
+                        plannedDate = LocalDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -152,7 +152,7 @@ class AccountServiceTest(
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(1),
+                        plannedDate = LocalDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.COLONOSCOPY,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
@@ -453,13 +453,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(2).plusDays(1),
+                        plannedDate = LocalDateTime.now().minusYears(2).plusDays(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -507,7 +507,7 @@ class AccountServiceTest(
                     birthdate = account.birthdate,
                     examinations = listOf(
                         ExaminationRecordDto(
-                            date = LocalDateTime.now().minusYears(3),
+                            plannedDate = LocalDateTime.now().minusYears(3),
                             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                             status = ExaminationStatusDto.CONFIRMED,
                             firstExam = true
@@ -541,7 +541,7 @@ class AccountServiceTest(
                     birthdate = account.birthdate,
                     examinations = listOf(
                         ExaminationRecordDto(
-                            date = LocalDateTime.now().plusDays(1),
+                            plannedDate = LocalDateTime.now().plusDays(1),
                             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                             status = ExaminationStatusDto.CONFIRMED,
                             firstExam = true
@@ -601,13 +601,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.NEW,
                         firstExam = true

@@ -83,7 +83,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            date = LocalDateTime.MAX
+            plannedDate = LocalDateTime.MAX
         )
 
         assertThrows<LoonoBackendException> {
@@ -107,7 +107,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            date = LocalDateTime.MIN
+            plannedDate = LocalDateTime.MIN
         )
 
         assertThrows<LoonoBackendException>("The given examination identifier not found.") {
@@ -139,7 +139,7 @@ class ExaminationRecordServiceTest(
         val exam = ExaminationRecordDto(
             firstExam = true,
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            date = LocalDateTime.now().minusDays(1)
+            plannedDate = LocalDateTime.now().minusDays(1)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -170,7 +170,7 @@ class ExaminationRecordServiceTest(
             )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            date = LocalDateTime.now().plusYears(2)
+            plannedDate = LocalDateTime.now().plusYears(2)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -208,7 +208,7 @@ class ExaminationRecordServiceTest(
         )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            date = LocalDateTime.now().minusDays(1)
+            plannedDate = LocalDateTime.now().minusDays(1)
         )
 
         assertThrows<LoonoBackendException> {
@@ -242,14 +242,14 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            date = LocalDateTime.MAX
+            plannedDate = LocalDateTime.MAX
         )
 
         val result = examinationRecordService.createOrUpdateExam(changedExam, "101")
 
         assert(result.status == changedExam.status)
         assert(result.firstExam == changedExam.firstExam)
-        assert(result.date == changedExam.date)
+        assert(result.plannedDate == changedExam.plannedDate)
     }
 
     @Test
@@ -271,7 +271,7 @@ class ExaminationRecordServiceTest(
             )
         val examRecord = ExaminationRecordDto(
             type = ExaminationTypeDto.GYNECOLOGIST,
-            date = LocalDateTime.MAX
+            plannedDate = LocalDateTime.MAX
         )
 
         assertThrows<LoonoBackendException>("The account doesn't have rights to create this type of examinations.") {
