@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
-import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -28,24 +27,12 @@ import java.time.LocalDateTime
 class ExaminationRecordServiceTest(
     private val accountRepository: AccountRepository,
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    private val examinationRecordService: ExaminationRecordService
 ) {
-
-    private val preventionService =
-        PreventionService(examinationRecordRepository, selfExaminationRecordRepository, accountRepository)
-    private val clock = Clock.systemUTC()
 
     @Test
     fun `changing state for a non-existing user`() {
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
-
         assertThrows<LoonoBackendException>("Account not found") {
             examinationRecordService.createOrUpdateExam(
                 ExaminationRecordDto(
@@ -67,14 +54,6 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER
         )
@@ -94,14 +73,6 @@ class ExaminationRecordServiceTest(
     @Test
     fun `changing state of a non-existing exam`() {
         accountRepository.save(createAccount(uid = "101"))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
         val exam = ExaminationRecordDto(
             uuid = "1",
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
@@ -128,14 +99,7 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         val exam = ExaminationRecordDto(
             firstExam = true,
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
@@ -160,14 +124,6 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             plannedDate = LocalDateTime.now().plusYears(2)
@@ -190,14 +146,7 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         examinationRecordRepository.save(
             ExaminationRecord(
                 type = ExaminationTypeDto.GENERAL_PRACTITIONER,
@@ -225,14 +174,7 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER
         )
@@ -261,14 +203,7 @@ class ExaminationRecordServiceTest(
                 birthday = LocalDate.of(1990, 9, 9)
             )
         )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         val examRecord = ExaminationRecordDto(
             type = ExaminationTypeDto.GYNECOLOGIST,
             plannedDate = LocalDateTime.MAX
@@ -282,14 +217,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `confirm exam`() {
         val account = accountRepository.save(createAccount(uid = "101"))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW
@@ -304,14 +232,7 @@ class ExaminationRecordServiceTest(
     @Test
     fun `cancel exam`() {
         val account = accountRepository.save(createAccount(uid = "101"))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW
@@ -327,14 +248,6 @@ class ExaminationRecordServiceTest(
     fun `complete first self-exam of incorrect type`() {
         val account =
             accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
 
         assertThrows<LoonoBackendException>("This type of examination cannot applied for the account.") {
             examinationRecordService.confirmSelfExam(
@@ -349,14 +262,6 @@ class ExaminationRecordServiceTest(
     fun `complete first self-exam`() {
         val account =
             accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.BREAST,
@@ -381,14 +286,6 @@ class ExaminationRecordServiceTest(
     fun `complete first self-exam with finding`() {
         val account =
             accountRepository.save(createAccount(uid = "101", sex = SexDto.FEMALE.name))
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
 
         val result = examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.BREAST,
@@ -417,14 +314,7 @@ class ExaminationRecordServiceTest(
                     uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
             SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
@@ -460,14 +350,7 @@ class ExaminationRecordServiceTest(
                     uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         examinationRecordService.confirmSelfExam(
             SelfExaminationTypeDto.TESTICULAR,
             SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
@@ -503,14 +386,7 @@ class ExaminationRecordServiceTest(
                     uid = "101", sex = SexDto.MALE.name, points = 150
                 )
             )
-        val examinationRecordService =
-            ExaminationRecordService(
-                accountRepository,
-                examinationRecordRepository,
-                selfExaminationRecordRepository,
-                preventionService,
-                clock
-            )
+
         repeat(5) {
             examinationRecordService.confirmSelfExam(
                 SelfExaminationTypeDto.TESTICULAR,
@@ -532,5 +408,33 @@ class ExaminationRecordServiceTest(
         assert(result.streak == 6)
         assert(result.badgeLevel == 3)
         assert(result.badgeType == BadgeTypeDto.SHIELD)
+    }
+
+    @Test
+    fun `Should not add another badge when cancelling`() {
+        accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            plannedDate = LocalDateTime.now().minusYears(2)
+        )
+
+        val examRecord = examinationRecordService.createOrUpdateExam(exam, "101")
+        examinationRecordService.cancelExam(examRecord.uuid!!, "101")
+
+        assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
+    }
+
+    @Test
+    fun `Should not add another badge when updating`() {
+        accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.DERMATOLOGIST,
+            plannedDate = LocalDateTime.now().minusYears(3)
+        )
+
+        val examRecord = examinationRecordService.createOrUpdateExam(exam, "101")
+        examinationRecordService.createOrUpdateExam(examRecord.copy(plannedDate = examRecord.plannedDate?.plusYears(1)), "101")
+
+        assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
     }
 }

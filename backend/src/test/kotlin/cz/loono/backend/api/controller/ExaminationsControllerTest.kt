@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 @Import(ExaminationRecordService::class, PreventionService::class)
@@ -39,7 +40,10 @@ class ExaminationsControllerTest(
         val controller = ExaminationsController(recordService, preventionService)
         val basicUser = createBasicUser()
         var existingAccount = createAccount(birthday = LocalDate.of(1970, 1, 1))
-        val examinationRecord = ExaminationRecordDto(type = ExaminationTypeDto.DENTIST)
+        val examinationRecord = ExaminationRecordDto(
+            type = ExaminationTypeDto.DENTIST,
+            plannedDate = LocalDateTime.now().minusYears(3)
+        )
         // This is done to get assigned ID by the DB
         existingAccount = repo.save(existingAccount)
         val expectedBadge = Badge(BadgeTypeDto.HEADBAND.value, existingAccount.id, 1, existingAccount, Instant.ofEpochMilli(1644682446419L).toLocalDateTime())
@@ -51,7 +55,9 @@ class ExaminationsControllerTest(
         assertThat(actual.badges).containsExactly(expectedBadge)
         assertThat(actual.points).isEqualTo(300)
 
-        controller.confirm(basicUser, ExaminationIdDto(examUUID))
+        controller.updateOrCreate(
+            basicUser, examinationRecord.copy(plannedDate = LocalDateTime.now().minusYears(1))
+        )
 
         // Making sure that level upgraded and points increased
         actual = repo.findByUid("uid")!!
