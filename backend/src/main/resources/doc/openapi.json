@@ -1318,7 +1318,7 @@
                     "type": {
                         "$ref": "#/components/schemas/ExaminationType"
                     },
-                    "date": {
+                    "plannedDate": {
                         "type": "string",
                         "format": "date-time",
                         "nullable": true

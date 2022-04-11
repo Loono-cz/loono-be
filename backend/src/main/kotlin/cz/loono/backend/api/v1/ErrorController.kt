@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.dto.ErrorDto
 import org.slf4j.LoggerFactory

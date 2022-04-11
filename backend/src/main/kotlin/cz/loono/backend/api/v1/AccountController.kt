@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/account", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE])
 class AccountController(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository

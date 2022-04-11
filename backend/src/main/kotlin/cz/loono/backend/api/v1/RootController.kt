@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
