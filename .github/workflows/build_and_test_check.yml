@@ -19,7 +19,7 @@ jobs:
         env:
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
         run: |
-          ./gradlew build
+          ./gradlew build -x ktlintMainSourceSetCheck 
 
       - name: Publish Unit Test Results
         # This action shall be used for ubuntu

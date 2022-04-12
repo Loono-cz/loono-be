@@ -33,7 +33,7 @@ class PreventionService(
         val age = ChronoUnit.YEARS.between(account.birthdate, LocalDate.now()).toInt()
 
         return ExaminationIntervalProvider.findExaminationRequests(
-            Patient(age, SexDto.valueOf(account.sex))
+            Patient(age, account.getSexAsEnum())
         )
     }
 
@@ -92,7 +92,7 @@ class PreventionService(
         val totalCountOfConfirmedExams = confirmedExamsOfCurrentType.size
 
         val rewards =
-            BadgesPointsProvider.getBadgesAndPoints(examinationInterval.examinationType, SexDto.valueOf(account.sex))
+            BadgesPointsProvider.getGeneralBadgesAndPoints(examinationInterval.examinationType, account.getSexAsEnum())
 
         ExaminationPreventionStatusDto(
             uuid = sortedExamsOfType[0].uuid,
@@ -115,7 +115,7 @@ class PreventionService(
         SelfExaminationTypeDto.values().forEach { type ->
             val filteredExams =
                 selfExams.filter { exam -> exam.type == type && exam.result != SelfExaminationResultDto.Result.NOT_OK }
-            val rewards = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
+            val rewards = BadgesPointsProvider.getSelfExaminationBadgesAndPoints(type, account.getSexAsEnum())
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
                     val activeExam =

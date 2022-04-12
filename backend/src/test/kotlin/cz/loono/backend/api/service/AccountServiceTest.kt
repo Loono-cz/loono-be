@@ -61,7 +61,7 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = emptyList()
@@ -72,7 +72,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -104,7 +104,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = emptyList()
@@ -130,18 +130,18 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(1),
+                        plannedDate = LocalDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -152,7 +152,7 @@ class AccountServiceTest(
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(1),
+                        plannedDate = LocalDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.COLONOSCOPY,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
@@ -166,7 +166,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 500,
@@ -203,7 +203,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -237,7 +237,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = "Boss",
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -277,7 +277,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -320,7 +320,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = account.uid,
                 nickname = "Boss",
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = "email",
                 birthdate = account.birthdate,
                 points = 0,
@@ -355,7 +355,7 @@ class AccountServiceTest(
             accountDto == AccountDto(
                 uid = storedAccount.uid,
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 0,
@@ -390,6 +390,48 @@ class AccountServiceTest(
     }
 
     @Test
+    fun `login account`() {
+        // Arrange
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService,
+            pageSize
+        )
+        val existingAccount = createAccount("uid")
+        repo.save(existingAccount)
+
+        // Act
+        service.login(uid = existingAccount.uid)
+
+        // Assert
+        assert(repo.findByUid(existingAccount.uid)!!.active)
+    }
+
+    @Test
+    fun `logout account`() {
+        // Arrange
+        val service = AccountService(
+            repo,
+            examinationRecordRepository,
+            selfExaminationRecordRepository,
+            firebaseAuthService,
+            examinationRecordService,
+            pageSize
+        )
+        val existingAccount = createAccount("uid")
+        repo.save(existingAccount)
+
+        // Act
+        service.logout(uid = existingAccount.uid)
+
+        // Assert
+        assert(!repo.findByUid(existingAccount.uid)!!.active)
+    }
+
+    @Test
     fun `Should add badges and points for exams which are within expected interval`() {
         val uid = UUID.randomUUID().toString()
         val account = createAccount(uid = uid, sex = SexDto.FEMALE.name)
@@ -406,18 +448,18 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now().minusYears(2).plusDays(1),
+                        plannedDate = LocalDateTime.now().minusYears(2).plusDays(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -429,7 +471,7 @@ class AccountServiceTest(
         val expected = AccountDto(
             uid = account.uid,
             nickname = account.nickname,
-            sex = SexDto.valueOf(account.sex),
+            sex = account.getSexAsEnum(),
             preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 500,
@@ -460,12 +502,12 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = listOf(
                         ExaminationRecordDto(
-                            date = LocalDateTime.now().minusYears(3),
+                            plannedDate = LocalDateTime.now().minusYears(3),
                             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                             status = ExaminationStatusDto.CONFIRMED,
                             firstExam = true
@@ -494,12 +536,12 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = listOf(
                         ExaminationRecordDto(
-                            date = LocalDateTime.now().plusDays(1),
+                            plannedDate = LocalDateTime.now().plusDays(1),
                             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                             status = ExaminationStatusDto.CONFIRMED,
                             firstExam = true
@@ -528,7 +570,7 @@ class AccountServiceTest(
                 uid,
                 account = AccountOnboardingDto(
                     nickname = account.nickname,
-                    sex = SexDto.valueOf(account.sex),
+                    sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
                     examinations = emptyList()
@@ -554,18 +596,18 @@ class AccountServiceTest(
             uid,
             account = AccountOnboardingDto(
                 nickname = account.nickname,
-                sex = SexDto.valueOf(account.sex),
+                sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        date = LocalDateTime.now(),
+                        plannedDate = LocalDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.NEW,
                         firstExam = true
@@ -577,7 +619,7 @@ class AccountServiceTest(
         val expected = AccountDto(
             uid = account.uid,
             nickname = account.nickname,
-            sex = SexDto.valueOf(account.sex),
+            sex = account.getSexAsEnum(),
             preferredEmail = account.preferredEmail,
             birthdate = account.birthdate,
             points = 200,

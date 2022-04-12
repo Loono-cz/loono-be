@@ -90,6 +90,7 @@ class ExaminationRecordServiceSelfResultTest {
 
         assert(result.message == "The examination marked as NOT OK. Notifications are turned off.")
         verify(selfExaminationRecordRepository, times(1)).save(any())
+        verify(accountRepository, times(1)).save(account.copy(notify = false))
     }
 
     @Test

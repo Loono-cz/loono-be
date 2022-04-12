@@ -27,7 +27,7 @@ class SelfExaminationIntervalClosingTaskTest {
                         type = SelfExaminationTypeDto.BREAST,
                         account = createAccount(),
                         status = SelfExaminationStatusDto.PLANNED,
-                        dueDate = LocalDate.now().minusDays(1)
+                        dueDate = LocalDate.now().minusDays(4)
                     )
                 )
             )

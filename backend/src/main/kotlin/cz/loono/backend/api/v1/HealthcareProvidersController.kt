@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.dto.HealthcareProviderDetailListDto
 import cz.loono.backend.api.dto.HealthcareProviderIdListDto
@@ -16,21 +16,21 @@ import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/providers", produces = [MediaType.APPLICATION_JSON_VALUE])
 class HealthcareProvidersController(
     private var healthCareProvidersService: HealthcareProvidersService
 ) {
 
-    @GetMapping(value = ["$DOCTORS_PATH/lastupdate"])
+    @GetMapping(value = ["/lastupdate"])
     fun lastUpdate(): HealthcareProviderLastUpdateDto =
         HealthcareProviderLastUpdateDto(
             lastUpdate = healthCareProvidersService.lastUpdate
         )
 
-    @GetMapping(value = ["$DOCTORS_PATH/update"])
+    @GetMapping(value = ["/update"])
     fun updateData(): UpdateStatusMessageDto = healthCareProvidersService.updateData()
 
-    @GetMapping(value = ["$DOCTORS_PATH/all"], produces = ["application/zip"])
+    @GetMapping(value = ["/all"], produces = ["application/zip"])
     fun getAll(response: HttpServletResponse): FileSystemResource =
         healthCareProvidersService.getAllSimpleData().let { path ->
             response.setHeader(
@@ -40,15 +40,11 @@ class HealthcareProvidersController(
             FileSystemResource(path)
         }
 
-    @PostMapping(value = ["$DOCTORS_PATH/details"])
+    @PostMapping(value = ["/details"])
     fun getDetail(
         @RequestBody
         @Valid
         providerIdListDto: HealthcareProviderIdListDto
     ): HealthcareProviderDetailListDto =
         healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
-
-    companion object {
-        const val DOCTORS_PATH = "/providers"
-    }
 }
