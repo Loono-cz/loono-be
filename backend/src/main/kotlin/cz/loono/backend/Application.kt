@@ -30,17 +30,19 @@ class Config(
     private val accountCreatingInterceptor: AccountCreatingInterceptor,
 ) : WebMvcConfigurer {
 
+    val apiVersion = "/v1"
+
     val unauthenticatedEndpoints = listOf(
-        "/v3/api-docs",
+        "$apiVersion/api-docs",
         "/actuator/health",
         "/error",
-        "/providers/update",
+        "$apiVersion/providers/update",
         "/favicon.ico",
         "/notification/*",
         // Temporary Auth disabled for endpoints bellow
-        "/providers/all",
-        "/providers/details",
-        "/providers/lastupdate"
+        "$apiVersion/providers/all",
+        "$apiVersion/providers/details",
+        "$apiVersion/providers/lastupdate"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
