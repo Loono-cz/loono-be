@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/leaderboard", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/leaderboard", produces = [MediaType.APPLICATION_JSON_VALUE])
 class LeaderboardController(
     private val leaderboardService: LeaderboardService
 ) {

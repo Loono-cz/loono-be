@@ -1,5 +1,6 @@
 package cz.loono.backend.db.model
 
+import cz.loono.backend.api.dto.BadgeTypeDto
 import org.hibernate.envers.Audited
 import java.io.Serializable
 import java.time.LocalDateTime
@@ -29,7 +30,9 @@ data class Badge(
     val account: Account,
     @Column(nullable = false)
     val lastUpdateOn: LocalDateTime = LocalDateTime.now()
-)
+) {
+    fun getBadgeAsEnum() = BadgeTypeDto.valueOf(this.type)
+}
 
 /**
  * This class is needed to allow a composite key on the Badge class
