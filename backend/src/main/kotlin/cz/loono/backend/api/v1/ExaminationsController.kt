@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.Attributes
 import cz.loono.backend.api.BasicUser
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/examinations", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE])
 class ExaminationsController(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService

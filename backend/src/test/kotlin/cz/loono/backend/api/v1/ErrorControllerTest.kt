@@ -1,4 +1,4 @@
-package cz.loono.backend.api.controller
+package cz.loono.backend.api.v1
 
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

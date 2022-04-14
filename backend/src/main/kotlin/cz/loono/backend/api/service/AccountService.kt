@@ -4,7 +4,6 @@ import cz.loono.backend.api.dto.AccountDto
 import cz.loono.backend.api.dto.AccountOnboardingDto
 import cz.loono.backend.api.dto.AccountUpdateDto
 import cz.loono.backend.api.dto.BadgeDto
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
@@ -135,7 +134,7 @@ class AccountService(
         AccountDto(
             uid = account.uid,
             nickname = account.nickname,
-            sex = SexDto.valueOf(account.sex),
+            sex = account.getSexAsEnum(),
             birthdate = account.birthdate,
             profileImageUrl = account.profileImageUrl,
             points = account.points,
@@ -144,7 +143,7 @@ class AccountService(
             leaderboardAnonymizationOptIn = account.leaderboardAnonymizationOptIn,
             newsletterOptIn = account.newsletterOptIn,
             badges = account.badges
-                .map { BadgeDto(type = BadgeTypeDto.valueOf(it.type), level = it.level) }
+                .map { BadgeDto(type = it.getBadgeAsEnum(), level = it.level) }
                 .sortedBy(BadgeDto::type)
         )
 
@@ -157,5 +156,23 @@ class AccountService(
             transformPage(accountsFromPage)
             page = accountsPage.nextPageable()
         } while (accountsPage.hasNext())
+    }
+
+    fun login(uid: String) =
+        accountRepository.findByUid(uid)?.let {
+            accountRepository.save(it.copy(active = true))
+        } ?: throw404()
+
+    fun logout(uid: String) =
+        accountRepository.findByUid(uid)?.let {
+            accountRepository.save(it.copy(active = false))
+        } ?: throw404()
+
+    private fun throw404(): Nothing {
+        throw LoonoBackendException(
+            status = HttpStatus.NOT_FOUND,
+            errorCode = "404",
+            errorMessage = "The account not found."
+        )
     }
 }

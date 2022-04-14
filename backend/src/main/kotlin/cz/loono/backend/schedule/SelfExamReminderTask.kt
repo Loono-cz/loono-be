@@ -1,6 +1,5 @@
 package cz.loono.backend.schedule
 
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.db.model.Account
@@ -22,10 +21,10 @@ class SelfExamReminderTask(
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
             statuses.forEach {
                 if (account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null) {
-                    notificationService.sendFirstSelfExamNotification(setOf<Account>(account), SexDto.valueOf(account.sex))
+                    notificationService.sendFirstSelfExamNotification(setOf<Account>(account), account.getSexAsEnum())
                 }
                 if (it.plannedDate == today) {
-                    notificationService.sendSelfExamNotification(setOf<Account>(account), SexDto.valueOf(account.sex))
+                    notificationService.sendSelfExamNotification(setOf<Account>(account), account.getSexAsEnum())
                 }
             }
         }

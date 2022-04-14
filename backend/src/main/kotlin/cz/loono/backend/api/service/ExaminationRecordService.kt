@@ -8,7 +8,6 @@ import cz.loono.backend.api.dto.SelfExaminationFindingResponseDto
 import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Badge
@@ -117,7 +116,7 @@ class ExaminationRecordService(
                 }
             }
         }
-        val reward = BadgesPointsProvider.getBadgesAndPoints(type, SexDto.valueOf(account.sex))
+        val reward = BadgesPointsProvider.getSelfExaminationBadgesAndPoints(type, account.getSexAsEnum())
             ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         selfExams.forEach exams@{
             when (it.status) {
@@ -235,7 +234,7 @@ class ExaminationRecordService(
                         status = SelfExaminationStatusDto.COMPLETED
                     )
                 )
-                // TODO turn off notification related to the self-exams
+                accountRepository.save(account.copy(notify = false))
                 return SelfExaminationFindingResponseDto(
                     message = "The examination marked as NOT OK. Notifications are turned off."
                 )
@@ -260,13 +259,13 @@ class ExaminationRecordService(
         val account = findAccount(accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
-        addRewardIfEligible(examinationRecordDto, accountUuid)
+        addRewardIfEligible(examinationRecordDto, account)
         return examinationRecordRepository.save(
             ExaminationRecord(
                 id = record.id,
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
-                plannedDate = examinationRecordDto.date,
+                plannedDate = examinationRecordDto.plannedDate,
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
@@ -278,13 +277,13 @@ class ExaminationRecordService(
         record: ExaminationRecordDto,
         account: Account
     ) =
-        record.date?.let {
+        record.plannedDate?.let planned@{
             record.firstExam?.let { isFirstExam ->
+                if (isFirstExam) {
+                    return@planned
+                }
                 val today = now()
-                if (
-                    (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
-                    (!isFirstExam && it.isBefore(today) && plannedDateInAcceptedInterval(it, account, record))
-                ) {
+                if (it.isBefore(today) || plannedDateInAcceptedInterval(it, account, record)) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
@@ -367,10 +366,8 @@ class ExaminationRecordService(
 
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         exam.status = state
-        val badgeToPoints =
-            BadgesPointsProvider.getBadgesAndPoints(exam.type, SexDto.valueOf(account.sex))
-        val updatedAccount = updateWithBadgeAndPoints(badgeToPoints, account)
-        accountRepository.save(updatedAccount)
+
+        addRewardIfEligible(exam.toExaminationRecordDto(), account)
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
@@ -394,27 +391,29 @@ class ExaminationRecordService(
         return account.copy(badges = badgesToCopy, points = account.points + points)
     }
 
-    private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, accountUuid: String) {
-        if (isEligibleForReward(examinationRecordDto)) {
-            // Null validation done before this function called, thus using double-bang operator
-            val acc = accountRepository.findByUid(accountUuid)!!
-            val reward = BadgesPointsProvider.getBadgesAndPoints(examinationRecordDto.type, SexDto.valueOf(acc.sex))
+    private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, acc: Account) {
+        val isFirstOrStatusChanged = examinationRecordDto.uuid?.let {
+            examinationRecordRepository.findByUuid(it)?.status != examinationRecordDto.status
+        } ?: true
+
+        if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto)) {
+            val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
             val updatedAccount = updateWithBadgeAndPoints(reward, acc)
             accountRepository.save(updatedAccount)
         }
     }
 
-    private fun isEligibleForReward(erd: ExaminationRecordDto) =
+    private fun isEligibleForReward(isFirstOrStatusChanged: Boolean, erd: ExaminationRecordDto) =
         now().let { now ->
-            (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (erd.date?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.date) < 2)
+            isFirstOrStatusChanged && (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+                (erd.plannedDate?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
         }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
             uuid = uuid,
             type = type,
-            date = plannedDate,
+            plannedDate = plannedDate,
             firstExam = firstExam,
             status = status
         )
