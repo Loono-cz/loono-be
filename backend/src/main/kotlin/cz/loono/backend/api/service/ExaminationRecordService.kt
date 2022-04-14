@@ -277,13 +277,13 @@ class ExaminationRecordService(
         record: ExaminationRecordDto,
         account: Account
     ) =
-        record.plannedDate?.let {
+        record.plannedDate?.let planned@{
             record.firstExam?.let { isFirstExam ->
+                if (isFirstExam) {
+                    return@planned
+                }
                 val today = now()
-                if (
-                    (isFirstExam && (it.isAfter(today) || it.isBefore(today.minusYears(2)))) ||
-                    (!isFirstExam && it.isBefore(today) && plannedDateInAcceptedInterval(it, account, record))
-                ) {
+                if (it.isBefore(today) || plannedDateInAcceptedInterval(it, account, record)) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
