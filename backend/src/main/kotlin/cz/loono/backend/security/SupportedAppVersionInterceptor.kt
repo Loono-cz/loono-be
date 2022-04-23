@@ -1,6 +1,8 @@
 package cz.loono.backend.security
 
+import com.google.api.client.http.HttpStatusCodes
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import org.apache.http.HttpStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
@@ -20,7 +22,14 @@ class SupportedAppVersionInterceptor(
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
 
         val appVersion = request.getHeader("app-version")
-        return isSupported(appVersion)
+        val supported = isSupported(appVersion)
+
+        if (!supported) {
+            response.status = HttpStatus.SC_GONE
+            return false
+        }
+
+        return true
     }
 
     private fun isSupported(appVersion: String): Boolean {
