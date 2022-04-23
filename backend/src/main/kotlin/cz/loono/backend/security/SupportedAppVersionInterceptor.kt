@@ -1,6 +1,5 @@
 package cz.loono.backend.security
 
-import com.google.api.client.http.HttpStatusCodes
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.apache.http.HttpStatus
 import org.slf4j.LoggerFactory
