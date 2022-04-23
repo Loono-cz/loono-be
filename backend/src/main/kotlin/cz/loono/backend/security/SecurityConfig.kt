@@ -1,6 +1,5 @@
 package cz.loono.backend.security
 
-import cz.loono.backend.Config
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import cz.loono.backend.security.basic.CustomBasicAuthenticationEntryPoint
 import cz.loono.backend.security.basic.SuperUserDetailsService

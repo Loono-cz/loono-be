@@ -33,8 +33,8 @@ object ExaminationIntervalProvider {
     private val rules = listOf(
         PreventionRule(
             examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
+            intervalsMale = listOf(AgeInterval(fromAge = 18, intervalYears = 2)),
+            intervalsFemale = listOf(AgeInterval(fromAge = 18, intervalYears = 2)),
             priority = 1
         ),
         PreventionRule(
