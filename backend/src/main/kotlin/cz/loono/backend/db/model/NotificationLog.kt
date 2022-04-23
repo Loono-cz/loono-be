@@ -12,7 +12,7 @@ import javax.persistence.Table
 data class NotificationLog(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(columnDefinition = "TEXT")
