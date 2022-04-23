@@ -18,7 +18,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.util.AssertionErrors.assertEquals
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -219,15 +218,14 @@ class ExaminationRecordServiceTest(
     fun `confirm exam`() {
         val account = accountRepository.save(createAccount(uid = "101"))
 
-        val exam = ExaminationRecordDto(
-            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.NEW
+        val storedExam = examinationRecordRepository.save(
+            ExaminationRecord(type = ExaminationTypeDto.GENERAL_PRACTITIONER, account = account)
         )
-        val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
         val result = examinationRecordService.confirmExam(storedExam.uuid!!, "101")
-
-        assertEquals("The status should be CONFIRMED.", ExaminationStatusDto.CONFIRMED, result.status)
+        assertThat(accountRepository.findByUid(account.uid)?.badges).isNotEmpty
+        assertThat(accountRepository.findByUid(account.uid)?.points).isEqualTo(200)
+        assert(result.status == ExaminationStatusDto.CONFIRMED)
     }
 
     @Test

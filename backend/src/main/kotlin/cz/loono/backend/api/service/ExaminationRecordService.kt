@@ -259,7 +259,7 @@ class ExaminationRecordService(
         val account = findAccount(accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
-        addRewardIfEligible(examinationRecordDto, account)
+        addRewardIfEligible(examinationRecordDto, account, examinationRecordDto.status)
         return examinationRecordRepository.save(
             ExaminationRecord(
                 id = record.id,
@@ -365,9 +365,8 @@ class ExaminationRecordService(
         val account = findAccount(accountUuid)
 
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
+        addRewardIfEligible(exam.toExaminationRecordDto(), account, state)
         exam.status = state
-
-        addRewardIfEligible(exam.toExaminationRecordDto(), account)
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
@@ -391,23 +390,31 @@ class ExaminationRecordService(
         return account.copy(badges = badgesToCopy, points = account.points + points)
     }
 
-    private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, acc: Account) {
+    private fun addRewardIfEligible(
+        examinationRecordDto: ExaminationRecordDto,
+        acc: Account,
+        newState: ExaminationStatusDto?
+    ) {
         val isFirstOrStatusChanged = examinationRecordDto.uuid?.let {
-            examinationRecordRepository.findByUuid(it)?.status != examinationRecordDto.status
+            val recordBeforeUpdate = examinationRecordRepository.findByUuid(it)
+            recordBeforeUpdate?.firstExam ?: true && recordBeforeUpdate?.status != newState
         } ?: true
 
-        if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto)) {
+        if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto.plannedDate, newState)) {
             val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
             val updatedAccount = updateWithBadgeAndPoints(reward, acc)
             accountRepository.save(updatedAccount)
         }
     }
 
-    private fun isEligibleForReward(isFirstOrStatusChanged: Boolean, erd: ExaminationRecordDto) =
-        now().let { now ->
-            isFirstOrStatusChanged && (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (erd.plannedDate?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
-        }
+    private fun isEligibleForReward(
+        isFirstOrStatusChanged: Boolean,
+        plannedDate: LocalDateTime?,
+        newState: ExaminationStatusDto?
+    ) = now().let { now ->
+        isFirstOrStatusChanged && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+            (plannedDate?.isBefore(now) ?: true && plannedDate?.let { ChronoUnit.YEARS.between(now, it) < 2 } ?: true)
+    }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
