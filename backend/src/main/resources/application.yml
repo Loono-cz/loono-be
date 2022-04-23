@@ -29,7 +29,7 @@ logging:
     cz.loono.backend: INFO
     org.springframework: WARN
     org.hibernate: WARN
-    org.zalando: DEBUG
+    org.zalando.logbook: TRACE
     org.flywaydb: INFO
 # Server configuration
 server:
