@@ -36,6 +36,10 @@ variable "onesignal-api-key" {
   type = string
 }
 
+variable "onesignal-app-id" {
+  type = string
+}
+
 variable "PATH_TO_PUBLIC_KEY" {
   default = "ed25519-key.pub"
 }
