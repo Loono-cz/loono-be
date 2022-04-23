@@ -133,8 +133,8 @@ class ExaminationRecordServiceTest(
         examinationRecordService.createOrUpdateExam(exam, uid)
         val actual = accountRepository.findByUid(uid)
 
-        assertThat(actual?.points).isEqualTo(200)
-        assertThat(actual?.badges).isNotEmpty
+        assertThat(actual?.points).isEqualTo(0)
+        assertThat(actual?.badges).isEmpty()
     }
 
     @Test
