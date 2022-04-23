@@ -26,9 +26,10 @@ logging:
     console: "%d %-5level %logger : %msg%n"
   level:
     root: WARN
-    cz.loono.backend: DEBUG
-    org.springframework: DEBUG
-    org.hibernate: DEBUG
+    cz.loono.backend: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.zalando: DEBUG
     org.flywaydb: INFO
 # Server configuration
 server:
