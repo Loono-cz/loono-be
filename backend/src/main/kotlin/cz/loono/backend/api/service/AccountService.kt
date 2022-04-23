@@ -40,6 +40,7 @@ class AccountService(
 
     @Transactional(rollbackFor = [Exception::class])
     fun onboardAccount(uuid: String, account: AccountOnboardingDto): AccountDto {
+        logger.info("Onboarding was called with this data '$uuid' '$account'")
         if (accountRepository.existsByUid(uuid)) {
             throw LoonoBackendException(HttpStatus.BAD_REQUEST, "400", "Account already exists.")
         }
