@@ -22,7 +22,10 @@ class PushNotificationService {
 
     init {
         if (ONESIGNAL_API_KEY.isEmpty()) {
-            logger.warn("ONESIGNAL_API_KEY ENV variable is not set.")
+            logger.error("ONESIGNAL_API_KEY ENV variable is not set.")
+        }
+        if (ONESIGNAL_APP_ID.isEmpty()) {
+            logger.error("ONESIGNAL_APP_ID ENV variable is not set.")
         }
     }
 
@@ -105,7 +108,8 @@ class PushNotificationService {
     private fun composeUrl(endpoint: String): String = "$ONESIGNAL_API_URL/$API_VERSION/$endpoint"
 
     companion object {
-        val ONESIGNAL_API_KEY: String = System.getenv("ONESIGNAL_API_KEY")
+        val ONESIGNAL_API_KEY: String = System.getenv().getOrDefault("ONESIGNAL_API_KEY", "")
+        val ONESIGNAL_APP_ID: String = System.getenv().getOrDefault("ONESIGNAL_APP_ID", "")
         const val ONESIGNAL_API_URL = "https://onesignal.com/api"
         const val API_VERSION = "v1"
     }
