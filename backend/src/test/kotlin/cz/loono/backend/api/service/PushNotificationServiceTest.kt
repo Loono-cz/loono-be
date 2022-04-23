@@ -202,7 +202,7 @@ class PushNotificationServiceTest(
 
     private fun createAccount() = accountRepository.save(
         createAccount(
-            uid = "QzbMU9A3RZb5yEGqck4kq2LLAUc2",
+            uid = "5DzrXTnYZDcZHVsZYQf9CzBvUpB3",
             sex = SexDto.MALE.value,
             birthday = LocalDate.of(1990, 9, 9)
         )
