@@ -1,5 +1,6 @@
 package cz.loono.backend.security
 
+import cz.loono.backend.Config
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import cz.loono.backend.security.basic.CustomBasicAuthenticationEntryPoint
 import cz.loono.backend.security.basic.SuperUserDetailsService
@@ -38,7 +39,7 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/providers/update").hasRole("ADMIN")
+            .antMatchers("/v1/providers/update", "v1/notify").hasRole("ADMIN")
             .and()
             .httpBasic()
             .authenticationEntryPoint(authenticationEntryPoint)
