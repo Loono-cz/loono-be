@@ -132,8 +132,8 @@ class ExaminationRecordServiceTest(
         examinationRecordService.createOrUpdateExam(exam, uid)
         val actual = accountRepository.findByUid(uid)
 
-        assertThat(actual?.points).isEqualTo(0)
-        assertThat(actual?.badges).isEmpty()
+        assertThat(actual?.points).isEqualTo(200)
+        assertThat(actual?.badges).isNotEmpty
     }
 
     @Test
@@ -225,7 +225,8 @@ class ExaminationRecordServiceTest(
         val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
         val result = examinationRecordService.confirmExam(storedExam.uuid!!, "101")
-
+        assertThat(accountRepository.findByUid(account.uid)?.badges).isNotEmpty
+        assertThat(accountRepository.findByUid(account.uid)?.points).isEqualTo(200)
         assert(result.status == ExaminationStatusDto.CONFIRMED)
     }
 
