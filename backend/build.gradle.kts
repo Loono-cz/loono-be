@@ -47,7 +47,7 @@ dependencies {
     implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core:8.5.1")
-    implementation("org.zalando:logbook-core:2.14.0")
+    implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
 
     testRuntimeOnly("com.h2database:h2")
 
