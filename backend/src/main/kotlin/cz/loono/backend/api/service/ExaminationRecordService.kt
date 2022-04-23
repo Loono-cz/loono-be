@@ -393,7 +393,7 @@ class ExaminationRecordService(
 
     private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, acc: Account) {
         val isFirstOrStatusChanged = examinationRecordDto.uuid?.let {
-            examinationRecordRepository.findByUuid(it)?.status != examinationRecordDto.status
+            examinationRecordRepository.findByUuid(it)?.firstExam ?: false && examinationRecordRepository.findByUuid(it)?.status != examinationRecordDto.status
         } ?: true
 
         if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto)) {
@@ -405,8 +405,9 @@ class ExaminationRecordService(
 
     private fun isEligibleForReward(isFirstOrStatusChanged: Boolean, erd: ExaminationRecordDto) =
         now().let { now ->
-            isFirstOrStatusChanged && (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (erd.plannedDate?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
+            isFirstOrStatusChanged &&
+                (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+                (erd.plannedDate?.isBefore(now) ?: true || ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
         }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
