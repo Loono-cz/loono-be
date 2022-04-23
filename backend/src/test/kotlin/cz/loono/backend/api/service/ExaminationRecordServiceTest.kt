@@ -15,9 +15,11 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.util.AssertionErrors.assertEquals
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -226,7 +228,7 @@ class ExaminationRecordServiceTest(
 
         val result = examinationRecordService.confirmExam(storedExam.uuid!!, "101")
 
-        assert(result.status == ExaminationStatusDto.CONFIRMED)
+        assertEquals("The status should be CONFIRMED.", ExaminationStatusDto.CONFIRMED, result.status)
     }
 
     @Test
