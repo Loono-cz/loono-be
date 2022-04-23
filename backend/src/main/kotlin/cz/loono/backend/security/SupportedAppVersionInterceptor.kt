@@ -8,9 +8,6 @@ import org.springframework.web.servlet.HandlerInterceptor
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-/**
- * An interceptor that ensures an account exists
- */
 @Component
 class SupportedAppVersionInterceptor(
     private val serverPropertiesRepository: ServerPropertiesRepository
@@ -23,12 +20,12 @@ class SupportedAppVersionInterceptor(
         val appVersion = request.getHeader("app-version")
         val supported = isSupported(appVersion)
 
-        if (!supported) {
+        return if (!supported) {
             response.status = HttpStatus.SC_GONE
-            return false
+            false
+        } else {
+            true
         }
-
-        return true
     }
 
     private fun isSupported(appVersion: String): Boolean {
