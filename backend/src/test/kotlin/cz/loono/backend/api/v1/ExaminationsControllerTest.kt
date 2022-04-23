@@ -53,8 +53,8 @@ class ExaminationsControllerTest(
         controller.confirm(basicUser, ExaminationIdDto(examUUID))
 
         var actual = repo.findByUid("uid")!!
-        assertThat(actual.badges).containsExactly(expectedBadge)
-        assertThat(actual.points).isEqualTo(300)
+        assertThat(actual.badges).containsExactly(expectedBadge.copy(level = 2))
+        assertThat(actual.points).isEqualTo(600)
 
         controller.updateOrCreate(
             basicUser, examinationRecord.copy(plannedDate = LocalDateTime.now().minusYears(1))
@@ -62,8 +62,8 @@ class ExaminationsControllerTest(
 
         // Making sure that level upgraded and points increased
         actual = repo.findByUid("uid")!!
-        assertThat(actual.badges).containsExactly(expectedBadge.copy(level = 2))
-        assertThat(actual.points).isEqualTo(600)
+        assertThat(actual.badges).containsExactly(expectedBadge.copy(level = 3))
+        assertThat(actual.points).isEqualTo(900)
 
         // Creating exam of another type
         examUUID =
@@ -71,9 +71,9 @@ class ExaminationsControllerTest(
         controller.confirm(basicUser, ExaminationIdDto(examUUID))
 
         assertThat(actual.badges).containsExactly(
-            expectedBadge.copy(level = 2), expectedBadge.copy(type = BadgeTypeDto.BELT.value)
+            expectedBadge.copy(level = 3), expectedBadge.copy(type = BadgeTypeDto.BELT.value, level = 2)
         )
-        assertThat(actual.points).isEqualTo(900)
+        assertThat(actual.points).isEqualTo(1500)
     }
 
     @TestConfiguration
