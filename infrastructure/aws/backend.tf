@@ -1,5 +1,6 @@
 # ----------
 # ECR (Docker repositories)
+# trigger commit for terraform github action
 # ----------
 
 resource "aws_ecr_repository" "backend" {
