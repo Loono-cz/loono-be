@@ -38,7 +38,7 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-            .antMatchers("/providers/update").hasRole("ADMIN")
+            .antMatchers("/v1/providers/update", "v1/notify").hasRole("ADMIN")
             .and()
             .httpBasic()
             .authenticationEntryPoint(authenticationEntryPoint)

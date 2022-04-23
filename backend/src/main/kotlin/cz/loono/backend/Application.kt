@@ -39,6 +39,7 @@ class Config(
         "/actuator/health",
         "/error",
         "$apiVersion/providers/update",
+        "$apiVersion/notify",
         "/favicon.ico",
         "/notification/*",
         // Temporary Auth disabled for endpoints bellow

@@ -5,6 +5,8 @@ import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.db.model.Account
+import cz.loono.backend.db.model.NotificationLog
+import cz.loono.backend.db.repository.NotificationLogRepository
 import cz.loono.backend.notification.NotificationDefinition
 import cz.loono.backend.notification.NotificationResponse
 import cz.loono.backend.notification.PushNotification
@@ -16,7 +18,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class PushNotificationService {
+class PushNotificationService(
+    private val notificationLogRepository: NotificationLogRepository
+) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -94,6 +98,19 @@ class PushNotificationService {
             .url(composeUrl("notifications"))
             .post(body)
             .build()
+
+        notificationLogRepository.save(
+            NotificationLog(
+                name = notification.name,
+                heading = notification.headings.cs,
+                content = notification.contents.cs,
+                includeExternalUserIds = notification.includeExternalUserIds.toString(),
+                scheduleTimeOfDay = notification.scheduleTimeOfDay,
+                delayedOption = notification.delayedOption,
+                largeImage = notification.largeImage,
+                iosAttachments = notification.iosAttachments.toString()
+            )
+        )
 
         val call: Call = OkHttpClient().newCall(request)
         return Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
