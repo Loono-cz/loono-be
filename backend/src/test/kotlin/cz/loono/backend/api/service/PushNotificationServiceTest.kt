@@ -202,6 +202,7 @@ class PushNotificationServiceTest(
 
     private fun createAccount() = accountRepository.save(
         createAccount(
+            // User UID used also in the notifications as the external ID
             uid = "5DzrXTnYZDcZHVsZYQf9CzBvUpB3",
             sex = SexDto.MALE.value,
             birthday = LocalDate.of(1990, 9, 9)
