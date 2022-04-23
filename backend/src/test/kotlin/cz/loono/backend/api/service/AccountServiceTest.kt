@@ -162,19 +162,15 @@ class AccountServiceTest(
         )
 
         val exams = repo.findByUid(account.uid)!!.examinationRecords
-        assertThat(accountDto).isEqualTo(
-            AccountDto(
+        assert(
+            accountDto == AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
                 sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
-                points = 700,
-                badges = listOf(
-                    BadgeDto(BadgeTypeDto.COAT, 1),
-                    BadgeDto(BadgeTypeDto.BELT, 1),
-                    BadgeDto(BadgeTypeDto.HEADBAND, 1)
-                ),
+                points = 500,
+                badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
                 newsletterOptIn = false,
                 appointmentReminderEmailsOptIn = true,
                 leaderboardAnonymizationOptIn = true,
