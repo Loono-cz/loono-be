@@ -9,6 +9,7 @@ import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.NotificationLogRepository
 import cz.loono.backend.notification.NotificationData
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -21,10 +22,11 @@ import java.time.LocalDate
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 class PushNotificationServiceTest(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    notificationLogRepository: NotificationLogRepository
 ) {
 
-    private val pushNotificationService = PushNotificationService()
+    private val pushNotificationService = PushNotificationService(notificationLogRepository)
 
     @AfterEach
     fun setUp() {
