@@ -172,7 +172,7 @@ class AccountServiceTest(
                 points = 700,
                 badges = listOf(
                     BadgeDto(BadgeTypeDto.COAT, 1),
-                   BadgeDto(BadgeTypeDto.BELT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)
+                    BadgeDto(BadgeTypeDto.BELT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)
                 ),
                 newsletterOptIn = false,
                 appointmentReminderEmailsOptIn = true,
