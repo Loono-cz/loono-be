@@ -21,7 +21,5 @@ class UserFeedbackController(
 
         @RequestBody
         feedback: UserFeedbackDto
-    ) {
-        userFeedbackService.storeFeedback(basicUser.uid, feedback)
-    }
+    ) = userFeedbackService.storeFeedback(basicUser.uid, feedback)
 }
