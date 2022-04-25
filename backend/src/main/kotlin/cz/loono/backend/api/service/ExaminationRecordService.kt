@@ -25,6 +25,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.time.temporal.ChronoUnit
+import java.util.Objects
 
 @Service
 class ExaminationRecordService(
@@ -412,8 +413,12 @@ class ExaminationRecordService(
         plannedDate: LocalDateTime?,
         newState: ExaminationStatusDto?
     ) = now().let { now ->
-        isFirstOrStatusChanged && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-            (plannedDate?.isBefore(now) ?: true && plannedDate?.let { ChronoUnit.YEARS.between(now, it) < 2 } ?: true)
+        when {
+            newState == ExaminationStatusDto.UNKNOWN && Objects.isNull(plannedDate) -> false
+            newState == ExaminationStatusDto.UNKNOWN && plannedDate?.dayOfMonth == now.dayOfMonth && plannedDate.year == now.year -> true
+            else -> isFirstOrStatusChanged && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
+                (plannedDate?.isBefore(now) ?: true && plannedDate?.let { ChronoUnit.YEARS.between(now, it) < 2 } ?: true)
+        }
     }
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
