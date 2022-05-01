@@ -111,28 +111,28 @@ class PreventionService(
 
     private fun prepareSelfExaminationsStatuses(account: Account): List<SelfExaminationPreventionStatusDto> {
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
-        val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
-            val filteredExams =
-                selfExams.filter { exam -> exam.type == type && exam.result != SelfExaminationResultDto.Result.NOT_OK }
+            val filteredExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
             val rewards = BadgesPointsProvider.getSelfExaminationBadgesAndPoints(type, account.getSexAsEnum())
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
-                    val activeExam =
-                        filteredExams.first { exam ->
-                            exam.status == SelfExaminationStatusDto.PLANNED ||
-                                exam.result == SelfExaminationResultDto.Result.FINDING
-                        }
-                    result.add(
-                        SelfExaminationPreventionStatusDto(
-                            lastExamUuid = activeExam.uuid,
-                            plannedDate = activeExam.dueDate,
-                            type = type,
-                            history = filteredExams.map(SelfExaminationRecord::status),
-                            points = rewards.second,
-                            badge = rewards.first
+                    if (filteredExams.first().result != SelfExaminationResultDto.Result.NOT_OK) {
+                        val activeExam =
+                            filteredExams.first { exam ->
+                                exam.status == SelfExaminationStatusDto.PLANNED ||
+                                    exam.result == SelfExaminationResultDto.Result.FINDING
+                            }
+                        result.add(
+                            SelfExaminationPreventionStatusDto(
+                                lastExamUuid = activeExam.uuid,
+                                plannedDate = activeExam.dueDate,
+                                type = type,
+                                history = filteredExams.map(SelfExaminationRecord::status),
+                                points = rewards.second,
+                                badge = rewards.first
+                            )
                         )
-                    )
+                    }
                 }
                 rewards != null -> {
                     result.add(

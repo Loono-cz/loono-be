@@ -257,8 +257,13 @@ class PreventionServiceTest {
         )
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
-        whenever(selfExaminationRecordRepository.findAllByAccount(account)).thenReturn(
-            setOf(
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            )
+        ).thenReturn(
+            listOf(
                 SelfExaminationRecord(
                     id = 3,
                     dueDate = now.minusMonths(1L),
@@ -341,8 +346,13 @@ class PreventionServiceTest {
         )
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
-        whenever(selfExaminationRecordRepository.findAllByAccount(account)).thenReturn(
-            setOf(
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            )
+        ).thenReturn(
+            listOf(
                 SelfExaminationRecord(
                     id = 3,
                     dueDate = now.minusMonths(1L),
@@ -371,6 +381,41 @@ class PreventionServiceTest {
             ),
             /* actual = */ result.selfexaminations
         )
+    }
+
+    @Test
+    fun `get self-examinations for patient in case of NOT_OK`() {
+        val uuid = UUID.randomUUID().toString()
+        val examsUUID = UUID.randomUUID().toString()
+        val age: Long = 45
+        val now = LocalDate.now()
+        val account = createAccount(
+            sex = "FEMALE",
+            birthday = LocalDate.now().minusYears(age)
+        )
+
+        whenever(accountRepository.findByUid(uuid)).thenReturn(account)
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+                account,
+                SelfExaminationTypeDto.BREAST
+            )
+        ).thenReturn(
+            listOf(
+                SelfExaminationRecord(
+                    id = 3,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.BREAST,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.NOT_OK,
+                    uuid = examsUUID,
+                    account = account
+                )
+            )
+        )
+
+        val result = preventionService.getPreventionStatus(uuid)
+        assertEquals(emptyList<SelfExaminationStatusDto>(), result.selfexaminations)
     }
 
     @Test
