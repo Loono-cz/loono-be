@@ -14,12 +14,16 @@ class UserFeedbackService(
     private val accountRepository: AccountRepository
 ) {
 
-    fun storeFeedback(userUid: String, userFeedbackDto: UserFeedbackDto) {
-        val account = accountRepository.findByUid(userUid) ?: throw LoonoBackendException(
-            status = HttpStatus.NOT_FOUND,
-            errorCode = "404",
-            errorMessage = "The account not found."
-        )
+    fun storeFeedback(userFeedbackDto: UserFeedbackDto) {
+        userFeedbackDto.message?.let {
+            validateMessageContent(userFeedbackDto.message)
+        }
+        val account = userFeedbackDto.uid?.let {
+            accountRepository.findByUid(userFeedbackDto.uid) ?: throw LoonoBackendException(
+                status = HttpStatus.NOT_FOUND,
+                errorCode = "404"
+            )
+        }
         userFeedbackRepository.save(
             UserFeedback(
                 evaluation = userFeedbackDto.evaluation,
@@ -27,5 +31,15 @@ class UserFeedbackService(
                 account = account
             )
         )
+    }
+
+    private fun validateMessageContent(message: String) {
+        if (message.length > 500) {
+            throw LoonoBackendException(
+                status = HttpStatus.BAD_REQUEST,
+                errorCode = "400",
+                errorMessage = "The message is too long."
+            )
+        }
     }
 }

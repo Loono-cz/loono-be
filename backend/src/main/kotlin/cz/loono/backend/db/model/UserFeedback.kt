@@ -22,6 +22,6 @@ data class UserFeedback(
     @Column(columnDefinition = "TEXT")
     val message: String? = null,
 
-    @ManyToOne(optional = false)
-    val account: Account
+    @ManyToOne(optional = true)
+    val account: Account?
 )
