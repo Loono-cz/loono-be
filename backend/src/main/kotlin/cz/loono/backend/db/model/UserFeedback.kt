@@ -25,6 +25,5 @@ data class UserFeedback(
     val message: String? = null,
 
     @ManyToOne(optional = false)
-    @JoinColumns(JoinColumn(name = "account_id", insertable = false, updatable = false))
     val account: Account
 )
