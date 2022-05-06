@@ -45,7 +45,8 @@ class Config(
         // Temporary Auth disabled for endpoints bellow
         "$apiVersion/providers/all",
         "$apiVersion/providers/details",
-        "$apiVersion/providers/lastupdate"
+        "$apiVersion/providers/lastupdate",
+        "$apiVersion/feedback"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
