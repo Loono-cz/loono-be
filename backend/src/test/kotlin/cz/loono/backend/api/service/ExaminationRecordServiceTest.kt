@@ -438,4 +438,23 @@ class ExaminationRecordServiceTest(
 
         assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
     }
+
+    @Test
+    fun `Should add badges on confirming`() {
+        val existingAccount = accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
+
+        val existingNewExam = examinationRecordRepository.save(
+            ExaminationRecord(
+                type = ExaminationTypeDto.DENTIST,
+                account = existingAccount,
+                firstExam = false,
+                plannedDate = LocalDateTime.now().minusDays(3),
+                status = ExaminationStatusDto.NEW
+            )
+        )
+
+        examinationRecordService.confirmExam(existingNewExam.uuid!!, existingAccount.uid)
+
+        assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
+    }
 }
