@@ -396,12 +396,12 @@ class ExaminationRecordService(
         acc: Account,
         newState: ExaminationStatusDto?
     ) {
-        val isFirstOrStatusChanged = examinationRecordDto.uuid?.let {
-            val recordBeforeUpdate = examinationRecordRepository.findByUuid(it)
-            recordBeforeUpdate?.firstExam ?: true && recordBeforeUpdate?.status != newState
-        } ?: true
+        val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
+        val isFirstExam = recordBeforeUpdate?.firstExam ?: true
+        val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState &&
+            (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
 
-        if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto.plannedDate, newState)) {
+        if (isEligibleForReward(isFirstExam, isStatusChangedToExpectedStates, examinationRecordDto.plannedDate, newState)) {
             val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
             val updatedAccount = updateWithBadgeAndPoints(reward, acc)
             accountRepository.save(updatedAccount)
@@ -409,17 +409,25 @@ class ExaminationRecordService(
     }
 
     private fun isEligibleForReward(
-        isFirstOrStatusChanged: Boolean,
+        isFirstExam: Boolean,
+        isStatusCorrect: Boolean,
         plannedDate: LocalDateTime?,
         newState: ExaminationStatusDto?
     ) = now().let { now ->
         when {
             newState == ExaminationStatusDto.UNKNOWN && Objects.isNull(plannedDate) -> false
             newState == ExaminationStatusDto.UNKNOWN && plannedDate?.dayOfMonth == now.dayOfMonth && plannedDate.year == now.year -> true
-            else -> isFirstOrStatusChanged && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (plannedDate?.isBefore(now) ?: true && plannedDate?.let { ChronoUnit.YEARS.between(now, it) < 2 } ?: true)
+            isFirstExam && isStatusCorrect && isPlannedDateWithinExpectedRange(plannedDate) -> true
+            isStatusCorrect && isPlannedDateWithinExpectedRange(plannedDate) -> true
+            else -> false
         }
     }
+
+    private fun isPlannedDateWithinExpectedRange(plannedDate: LocalDateTime?) = plannedDate?.let {
+        now().let { now ->
+            plannedDate.isBefore(now) && plannedDate.let { ChronoUnit.YEARS.between(now, plannedDate) < 2 }
+        }
+    } ?: true
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
