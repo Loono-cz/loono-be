@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
