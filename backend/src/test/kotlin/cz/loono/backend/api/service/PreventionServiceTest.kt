@@ -21,8 +21,11 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
 
 class PreventionServiceTest {
 
@@ -96,7 +99,7 @@ class PreventionServiceTest {
         )
 
         val result = preventionService.getPreventionStatus(uuid)
-        assertEquals(
+        assertThat(
             /* expected = */ listOf(
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[0].toString(),
@@ -114,8 +117,8 @@ class PreventionServiceTest {
                     uuid = examsUUIDs[5].toString(),
                     examinationType = ExaminationTypeDto.DERMATOLOGIST,
                     intervalYears = 1,
-                    plannedDate = OffsetDateTime.MIN,
-                    lastConfirmedDate = OffsetDateTime.MIN,
+                    plannedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
+                    lastConfirmedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
                     firstExam = true,
                     priority = 6,
                     state = ExaminationStatusDto.CONFIRMED,
@@ -132,7 +135,7 @@ class PreventionServiceTest {
                     priority = 8,
                     state = ExaminationStatusDto.NEW,
                     count = 1,
-                    lastConfirmedDate = OffsetDateTime.MIN,
+                    lastConfirmedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
                     points = 300,
                     badge = BadgeTypeDto.HEADBAND
                 ),
@@ -148,9 +151,7 @@ class PreventionServiceTest {
                     points = 100,
                     badge = BadgeTypeDto.GLASSES
                 ),
-            ),
-            /* actual = */ result.examinations
-        )
+            )).isEqualTo(result.examinations)
     }
 
     @Test
