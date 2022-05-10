@@ -18,6 +18,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class PreventionReminderTaskTest {
 
@@ -50,7 +51,7 @@ class PreventionReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusYears(2)
+                        lastConfirmedDate = OffsetDateTime.now().minusYears(2)
                     )
                 ),
                 emptyList()
@@ -85,7 +86,7 @@ class PreventionReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusYears(2)
+                        lastConfirmedDate = OffsetDateTime.now().minusYears(2)
                     )
                 ),
                 emptyList()
@@ -120,7 +121,7 @@ class PreventionReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now()
+                        lastConfirmedDate = OffsetDateTime.now()
                     )
                 ),
                 emptyList()

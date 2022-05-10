@@ -17,6 +17,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class PlanNewExamReminderTaskTest {
 
@@ -47,7 +48,7 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusMonths(22)
+                        lastConfirmedDate = OffsetDateTime.now().minusMonths(22)
                     )
                 ),
                 emptyList()
@@ -86,7 +87,7 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusMonths(23)
+                        lastConfirmedDate = OffsetDateTime.now().minusMonths(23)
                     )
                 ),
                 emptyList()
@@ -165,7 +166,7 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusYears(1)
+                        lastConfirmedDate = OffsetDateTime.now().minusYears(1)
                     )
                 ),
                 emptyList()

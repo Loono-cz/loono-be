@@ -25,6 +25,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 @Import(ExaminationRecordService::class, PreventionService::class)
@@ -42,7 +43,7 @@ class ExaminationsControllerTest(
         var existingAccount = createAccount(birthday = LocalDate.of(1970, 1, 1))
         val examinationRecord = ExaminationRecordDto(
             type = ExaminationTypeDto.DENTIST,
-            plannedDate = LocalDateTime.now().minusYears(3),
+            plannedDate = OffsetDateTime.now().minusYears(3),
             firstExam = true
         )
         // This is done to get assigned ID by the DB
@@ -57,7 +58,7 @@ class ExaminationsControllerTest(
         assertThat(actual.points).isEqualTo(600)
 
         controller.updateOrCreate(
-            basicUser, examinationRecord.copy(plannedDate = LocalDateTime.now().minusYears(1))
+            basicUser, examinationRecord.copy(plannedDate = OffsetDateTime.now().minusYears(1))
         )
 
         // Making sure that level upgraded and points increased

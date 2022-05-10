@@ -14,6 +14,8 @@ import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import java.time.Clock
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -21,6 +23,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 @Transactional
@@ -62,7 +67,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MAX
+            plannedDate = OffsetDateTime.MAX
         )
 
         assertThrows<LoonoBackendException> {
@@ -78,7 +83,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MIN
+            plannedDate = OffsetDateTime.MIN
         )
 
         assertThrows<LoonoBackendException>("The given examination identifier not found.") {
@@ -103,7 +108,7 @@ class ExaminationRecordServiceTest(
         val exam = ExaminationRecordDto(
             firstExam = true,
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusDays(1)
+            plannedDate = OffsetDateTime.now().minusDays(1)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -126,7 +131,7 @@ class ExaminationRecordServiceTest(
         )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().plusYears(2)
+            plannedDate = OffsetDateTime.now().plusYears(2)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -157,7 +162,7 @@ class ExaminationRecordServiceTest(
         )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusDays(1)
+            plannedDate = OffsetDateTime.now().minusDays(1)
         )
 
         assertThrows<LoonoBackendException> {
@@ -184,14 +189,14 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MAX
+            plannedDate = OffsetDateTime.of(LocalDate.MAX, LocalTime.MAX, ZoneOffset.UTC)
         )
 
         val result = examinationRecordService.createOrUpdateExam(changedExam, "101")
 
-        assert(result.status == changedExam.status)
-        assert(result.firstExam == changedExam.firstExam)
-        assert(result.plannedDate == changedExam.plannedDate)
+        assertThat(result.status).isEqualTo(changedExam.status)
+        assertThat(result.firstExam).isEqualTo(changedExam.firstExam)
+        assertThat(result.plannedDate).isEqualTo(changedExam.plannedDate)
     }
 
     @Test
@@ -206,7 +211,7 @@ class ExaminationRecordServiceTest(
 
         val examRecord = ExaminationRecordDto(
             type = ExaminationTypeDto.GYNECOLOGIST,
-            plannedDate = LocalDateTime.MAX
+            plannedDate = OffsetDateTime.MAX
         )
 
         assertThrows<LoonoBackendException>("The account doesn't have rights to create this type of examinations.") {
@@ -414,7 +419,7 @@ class ExaminationRecordServiceTest(
         accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusYears(2),
+            plannedDate = OffsetDateTime.now().minusYears(2),
             firstExam = true
         )
 
@@ -429,7 +434,7 @@ class ExaminationRecordServiceTest(
         accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.DERMATOLOGIST,
-            plannedDate = LocalDateTime.now().minusYears(3),
+            plannedDate = OffsetDateTime.now().minusYears(3),
             firstExam = true
         )
 
