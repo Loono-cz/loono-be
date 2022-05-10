@@ -14,12 +14,17 @@ import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.atUTCOffset
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 class PreventionServiceTest {
@@ -94,7 +99,7 @@ class PreventionServiceTest {
         )
 
         val result = preventionService.getPreventionStatus(uuid)
-        assertEquals(
+        assertThat(
             /* expected = */ listOf(
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[0].toString(),
@@ -104,7 +109,7 @@ class PreventionServiceTest {
                     priority = 1,
                     state = ExaminationStatusDto.NEW,
                     count = 0,
-                    plannedDate = now,
+                    plannedDate = now.atUTCOffset(),
                     points = 200,
                     badge = BadgeTypeDto.COAT
                 ),
@@ -112,8 +117,8 @@ class PreventionServiceTest {
                     uuid = examsUUIDs[5].toString(),
                     examinationType = ExaminationTypeDto.DERMATOLOGIST,
                     intervalYears = 1,
-                    plannedDate = LocalDateTime.MIN,
-                    lastConfirmedDate = LocalDateTime.MIN,
+                    plannedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
+                    lastConfirmedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
                     firstExam = true,
                     priority = 6,
                     state = ExaminationStatusDto.CONFIRMED,
@@ -130,7 +135,7 @@ class PreventionServiceTest {
                     priority = 8,
                     state = ExaminationStatusDto.NEW,
                     count = 1,
-                    lastConfirmedDate = LocalDateTime.MIN,
+                    lastConfirmedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
                     points = 300,
                     badge = BadgeTypeDto.HEADBAND
                 ),
@@ -146,9 +151,8 @@ class PreventionServiceTest {
                     points = 100,
                     badge = BadgeTypeDto.GLASSES
                 ),
-            ),
-            /* actual = */ result.examinations
-        )
+            )
+        ).isEqualTo(result.examinations)
     }
 
     @Test
@@ -159,7 +163,7 @@ class PreventionServiceTest {
             examsUUIDs[it] = UUID.randomUUID().toString()
         }
         val age: Long = 45
-        val now = LocalDateTime.now()
+        val now = OffsetDateTime.now()
         val account = createAccount(
             sex = "MALE",
             birthday = LocalDate.now().minusYears(age)
@@ -170,7 +174,7 @@ class PreventionServiceTest {
             listOf(
                 ExaminationRecord(
                     id = 1,
-                    plannedDate = now,
+                    plannedDate = now.toLocalDateTime(),
                     type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                     uuid = examsUUIDs[0]!!,
                     account = account

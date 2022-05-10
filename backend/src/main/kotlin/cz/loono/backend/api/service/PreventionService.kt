@@ -16,6 +16,7 @@ import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.atUTCOffset
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -98,12 +99,12 @@ class PreventionService(
             uuid = sortedExamsOfType[0].uuid,
             examinationType = examinationInterval.examinationType,
             intervalYears = examinationInterval.intervalYears,
-            plannedDate = sortedExamsOfType[0].plannedDate,
+            plannedDate = sortedExamsOfType[0].plannedDate?.atUTCOffset(),
             firstExam = sortedExamsOfType[0].firstExam,
             priority = examinationInterval.priority,
             state = sortedExamsOfType[0].status,
             count = totalCountOfConfirmedExams,
-            lastConfirmedDate = lastConfirmedDate,
+            lastConfirmedDate = lastConfirmedDate?.atUTCOffset(),
             points = rewards.second,
             badge = rewards.first
         )

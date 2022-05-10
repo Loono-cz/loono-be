@@ -16,6 +16,7 @@ import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.atUTCOffset
 import cz.loono.backend.extensions.toLocalDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -266,7 +267,7 @@ class ExaminationRecordService(
                 id = record.id,
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
-                plannedDate = examinationRecordDto.plannedDate,
+                plannedDate = examinationRecordDto.plannedDate?.toLocalDateTime(),
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
@@ -283,8 +284,12 @@ class ExaminationRecordService(
                 if (isFirstExam) {
                     return@planned
                 }
-                val today = now()
-                if (it.isBefore(today) || plannedDateInAcceptedInterval(it, account, record)) {
+                val today = clock.instant().toLocalDateTime()
+                val plannedLocalDateTime = it.toLocalDateTime()
+                if (
+                    plannedLocalDateTime.isBefore(today) ||
+                    plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)
+                ) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
@@ -401,7 +406,13 @@ class ExaminationRecordService(
         val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState &&
             (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
 
-        if (isEligibleForReward(isFirstExam, isStatusChangedToExpectedStates, examinationRecordDto.plannedDate, newState)) {
+        if (isEligibleForReward(
+                isFirstExam,
+                isStatusChangedToExpectedStates,
+                examinationRecordDto.plannedDate?.toLocalDateTime(),
+                newState
+            )
+        ) {
             val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
             val updatedAccount = updateWithBadgeAndPoints(reward, acc)
             accountRepository.save(updatedAccount)
@@ -433,7 +444,7 @@ class ExaminationRecordService(
         ExaminationRecordDto(
             uuid = uuid,
             type = type,
-            plannedDate = plannedDate,
+            plannedDate = plannedDate?.atUTCOffset(),
             firstExam = firstExam,
             status = status
         )

@@ -22,7 +22,7 @@ import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
@@ -135,13 +135,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(1),
+                        plannedDate = OffsetDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -152,7 +152,7 @@ class AccountServiceTest(
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(1),
+                        plannedDate = OffsetDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.COLONOSCOPY,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
@@ -456,13 +456,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(2).plusDays(1),
+                        plannedDate = OffsetDateTime.now().minusYears(2).plusDays(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -536,13 +536,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.NEW,
                         firstExam = true
