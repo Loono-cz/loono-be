@@ -15,6 +15,7 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import cz.loono.backend.extensions.atUTCOffset
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -25,7 +26,6 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import org.assertj.core.api.Assertions.assertThat
 
 class PreventionServiceTest {
 
@@ -151,7 +151,8 @@ class PreventionServiceTest {
                     points = 100,
                     badge = BadgeTypeDto.GLASSES
                 ),
-            )).isEqualTo(result.examinations)
+            )
+        ).isEqualTo(result.examinations)
     }
 
     @Test
