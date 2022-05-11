@@ -12,8 +12,10 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.db.repository.UserFeedbackRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -31,6 +33,8 @@ class AccountServiceTest(
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    private val badgeRepository: BadgeRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
 ) {
@@ -54,7 +58,9 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
-            pageSize,
+            badgeRepository,
+            userFeedbackRepository,
+            pageSize
         )
 
         val accountDto = service.onboardAccount(
@@ -96,6 +102,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -123,6 +131,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -196,6 +206,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -229,6 +241,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -263,6 +277,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         repo.save(account)
@@ -303,6 +319,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         repo.save(account)
@@ -345,6 +363,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -380,6 +400,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("toDelete")
@@ -401,6 +423,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("uid")
@@ -422,6 +446,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("uid")
@@ -444,6 +470,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -497,6 +525,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -524,6 +554,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
