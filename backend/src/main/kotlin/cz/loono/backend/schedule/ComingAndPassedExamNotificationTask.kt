@@ -5,6 +5,7 @@ import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 @Component
@@ -23,13 +24,13 @@ class ComingAndPassedExamNotificationTask(
                     notificationService.sendComingVisitNotification(
                         setOf(record.account),
                         record.type,
-                        "${record.plannedDate.hour}:${record.plannedDate.minute}"
+                        record.plannedDate.format(DateTimeFormatter.ofPattern("HH:mm"))
                     )
                 }
                 if (hours in -24..0) {
                     notificationService.sendCompletionNotification(
                         setOf(record.account),
-                        "${record.plannedDate.hour}:${record.plannedDate.minute}",
+                        record.plannedDate.format(DateTimeFormatter.ofPattern("HH:mm")),
                         record.type
                     )
                 }
