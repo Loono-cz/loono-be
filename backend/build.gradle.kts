@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.google.firebase:firebase-admin:8.1.0")
+    implementation("com.google.cloud:google-cloud-storage:2.6.1")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
     implementation("org.slf4j:slf4j-api:1.7.36")
