@@ -8,8 +8,10 @@ import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.createAccount
 import cz.loono.backend.createBasicUser
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.db.repository.UserFeedbackRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -27,6 +29,8 @@ class AccountControllerTest(
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    private val badgeRepository: BadgeRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
 ) {
@@ -56,6 +60,8 @@ class AccountControllerTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val controller = AccountController(service, repo)
@@ -92,6 +98,8 @@ class AccountControllerTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val controller = AccountController(service, repo)
