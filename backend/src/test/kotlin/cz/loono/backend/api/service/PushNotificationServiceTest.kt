@@ -205,7 +205,7 @@ class PushNotificationServiceTest(
     private fun createAccount() = accountRepository.save(
         createAccount(
             // User UID from Firebase used also in the notifications as the external ID in the OneSignal
-            uid = "KYoEpTHamGQu5KE45p7Q5lHSaoq2",
+            uid = "DeEyWYR7bVYSbETtIly3BKKCqZD3",
             sex = SexDto.MALE.value,
             birthday = LocalDate.of(1990, 9, 9)
         )
