@@ -20,14 +20,14 @@ class ComingAndPassedExamNotificationTask(
         plannedExams.forEach { record ->
             record.plannedDate?.let {
                 val hours = ChronoUnit.HOURS.between(record.plannedDate, now)
-                if (hours in 24..47) {
+                if (hours in -47..-24) {
                     notificationService.sendComingVisitNotification(
                         setOf(record.account),
                         record.type,
                         record.plannedDate.format(DateTimeFormatter.ofPattern("HH:mm"))
                     )
                 }
-                if (hours in -24..0) {
+                if (hours in 0..24) {
                     notificationService.sendCompletionNotification(
                         setOf(record.account),
                         record.plannedDate.format(DateTimeFormatter.ofPattern("HH:mm")),
