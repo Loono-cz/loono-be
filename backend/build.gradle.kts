@@ -2,7 +2,7 @@ val logbackVersion = "1.2.10"
 val hibernateVersion = "5.6.5.Final"
 
 plugins {
-    id("org.springframework.boot") version "2.6.6"
+    id("org.springframework.boot") version "2.6.7"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("org.openapi.generator") version "5.4.0"
@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.google.firebase:firebase-admin:8.1.0")
+    implementation("com.google.cloud:google-cloud-storage:2.6.1")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
     implementation("org.slf4j:slf4j-api:1.7.36")
@@ -47,6 +48,7 @@ dependencies {
     implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core:8.5.1")
+    implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
 
     testRuntimeOnly("com.h2database:h2")
 
@@ -97,7 +99,7 @@ fun setUpOpenApiGenerator() {
     val localSpecFile = projectDir.toPath().resolve("src/main/resources/doc/openapi.json")
 
     tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadOpenApiSpec") {
-        src("https://raw.githubusercontent.com/cesko-digital/loono-api/main/openapi.json")
+        src("https://raw.githubusercontent.com/Loono-cz/loono-api/main/openapi.json")
         dest(localSpecFile.toFile())
     }
 
@@ -133,7 +135,6 @@ fun setUpOpenApiGenerator() {
             )
         )
         inputSpec.set(localSpecFile.toString())
-        typeMappings.put("java.time.OffsetDateTime", "java.time.LocalDateTime")
     }
 }
 

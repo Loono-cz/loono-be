@@ -24,5 +24,8 @@ data class ServerProperties(
     val superUserPassword: String = "\$2a\$10\$hx6i9opda20rbC81fJqUj.3mE.xZDB5OV5fApv9WlyEnkFNbFZUh2",
 
     @Column(nullable = false)
-    var lastUpdate: LocalDate = LocalDate.now()
+    var lastUpdate: LocalDate = LocalDate.now(),
+
+    @Column(nullable = false)
+    var supportedAppVersion: String = "0.3.8"
 )

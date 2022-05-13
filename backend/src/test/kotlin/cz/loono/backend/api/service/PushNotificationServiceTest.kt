@@ -5,8 +5,11 @@ import com.google.gson.annotations.SerializedName
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
+import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_API_KEY
+import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.NotificationLogRepository
 import cz.loono.backend.notification.NotificationData
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,10 +22,11 @@ import java.time.LocalDate
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 class PushNotificationServiceTest(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    notificationLogRepository: NotificationLogRepository
 ) {
 
-    private val pushNotificationService = PushNotificationService()
+    private val pushNotificationService = PushNotificationService(notificationLogRepository)
 
     @AfterEach
     fun setUp() {
@@ -200,7 +204,8 @@ class PushNotificationServiceTest(
 
     private fun createAccount() = accountRepository.save(
         createAccount(
-            uid = "tXHYX4ZisxcttkHH5DTROg2yTlv2",
+            // User UID from Firebase used also in the notifications as the external ID in the OneSignal
+            uid = "DeEyWYR7bVYSbETtIly3BKKCqZD3",
             sex = SexDto.MALE.value,
             birthday = LocalDate.of(1990, 9, 9)
         )
@@ -211,13 +216,11 @@ class OneSignalTestClient {
 
     companion object {
 
-        private val ONESIGNAL_API_KEY: String = System.getenv("ONESIGNAL_API_KEY")
-
         fun viewNotification(id: String): NotificationInfo {
             val request = Request.Builder().addHeader(
                 "Authorization",
                 "Basic $ONESIGNAL_API_KEY"
-            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=234d9f26-44c2-4752-b2d3-24bd93059267").get()
+            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=$ONESIGNAL_APP_ID").get()
                 .build()
 
             return Gson().fromJson(
@@ -230,7 +233,7 @@ class OneSignalTestClient {
             val request = Request.Builder().addHeader(
                 "Authorization",
                 "Basic $ONESIGNAL_API_KEY"
-            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=234d9f26-44c2-4752-b2d3-24bd93059267")
+            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=$ONESIGNAL_APP_ID")
                 .delete()
                 .build()
 

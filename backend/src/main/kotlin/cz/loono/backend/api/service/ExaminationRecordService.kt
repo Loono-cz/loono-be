@@ -16,6 +16,7 @@ import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.atUTCOffset
 import cz.loono.backend.extensions.toLocalDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -25,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.time.temporal.ChronoUnit
+import java.util.Objects
 
 @Service
 class ExaminationRecordService(
@@ -259,13 +261,13 @@ class ExaminationRecordService(
         val account = findAccount(accountUuid)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
-        addRewardIfEligible(examinationRecordDto, account)
+        addRewardIfEligible(examinationRecordDto, account, examinationRecordDto.status)
         return examinationRecordRepository.save(
             ExaminationRecord(
                 id = record.id,
                 uuid = record.uuid,
                 type = examinationRecordDto.type,
-                plannedDate = examinationRecordDto.plannedDate,
+                plannedDate = examinationRecordDto.plannedDate?.toLocalDateTime(),
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
@@ -282,8 +284,12 @@ class ExaminationRecordService(
                 if (isFirstExam) {
                     return@planned
                 }
-                val today = now()
-                if (it.isBefore(today) || plannedDateInAcceptedInterval(it, account, record)) {
+                val today = clock.instant().toLocalDateTime()
+                val plannedLocalDateTime = it.toLocalDateTime()
+                if (
+                    plannedLocalDateTime.isBefore(today) ||
+                    plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)
+                ) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
@@ -365,9 +371,8 @@ class ExaminationRecordService(
         val account = findAccount(accountUuid)
 
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
+        addRewardIfEligible(exam.toExaminationRecordDto(), account, state)
         exam.status = state
-
-        addRewardIfEligible(exam.toExaminationRecordDto(), account)
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
@@ -391,29 +396,55 @@ class ExaminationRecordService(
         return account.copy(badges = badgesToCopy, points = account.points + points)
     }
 
-    private fun addRewardIfEligible(examinationRecordDto: ExaminationRecordDto, acc: Account) {
-        val isFirstOrStatusChanged = examinationRecordDto.uuid?.let {
-            examinationRecordRepository.findByUuid(it)?.status != examinationRecordDto.status
-        } ?: true
+    private fun addRewardIfEligible(
+        examinationRecordDto: ExaminationRecordDto,
+        acc: Account,
+        newState: ExaminationStatusDto?
+    ) {
+        val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
+        val isFirstExam = recordBeforeUpdate?.firstExam ?: true
+        val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState &&
+            (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
 
-        if (isEligibleForReward(isFirstOrStatusChanged, examinationRecordDto)) {
+        if (isEligibleForReward(
+                isFirstExam,
+                isStatusChangedToExpectedStates,
+                examinationRecordDto.plannedDate?.toLocalDateTime(),
+                newState
+            )
+        ) {
             val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
             val updatedAccount = updateWithBadgeAndPoints(reward, acc)
             accountRepository.save(updatedAccount)
         }
     }
 
-    private fun isEligibleForReward(isFirstOrStatusChanged: Boolean, erd: ExaminationRecordDto) =
-        now().let { now ->
-            isFirstOrStatusChanged && (erd.status in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN)) &&
-                (erd.plannedDate?.isBefore(now) ?: false && ChronoUnit.YEARS.between(now, erd.plannedDate) < 2)
+    private fun isEligibleForReward(
+        isFirstExam: Boolean,
+        isStatusCorrect: Boolean,
+        plannedDate: LocalDateTime?,
+        newState: ExaminationStatusDto?
+    ) = now().let { now ->
+        when {
+            newState == ExaminationStatusDto.UNKNOWN && Objects.isNull(plannedDate) -> false
+            newState == ExaminationStatusDto.UNKNOWN && plannedDate?.dayOfMonth == now.dayOfMonth && plannedDate.year == now.year -> true
+            isFirstExam && isStatusCorrect && isPlannedDateWithinExpectedRange(plannedDate) -> true
+            isStatusCorrect && isPlannedDateWithinExpectedRange(plannedDate) -> true
+            else -> false
         }
+    }
+
+    private fun isPlannedDateWithinExpectedRange(plannedDate: LocalDateTime?) = plannedDate?.let {
+        now().let { now ->
+            plannedDate.isBefore(now) && plannedDate.let { ChronoUnit.YEARS.between(now, plannedDate) < 2 }
+        }
+    } ?: true
 
     fun ExaminationRecord.toExaminationRecordDto(): ExaminationRecordDto =
         ExaminationRecordDto(
             uuid = uuid,
             type = type,
-            plannedDate = plannedDate,
+            plannedDate = plannedDate?.atUTCOffset(),
             firstExam = firstExam,
             status = status
         )

@@ -2,6 +2,7 @@ package cz.loono.backend
 
 import cz.loono.backend.security.AccountCreatingInterceptor
 import cz.loono.backend.security.BearerTokenAuthenticator
+import cz.loono.backend.security.SupportedAppVersionInterceptor
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
@@ -26,6 +27,7 @@ fun main(args: Array<String>) {
 
 @Configuration
 class Config(
+    private val supportedAppVersionInterceptor: SupportedAppVersionInterceptor,
     private val authenticator: BearerTokenAuthenticator,
     private val accountCreatingInterceptor: AccountCreatingInterceptor,
 ) : WebMvcConfigurer {
@@ -37,22 +39,27 @@ class Config(
         "/actuator/health",
         "/error",
         "$apiVersion/providers/update",
+        "$apiVersion/notify",
         "/favicon.ico",
         "/notification/*",
         // Temporary Auth disabled for endpoints bellow
         "$apiVersion/providers/all",
         "$apiVersion/providers/details",
-        "$apiVersion/providers/lastupdate"
+        "$apiVersion/providers/lastupdate",
+        "$apiVersion/feedback"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(supportedAppVersionInterceptor)
+            .order(0)
+
         registry.addInterceptor(authenticator)
             .excludePathPatterns(unauthenticatedEndpoints)
-            .order(0)
+            .order(1)
 
         registry.addInterceptor(accountCreatingInterceptor)
             .excludePathPatterns(unauthenticatedEndpoints)
-            .order(1)
+            .order(2)
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
