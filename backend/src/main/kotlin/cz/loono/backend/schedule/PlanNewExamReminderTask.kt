@@ -23,14 +23,14 @@ class PlanNewExamReminderTask(
                     status.lastConfirmedDate?.let {
                         val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                         val passedMonths = period.years * 12 + period.months
-                        if (passedMonths == (status.intervalYears * 12) - 2) {
+                        if (passedMonths == (status.intervalYears * 12) - 2 && period.days == 0) {
                             notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears
                             )
                         }
-                        if (passedMonths == (status.intervalYears * 12) - 1) {
+                        if (passedMonths == (status.intervalYears * 12) - 1 && period.days == 0) {
                             notificationService.sendNewExamMonthAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
