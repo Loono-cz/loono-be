@@ -10,9 +10,9 @@ plugins {
     id("org.owasp.dependencycheck") version "7.1.0.1"
     id("com.avast.gradle.docker-compose") version "0.15.1"
     id("org.flywaydb.flyway") version "8.5.2"
-    kotlin("jvm") version "1.6.20-RC"
-    kotlin("plugin.spring") version "1.6.20-RC"
-    kotlin("plugin.jpa") version "1.6.20-RC"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
+    kotlin("plugin.jpa") version "1.6.21"
     jacoco
 }
 

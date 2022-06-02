@@ -286,14 +286,18 @@ class ExaminationRecordService(
                 }
                 val today = clock.instant().toLocalDateTime()
                 val plannedLocalDateTime = it.toLocalDateTime()
-                if (
-                    plannedLocalDateTime.isBefore(today) ||
-                    plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)
-                ) {
+                if (plannedLocalDateTime.isBefore(today)) {
                     throw LoonoBackendException(
                         HttpStatus.BAD_REQUEST,
                         "400",
-                        "Unsupported date interval."
+                        "Cannot plan an exam in past."
+                    )
+                }
+                if (plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)) {
+                    throw LoonoBackendException(
+                        HttpStatus.UNPROCESSABLE_ENTITY,
+                        "422",
+                        "The time has NOT passed."
                     )
                 }
             }
@@ -315,7 +319,8 @@ class ExaminationRecordService(
                         )
             }
         lastConfirmed.ifEmpty { return false }
-        return date.isBefore(lastConfirmed.first().plannedDate!!.plusYears(interval.intervalYears.toLong()))
+        val intervalInMonths = (interval.intervalYears.toLong() * 12) - 2
+        return date.isBefore(lastConfirmed.first().plannedDate!!.plusMonths(intervalInMonths))
     }
 
     private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
