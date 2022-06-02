@@ -76,7 +76,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("9:45", storedNotification.delivery_time_of_day)
+        assertEquals("7:45", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -95,7 +95,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("9:45", storedNotification.delivery_time_of_day)
+        assertEquals("7:45", storedNotification.delivery_time_of_day)
     }
 
     @Test
