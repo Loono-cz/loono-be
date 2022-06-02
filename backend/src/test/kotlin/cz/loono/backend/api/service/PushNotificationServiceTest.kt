@@ -57,7 +57,7 @@ class PushNotificationServiceTest(
         assertEquals("Mrkni, na které preventivní prohlídky se objednat.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "main"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -70,7 +70,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Zítra tě čeká prohlídka", storedNotification.headings.cs)
-        assertEquals("Za 24 hodin jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
+        assertEquals("Zítra jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
         assertEquals(
             NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
             storedNotification.data
@@ -122,7 +122,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -148,7 +148,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test

@@ -8,7 +8,7 @@ import cz.loono.backend.db.model.Account
 
 object NotificationDefinition {
 
-    private const val MORNING_TIME_TO_NOTIFY = "8:00AM"
+    private const val MORNING_TIME_TO_NOTIFY = "10:00AM"
     private const val EVENING_TIME_TO_NOTIFY = "6:00PM"
     private const val URL_TO_NOTIFICATION = "https://app.devel.loono.cz/notification/"
     private val notificationTextManager = NotificationTextManager()
