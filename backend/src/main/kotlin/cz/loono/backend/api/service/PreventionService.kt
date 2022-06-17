@@ -113,13 +113,13 @@ class PreventionService(
     private fun prepareSelfExaminationsStatuses(account: Account): List<SelfExaminationPreventionStatusDto> {
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
         SelfExaminationTypeDto.values().forEach { type ->
-            val filteredExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(account, type)
+            val filteredExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(account, type)
             val rewards = BadgesPointsProvider.getSelfExaminationBadgesAndPoints(type, account.getSexAsEnum())
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
-                    if (filteredExams.first().result != SelfExaminationResultDto.Result.NOT_OK) {
+                    if (filteredExams.last().result != SelfExaminationResultDto.Result.NOT_OK) {
                         val activeExam =
-                            filteredExams.first { exam ->
+                            filteredExams.last { exam ->
                                 exam.status == SelfExaminationStatusDto.PLANNED ||
                                     exam.result == SelfExaminationResultDto.Result.FINDING
                             }
