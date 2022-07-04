@@ -2,17 +2,17 @@ val logbackVersion = "1.2.10"
 val hibernateVersion = "5.6.5.Final"
 
 plugins {
-    id("org.springframework.boot") version "2.6.7"
+    id("org.springframework.boot") version "2.7.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("org.openapi.generator") version "5.4.0"
     id("de.undercouch.download") version "5.0.1"
-    id("org.owasp.dependencycheck") version "6.5.3"
+    id("org.owasp.dependencycheck") version "7.1.0.1"
     id("com.avast.gradle.docker-compose") version "0.15.1"
     id("org.flywaydb.flyway") version "8.5.2"
-    kotlin("jvm") version "1.6.20-RC"
-    kotlin("plugin.spring") version "1.6.20-RC"
-    kotlin("plugin.jpa") version "1.6.20-RC"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
+    kotlin("plugin.jpa") version "1.6.21"
     jacoco
 }
 

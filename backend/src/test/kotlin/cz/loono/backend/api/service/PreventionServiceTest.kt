@@ -100,7 +100,7 @@ class PreventionServiceTest {
 
         val result = preventionService.getPreventionStatus(uuid)
         assertThat(
-            /* expected = */ listOf(
+            /* actual = */ listOf(
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[0].toString(),
                     examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
@@ -262,7 +262,7 @@ class PreventionServiceTest {
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
         whenever(
-            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
                 account,
                 SelfExaminationTypeDto.BREAST
             )
@@ -351,7 +351,7 @@ class PreventionServiceTest {
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
         whenever(
-            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
                 account,
                 SelfExaminationTypeDto.BREAST
             )
@@ -400,7 +400,7 @@ class PreventionServiceTest {
 
         whenever(accountRepository.findByUid(uuid)).thenReturn(account)
         whenever(
-            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateDesc(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
                 account,
                 SelfExaminationTypeDto.BREAST
             )
