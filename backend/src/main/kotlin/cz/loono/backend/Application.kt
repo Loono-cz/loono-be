@@ -34,6 +34,13 @@ class Config(
 
     val apiVersion = "/v1"
 
+    val swaggerEndpoints = listOf(
+        "/v3/api-docs",
+        "/v3/api-docs/**",
+        "/swagger-ui.html",
+        "/swagger-ui/**",
+    )
+
     val unauthenticatedEndpoints = listOf(
         "$apiVersion/api-docs",
         "/actuator/health",
@@ -46,19 +53,22 @@ class Config(
         "$apiVersion/providers/all",
         "$apiVersion/providers/details",
         "$apiVersion/providers/lastupdate",
-        "$apiVersion/feedback"
+        "$apiVersion/feedback",
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(supportedAppVersionInterceptor)
+            .excludePathPatterns(swaggerEndpoints)
             .order(0)
 
         registry.addInterceptor(authenticator)
             .excludePathPatterns(unauthenticatedEndpoints)
+            .excludePathPatterns(swaggerEndpoints)
             .order(1)
 
         registry.addInterceptor(accountCreatingInterceptor)
             .excludePathPatterns(unauthenticatedEndpoints)
+            .excludePathPatterns(swaggerEndpoints)
             .order(2)
     }
 

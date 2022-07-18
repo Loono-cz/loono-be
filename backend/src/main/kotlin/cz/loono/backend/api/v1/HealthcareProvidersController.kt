@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1/providers", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/providers", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class HealthcareProvidersController(
     private var healthCareProvidersService: HealthcareProvidersService
 ) {
