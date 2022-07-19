@@ -32,13 +32,10 @@ class SupportedAppVersionInterceptor(
         val supportedVersion = serverPropertiesRepository.findAll().first().supportedAppVersion.split(".")
         val appVersionsParts = appVersion.split(".")
 
-        for (i in 0..2) {
-            if (supportedVersion[i].toInt() > appVersionsParts[i].toInt()) {
-                logger.warn("Usage of an older version: $appVersion")
-                return false
-            }
+        if (supportedVersion[0].toInt() > appVersionsParts[0].toInt()) {
+            logger.warn("Usage of an older version: $appVersion")
+            return false
         }
-
         return true
     }
 }
