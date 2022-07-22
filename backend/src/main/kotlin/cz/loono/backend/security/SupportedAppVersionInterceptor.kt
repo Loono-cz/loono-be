@@ -13,6 +13,10 @@ class SupportedAppVersionInterceptor(
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) : HandlerInterceptor {
 
+    private val supportedVersion: Int by lazy {
+        serverPropertiesRepository.findAll().first().supportedAppVersion.replace(".", "").toInt()
+    }
+
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
@@ -29,13 +33,13 @@ class SupportedAppVersionInterceptor(
     }
 
     private fun isSupported(appVersion: String): Boolean {
-        val supportedVersion = serverPropertiesRepository.findAll().first().supportedAppVersion.split(".")
-        val appVersionsParts = appVersion.split(".")
+        val appVersionsParts = appVersion.replace(".", "").toInt()
 
-        if (supportedVersion[0].toInt() > appVersionsParts[0].toInt()) {
+        if (supportedVersion > appVersionsParts) {
             logger.warn("Usage of an older version: $appVersion")
             return false
         }
+
         return true
     }
 }

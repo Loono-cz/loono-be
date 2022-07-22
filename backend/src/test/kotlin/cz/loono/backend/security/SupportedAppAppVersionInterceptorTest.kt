@@ -30,7 +30,7 @@ class SupportedAppAppVersionInterceptorTest {
     }
 
     @Test
-    fun `invalid major App version`() {
+    fun `invalid critical App version`() {
         val request: HttpServletRequest = mock()
         whenever(request.getHeader("app-version")).thenReturn("0.2.3")
         whenever(serverPropertiesRepository.findAll()).thenReturn(
@@ -45,7 +45,7 @@ class SupportedAppAppVersionInterceptorTest {
     }
 
     @Test
-    fun `valid minor App version`() {
+    fun `invalid major App version`() {
         val request: HttpServletRequest = mock()
         whenever(request.getHeader("app-version")).thenReturn("1.1.3")
         whenever(serverPropertiesRepository.findAll()).thenReturn(
@@ -56,11 +56,11 @@ class SupportedAppAppVersionInterceptorTest {
             )
         )
 
-        assert(interceptor.preHandle(request, response, "handler"))
+        assert(!interceptor.preHandle(request, response, "handler"))
     }
 
     @Test
-    fun `valid patch App version`() {
+    fun `invalid minor App version`() {
         val request: HttpServletRequest = mock()
         whenever(request.getHeader("app-version")).thenReturn("1.2.2")
         whenever(serverPropertiesRepository.findAll()).thenReturn(
@@ -71,6 +71,6 @@ class SupportedAppAppVersionInterceptorTest {
             )
         )
 
-        assert(interceptor.preHandle(request, response, "handler"))
+        assert(!interceptor.preHandle(request, response, "handler"))
     }
 }
