@@ -154,5 +154,6 @@ class PreventionService(
         when (type) {
             SelfExaminationTypeDto.BREAST -> sex == SexDto.FEMALE.name
             SelfExaminationTypeDto.TESTICULAR -> sex == SexDto.MALE.name
+            SelfExaminationTypeDto.SKIN -> true
         }
 }
