@@ -70,8 +70,8 @@ class PreventionService(
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
         val sortedExamsOfType = examsOfType?.filter {
             it.plannedDate != null ||
-                    it.status != ExaminationStatusDto.CONFIRMED ||
-                    it.status != ExaminationStatusDto.CANCELED
+                it.status != ExaminationStatusDto.CONFIRMED ||
+                it.status != ExaminationStatusDto.CANCELED
         }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
             ExaminationRecord(
                 account = account,
@@ -83,7 +83,7 @@ class PreventionService(
 
         val confirmedExamsOfCurrentType = examsOfType?.filter {
             it.status == ExaminationStatusDto.CONFIRMED ||
-                    (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+                (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
         } ?: emptyList()
 
         // 1) Filter all the confirmed records
@@ -121,7 +121,7 @@ class PreventionService(
                         val activeExam =
                             filteredExams.last { exam ->
                                 exam.status == SelfExaminationStatusDto.PLANNED ||
-                                        exam.result == SelfExaminationResultDto.Result.FINDING
+                                    exam.result == SelfExaminationResultDto.Result.FINDING
                             }
                         result.add(
                             SelfExaminationPreventionStatusDto(
@@ -154,6 +154,6 @@ class PreventionService(
         when (type) {
             SelfExaminationTypeDto.BREAST -> sex == SexDto.FEMALE.name
             SelfExaminationTypeDto.TESTICULAR -> sex == SexDto.MALE.name
-            else -> true
+            SelfExaminationTypeDto.SKIN -> true
         }
 }
