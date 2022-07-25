@@ -23,9 +23,9 @@ class ErrorController : ErrorController {
     fun handleError(request: HttpServletRequest): ErrorDto {
         logger.warn(
             "Error should have been handled by throwing LoonoException. Message: ${
-                request.getAttribute(
-                    RequestDispatcher.ERROR_MESSAGE
-                )
+            request.getAttribute(
+                RequestDispatcher.ERROR_MESSAGE
+            )
             }"
         )
 
