@@ -13,7 +13,7 @@ env:
   TF_VAR_google-app-credentials: ${{ secrets.DEVEL_GOOGLE_APPLICATION_CREDENTIALS }}
   TF_VAR_onesignal-api-key: ${{ secrets.DEVEL_ONESIGNAL_API_KEY }}
   TF_VAR_onesignal-app-id: ${{ secrets.DEVEL_ONESIGNAL_APP_ID }}
-  TF_VAR_enable-swagger: ${{ secrets.ENABLE_SWAGGER }}
+  TF_VAR_enable-swagger: ${{ secrets.DEVEL_ENABLE_SWAGGER }}
 jobs:
   terraform:
     name: 'Terraform'
