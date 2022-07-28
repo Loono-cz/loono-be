@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class ExaminationsController(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService

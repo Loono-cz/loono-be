@@ -19,6 +19,7 @@ jobs:
         env:
           ONESIGNAL_API_KEY: ${{ secrets.DEVEL_ONESIGNAL_API_KEY}}
           ONESIGNAL_APP_ID: ${{ secrets.DEVEL_ONESIGNAL_APP_ID}}
+          ENABLE_SWAGGER: ${{ secrets.DEVEL_ENABLE_SWAGGER}}
         run: |
           ./gradlew build -x ktlintMainSourceSetCheck 
 

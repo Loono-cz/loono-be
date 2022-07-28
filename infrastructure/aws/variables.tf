@@ -40,6 +40,10 @@ variable "onesignal-app-id" {
   type = string
 }
 
+variable "enable-swagger" {
+  type = bool
+}
+
 variable "PATH_TO_PUBLIC_KEY" {
   default = "ed25519-key.pub"
 }

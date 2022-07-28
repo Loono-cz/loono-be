@@ -47,3 +47,7 @@ scheduler.cron:
 task.badge-downgrade:
   page-size: 100
   tolerance-months: 0
+# swagger
+springdoc:
+  swagger-ui:
+    enabled: ${ENABLE_SWAGGER}

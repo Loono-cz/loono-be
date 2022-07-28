@@ -50,6 +50,8 @@ dependencies {
     implementation("org.flywaydb:flyway-core:8.5.1")
     implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
 
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+
     testRuntimeOnly("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
