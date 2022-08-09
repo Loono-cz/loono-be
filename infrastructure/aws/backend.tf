@@ -124,7 +124,6 @@ resource "aws_ecs_task_definition" "backend" {
     google-app-credentials = var.google-app-credentials,
     onesignal-api-key      = var.onesignal-api-key,
     onesignal-app-id      = var.onesignal-app-id,
-    enable-swagger         = var.enable-swagger,
     container-name         = "${var.codename}-backend",
   })
   network_mode          = "awsvpc"
