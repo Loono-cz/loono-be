@@ -50,4 +50,4 @@ task.badge-downgrade:
 # swagger
 springdoc:
   swagger-ui:
-    enabled: ${ENABLE_SWAGGER}
+    enabled: true
