@@ -136,7 +136,8 @@ class ExaminationRecordService(
         }
         accountRepository.save(updatedAccount)
         val badgeLevel = updatedAccount.badges.find {
-            it.type == BadgeTypeDto.SHIELD.toString() || it.type == BadgeTypeDto.PAULDRONS.toString() }?.level
+            it.type == BadgeTypeDto.SHIELD.toString() || it.type == BadgeTypeDto.PAULDRONS.toString()
+        }?.level
             ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         return SelfExaminationCompletionInformationDto(
             points = reward.second,
