@@ -43,7 +43,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
 
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql:42.4.1")
     implementation("org.hibernate:hibernate-envers:$hibernateVersion")
     implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
