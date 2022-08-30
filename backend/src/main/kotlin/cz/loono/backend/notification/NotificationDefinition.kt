@@ -2,7 +2,6 @@ package cz.loono.backend.notification
 
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.db.model.Account
 
@@ -10,7 +9,6 @@ object NotificationDefinition {
 
     private const val MORNING_TIME_TO_NOTIFY = "10:00AM"
     private const val EVENING_TIME_TO_NOTIFY = "6:00PM"
-    private const val URL_TO_NOTIFICATION = "https://app.devel.loono.cz/notification/"
     private val notificationTextManager = NotificationTextManager()
 
     fun getPreventionNotification(accounts: Set<Account>): PushNotification {

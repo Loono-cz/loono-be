@@ -3,7 +3,6 @@ package cz.loono.backend.api.service
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.NotificationLog
 import cz.loono.backend.db.repository.NotificationLogRepository
