@@ -105,11 +105,10 @@ object NotificationDefinition {
         )
     }
 
-    fun getFirstSelfExamNotification(accounts: Set<Account>, sex: SexDto): PushNotification {
+    fun getFirstSelfExamNotification(accounts: Set<Account>): PushNotification {
         val name = "First self-exam notification"
         val title = notificationTextManager.getText("self.first.title")
         val text = notificationTextManager.getText("self.first.text")
-        val imageUrl = "${URL_TO_NOTIFICATION}self-${sex.name.lowercase()}.png"
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,
@@ -118,16 +117,13 @@ object NotificationDefinition {
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
             data = NotificationData(screen = "self"),
-            largeImage = imageUrl,
-            iosAttachments = NotificationAttachment(image = imageUrl)
         )
     }
 
-    fun getSelfExamNotification(accounts: Set<Account>, sex: SexDto): PushNotification {
+    fun getSelfExamNotification(accounts: Set<Account>): PushNotification {
         val name = "Self-exam notification"
         val title = notificationTextManager.getText("self.common.title")
-        val text = notificationTextManager.getText("self.common.text", sex)
-        val imageUrl = "${URL_TO_NOTIFICATION}self-${sex.name.lowercase()}.png"
+        val text = notificationTextManager.getText("self.common.text")
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,
@@ -136,15 +132,13 @@ object NotificationDefinition {
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
             data = NotificationData(screen = "self"),
-            largeImage = imageUrl,
-            iosAttachments = NotificationAttachment(image = imageUrl)
         )
     }
 
-    fun getSelfExamIssueResultNotification(accounts: Set<Account>, sex: SexDto): PushNotification {
+    fun getSelfExamIssueResultNotification(accounts: Set<Account>): PushNotification {
         val name = "Issue result of self-exam notification"
-        val title = notificationTextManager.getText("self.result.title", sex)
-        val text = notificationTextManager.getText("self.result.text", sex)
+        val title = notificationTextManager.getText("self.result.title")
+        val text = notificationTextManager.getText("self.result.text")
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,

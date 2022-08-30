@@ -44,7 +44,7 @@ class SelfExamReminderTaskTest {
 
         selfExaminationReminderTask.run()
 
-        verify(notificationService, times(1)).sendFirstSelfExamNotification(any(), any())
+        verify(notificationService, times(1)).sendFirstSelfExamNotification(any())
     }
 
     @Test
@@ -68,6 +68,6 @@ class SelfExamReminderTaskTest {
 
         selfExaminationReminderTask.run()
 
-        verify(notificationService, times(1)).sendSelfExamNotification(any(), any())
+        verify(notificationService, times(1)).sendSelfExamNotification(any())
     }
 }

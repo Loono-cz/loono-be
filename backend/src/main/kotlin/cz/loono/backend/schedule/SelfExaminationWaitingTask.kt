@@ -22,8 +22,7 @@ class SelfExaminationWaitingTask(
                     )
                 )
                 notificationService.sendSelfExamIssueResultNotification(
-                    setOf(it.account),
-                    it.account.getSexAsEnum()
+                    setOf(it.account)
                 )
             }
         }
