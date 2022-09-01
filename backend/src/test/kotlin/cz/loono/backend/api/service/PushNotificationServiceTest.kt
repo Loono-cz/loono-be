@@ -156,7 +156,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendFirstSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendFirstSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -172,12 +172,12 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Je čas na samovyšetření", storedNotification.headings.cs)
-        assertEquals("Po měsíci přišel čas si sáhnout na varlata.", storedNotification.contents.cs)
+        assertEquals("Po měsíci přišel čas se vyšetřit, zda je vše v pořádku.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "self"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
         assertEquals("6:00PM", storedNotification.delivery_time_of_day)
@@ -188,13 +188,13 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
-        assertEquals("Máš varlata zdravá?", storedNotification.headings.cs)
+        assertEquals("Je vše v pořádku?", storedNotification.headings.cs)
         assertEquals(
-            "Před časem se ti na varlatech něco nezdálo. Jak dopadla prohlídka u lékaře?",
+            "Před časem se ti při samovyšetření něco nezdálo. Jak dopadla prohlídka u lékaře?",
             storedNotification.contents.cs
         )
         assertEquals(NotificationData(screen = "self"), storedNotification.data)

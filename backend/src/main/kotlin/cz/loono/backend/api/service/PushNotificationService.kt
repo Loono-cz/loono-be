@@ -3,7 +3,6 @@ package cz.loono.backend.api.service
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
-import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.NotificationLog
 import cz.loono.backend.db.repository.NotificationLogRepository
@@ -81,14 +80,14 @@ class PushNotificationService(
         )
     )
 
-    fun sendFirstSelfExamNotification(accounts: Set<Account>, sex: SexDto): String =
-        sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts, sex))
+    fun sendFirstSelfExamNotification(accounts: Set<Account>): String =
+        sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts))
 
-    fun sendSelfExamNotification(accounts: Set<Account>, sex: SexDto): String =
-        sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts, sex))
+    fun sendSelfExamNotification(accounts: Set<Account>): String =
+        sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts))
 
-    fun sendSelfExamIssueResultNotification(accounts: Set<Account>, sex: SexDto): String =
-        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts, sex))
+    fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
+        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
 
     private fun sendPushNotification(notification: PushNotification): String {
         val body = Gson().toJson(notification).toRequestBody()
