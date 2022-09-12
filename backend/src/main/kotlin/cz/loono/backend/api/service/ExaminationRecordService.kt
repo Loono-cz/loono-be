@@ -275,7 +275,7 @@ class ExaminationRecordService(
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW,
                 note = examinationRecordDto.note,
                 customInterval = examinationRecordDto.customInterval,
-                examinationCategory = examinationRecordDto.examinationCategory,
+                examinationCategoryType = examinationRecordDto.examinationCategoryType,
                 periodicExam = examinationRecordDto.periodicExam
             )
         ).toExaminationRecordDto()
@@ -460,7 +460,7 @@ class ExaminationRecordService(
             note = note,
             periodicExam = periodicExam,
             customInterval = customInterval,
-            examinationCategory = examinationCategory,
+            examinationCategoryType = examinationCategoryType,
             status = status
         )
 }

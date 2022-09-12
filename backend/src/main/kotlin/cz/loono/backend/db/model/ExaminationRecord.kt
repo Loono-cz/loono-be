@@ -1,6 +1,6 @@
 package cz.loono.backend.db.model
 
-import cz.loono.backend.api.dto.ExaminationCategoryDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import org.hibernate.Hibernate
@@ -31,7 +31,7 @@ data class ExaminationRecord(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
-    val examinationCategory: ExaminationCategoryDto = ExaminationCategoryDto.MANDATORY,
+    val examinationCategoryType: ExaminationCategoryTypeDto = ExaminationCategoryTypeDto.MANDATORY,
 
     @Column
     val plannedDate: LocalDateTime? = null,
