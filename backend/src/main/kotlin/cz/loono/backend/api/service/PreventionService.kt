@@ -107,7 +107,10 @@ class PreventionService(
             count = totalCountOfConfirmedExams,
             lastConfirmedDate = lastConfirmedDate?.atUTCOffset(),
             points = rewards.second,
-            badge = rewards.first
+            badge = rewards.first,
+            examinationCategoryType = sortedExamsOfType[0].examinationCategoryType,
+            periodicExam = sortedExamsOfType[0].periodicExam,
+            customInterval = sortedExamsOfType[0].customInterval
         )
     }
 
