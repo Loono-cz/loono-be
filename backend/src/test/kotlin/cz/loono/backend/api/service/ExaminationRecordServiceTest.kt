@@ -21,6 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 @Transactional
@@ -62,7 +65,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MAX
+            plannedDate = OffsetDateTime.MAX
         )
 
         assertThrows<LoonoBackendException> {
@@ -78,7 +81,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MIN
+            plannedDate = OffsetDateTime.MIN
         )
 
         assertThrows<LoonoBackendException>("The given examination identifier not found.") {
@@ -103,7 +106,7 @@ class ExaminationRecordServiceTest(
         val exam = ExaminationRecordDto(
             firstExam = true,
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusDays(1)
+            plannedDate = OffsetDateTime.now().minusDays(1)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -126,7 +129,7 @@ class ExaminationRecordServiceTest(
         )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().plusYears(2)
+            plannedDate = OffsetDateTime.now().plusYears(2)
         )
 
         examinationRecordService.createOrUpdateExam(exam, uid)
@@ -157,7 +160,7 @@ class ExaminationRecordServiceTest(
         )
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusDays(1)
+            plannedDate = OffsetDateTime.now().minusDays(1)
         )
 
         assertThrows<LoonoBackendException> {
@@ -184,14 +187,14 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             status = ExaminationStatusDto.NEW,
             firstExam = false,
-            plannedDate = LocalDateTime.MAX
+            plannedDate = OffsetDateTime.of(LocalDate.MAX, LocalTime.MAX, ZoneOffset.UTC)
         )
 
         val result = examinationRecordService.createOrUpdateExam(changedExam, "101")
 
-        assert(result.status == changedExam.status)
-        assert(result.firstExam == changedExam.firstExam)
-        assert(result.plannedDate == changedExam.plannedDate)
+        assertThat(result.status).isEqualTo(changedExam.status)
+        assertThat(result.firstExam).isEqualTo(changedExam.firstExam)
+        assertThat(result.plannedDate).isEqualTo(changedExam.plannedDate)
     }
 
     @Test
@@ -205,8 +208,8 @@ class ExaminationRecordServiceTest(
         )
 
         val examRecord = ExaminationRecordDto(
-            type = ExaminationTypeDto.GYNECOLOGIST,
-            plannedDate = LocalDateTime.MAX
+            type = ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS,
+            plannedDate = OffsetDateTime.MAX
         )
 
         assertThrows<LoonoBackendException>("The account doesn't have rights to create this type of examinations.") {
@@ -218,14 +221,13 @@ class ExaminationRecordServiceTest(
     fun `confirm exam`() {
         val account = accountRepository.save(createAccount(uid = "101"))
 
-        val exam = ExaminationRecordDto(
-            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            status = ExaminationStatusDto.NEW
+        val storedExam = examinationRecordRepository.save(
+            ExaminationRecord(type = ExaminationTypeDto.GENERAL_PRACTITIONER, account = account)
         )
-        val storedExam = examinationRecordRepository.save(ExaminationRecord(type = exam.type, account = account))
 
         val result = examinationRecordService.confirmExam(storedExam.uuid!!, "101")
-
+        assertThat(accountRepository.findByUid(account.uid)?.badges).isNotEmpty
+        assertThat(accountRepository.findByUid(account.uid)?.points).isEqualTo(200)
         assert(result.status == ExaminationStatusDto.CONFIRMED)
     }
 
@@ -415,7 +417,7 @@ class ExaminationRecordServiceTest(
         accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            plannedDate = LocalDateTime.now().minusYears(2),
+            plannedDate = OffsetDateTime.now().minusYears(2),
             firstExam = true
         )
 
@@ -430,12 +432,31 @@ class ExaminationRecordServiceTest(
         accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
         val exam = ExaminationRecordDto(
             type = ExaminationTypeDto.DERMATOLOGIST,
-            plannedDate = LocalDateTime.now().minusYears(3),
+            plannedDate = OffsetDateTime.now().minusYears(3),
             firstExam = true
         )
 
         val examRecord = examinationRecordService.createOrUpdateExam(exam, "101")
         examinationRecordService.createOrUpdateExam(examRecord.copy(plannedDate = examRecord.plannedDate?.plusYears(1)), "101")
+
+        assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
+    }
+
+    @Test
+    fun `Should add badges on confirming`() {
+        val existingAccount = accountRepository.save(createAccount(uid = "101", sex = SexDto.MALE.name, points = 150))
+
+        val existingNewExam = examinationRecordRepository.save(
+            ExaminationRecord(
+                type = ExaminationTypeDto.DENTIST,
+                account = existingAccount,
+                firstExam = false,
+                plannedDate = LocalDateTime.now().minusDays(3),
+                status = ExaminationStatusDto.NEW
+            )
+        )
+
+        examinationRecordService.confirmExam(existingNewExam.uuid!!, existingAccount.uid)
 
         assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
     }

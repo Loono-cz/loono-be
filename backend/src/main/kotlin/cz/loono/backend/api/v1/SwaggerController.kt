@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 @Controller
 class SwaggerController {
 
-    @GetMapping(value = ["v1/api-docs"], produces = ["application/json"])
+    @GetMapping(value = ["v1/api-docs"], produces = ["application/json"], headers = ["app-version"])
     @ResponseBody
     fun getOpenAPI(): String = javaClass
         .getResourceAsStream("/doc/openapi.json")

@@ -11,7 +11,7 @@ class ExaminationIntervalProviderTest {
         Assertions.assertEquals(
             listOf(
                 ExaminationInterval(ExaminationTypeDto.GENERAL_PRACTITIONER, 2, 1),
-                ExaminationInterval(ExaminationTypeDto.GYNECOLOGIST, 1, 3),
+                ExaminationInterval(ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS, 1, 3),
                 ExaminationInterval(ExaminationTypeDto.DERMATOLOGIST, 1, 6),
                 ExaminationInterval(ExaminationTypeDto.ULTRASOUND_BREAST, 2, 7),
                 ExaminationInterval(ExaminationTypeDto.DENTIST, 1, 8),
@@ -27,7 +27,7 @@ class ExaminationIntervalProviderTest {
             listOf(
                 ExaminationInterval(ExaminationTypeDto.GENERAL_PRACTITIONER, 2, 1),
                 ExaminationInterval(ExaminationTypeDto.MAMMOGRAM, 2, 2),
-                ExaminationInterval(ExaminationTypeDto.GYNECOLOGIST, 1, 3),
+                ExaminationInterval(ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS, 1, 3),
                 ExaminationInterval(ExaminationTypeDto.COLONOSCOPY, 10, 4),
                 ExaminationInterval(ExaminationTypeDto.DERMATOLOGIST, 1, 6),
                 ExaminationInterval(ExaminationTypeDto.DENTIST, 1, 8),

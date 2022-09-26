@@ -5,8 +5,11 @@ import com.google.gson.annotations.SerializedName
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
+import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_API_KEY
+import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.NotificationLogRepository
 import cz.loono.backend.notification.NotificationData
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,10 +22,11 @@ import java.time.LocalDate
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 class PushNotificationServiceTest(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    notificationLogRepository: NotificationLogRepository
 ) {
 
-    private val pushNotificationService = PushNotificationService()
+    private val pushNotificationService = PushNotificationService(notificationLogRepository)
 
     @AfterEach
     fun setUp() {
@@ -53,7 +57,7 @@ class PushNotificationServiceTest(
         assertEquals("Mrkni, na které preventivní prohlídky se objednat.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "main"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -66,7 +70,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Zítra tě čeká prohlídka", storedNotification.headings.cs)
-        assertEquals("Za 24 hodin jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
+        assertEquals("Zítra jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
         assertEquals(
             NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
             storedNotification.data
@@ -118,7 +122,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -144,7 +148,7 @@ class PushNotificationServiceTest(
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
-        assertEquals("8:00AM", storedNotification.delivery_time_of_day)
+        assertEquals("10:00AM", storedNotification.delivery_time_of_day)
     }
 
     @Test
@@ -152,7 +156,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendFirstSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendFirstSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -168,12 +172,12 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Je čas na samovyšetření", storedNotification.headings.cs)
-        assertEquals("Po měsíci přišel čas si sáhnout na varlata.", storedNotification.contents.cs)
+        assertEquals("Po měsíci přišel čas se vyšetřit, zda je vše v pořádku.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "self"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
         assertEquals("6:00PM", storedNotification.delivery_time_of_day)
@@ -184,13 +188,13 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
-        assertEquals("Máš varlata zdravá?", storedNotification.headings.cs)
+        assertEquals("Je vše v pořádku?", storedNotification.headings.cs)
         assertEquals(
-            "Před časem se ti na varlatech něco nezdálo. Jak dopadla prohlídka u lékaře?",
+            "Před časem se ti při samovyšetření něco nezdálo. Jak dopadla prohlídka u lékaře?",
             storedNotification.contents.cs
         )
         assertEquals(NotificationData(screen = "self"), storedNotification.data)
@@ -200,7 +204,8 @@ class PushNotificationServiceTest(
 
     private fun createAccount() = accountRepository.save(
         createAccount(
-            uid = "tXHYX4ZisxcttkHH5DTROg2yTlv2",
+            // User UID from Firebase used also in the notifications as the external ID in the OneSignal
+            uid = "DeEyWYR7bVYSbETtIly3BKKCqZD3",
             sex = SexDto.MALE.value,
             birthday = LocalDate.of(1990, 9, 9)
         )
@@ -211,13 +216,11 @@ class OneSignalTestClient {
 
     companion object {
 
-        private val ONESIGNAL_API_KEY: String = System.getenv("ONESIGNAL_API_KEY")
-
         fun viewNotification(id: String): NotificationInfo {
             val request = Request.Builder().addHeader(
                 "Authorization",
                 "Basic $ONESIGNAL_API_KEY"
-            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=234d9f26-44c2-4752-b2d3-24bd93059267").get()
+            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=$ONESIGNAL_APP_ID").get()
                 .build()
 
             return Gson().fromJson(
@@ -230,7 +233,7 @@ class OneSignalTestClient {
             val request = Request.Builder().addHeader(
                 "Authorization",
                 "Basic $ONESIGNAL_API_KEY"
-            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=234d9f26-44c2-4752-b2d3-24bd93059267")
+            ).url("https://onesignal.com/api/v1/notifications/$id?app_id=$ONESIGNAL_APP_ID")
                 .delete()
                 .build()
 

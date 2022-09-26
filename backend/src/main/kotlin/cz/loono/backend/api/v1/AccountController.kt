@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class AccountController(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository

@@ -1,5 +1,7 @@
 package cz.loono.backend.db.model
 
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import org.hibernate.Hibernate
@@ -28,6 +30,10 @@ data class ExaminationRecord(
     @Column(nullable = false, columnDefinition = "TEXT")
     val type: ExaminationTypeDto = ExaminationTypeDto.GENERAL_PRACTITIONER,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val examinationCategoryType: ExaminationCategoryTypeDto = ExaminationCategoryTypeDto.MANDATORY,
+
     @Column
     val plannedDate: LocalDateTime? = null,
 
@@ -37,12 +43,25 @@ data class ExaminationRecord(
     @Column(nullable = false)
     val firstExam: Boolean = true,
 
+    @Column(nullable = true)
+    val note: String? = null,
+
+    @Column(nullable = true)
+    val customInterval: Int? = null,
+
+    @Column(nullable = true)
+    val periodicExam: Boolean? = true,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "TEXT")
     var status: ExaminationStatusDto = ExaminationStatusDto.NEW,
 
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
-    val uuid: String? = UUID.randomUUID().toString()
+    val uuid: String? = UUID.randomUUID().toString(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    var examinationActionType: ExaminationActionTypeDto = ExaminationActionTypeDto.EXAMINATION,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

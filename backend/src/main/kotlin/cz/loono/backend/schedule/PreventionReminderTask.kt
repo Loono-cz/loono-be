@@ -34,7 +34,9 @@ class PreventionReminderTask(
                     }
                 }
             }
-            notificationService.sendPreventionNotification(notificationAccounts)
+            if (notificationAccounts.isNotEmpty()) {
+                notificationService.sendPreventionNotification(notificationAccounts)
+            }
         }
     }
 }

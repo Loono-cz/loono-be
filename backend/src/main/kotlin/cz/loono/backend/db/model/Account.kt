@@ -91,4 +91,3 @@ data class Account(
             "appointmentReminderEmailsOptIn=$appointmentReminderEmailsOptIn, " +
             "newsletterOptIn=$newsletterOptIn, points=$points, examinationRecords=$examinationRecords)"
 }
-// psql -h database.internal.loono.ceskodigital.net -p 5432 -U loono -d loonodevelopment -f data_dump.sql\

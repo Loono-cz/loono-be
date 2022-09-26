@@ -29,6 +29,7 @@ logging:
     cz.loono.backend: INFO
     org.springframework: WARN
     org.hibernate: WARN
+    org.zalando.logbook: TRACE
     org.flywaydb: INFO
 # Server configuration
 server:
@@ -46,3 +47,7 @@ scheduler.cron:
 task.badge-downgrade:
   page-size: 100
   tolerance-months: 0
+# swagger
+springdoc:
+  swagger-ui:
+    enabled: true

@@ -17,7 +17,7 @@ object BadgesPointsProvider {
             examType == ExaminationTypeDto.COLONOSCOPY -> BadgeTypeDto.SHOES to 1000
 
             examType == ExaminationTypeDto.ULTRASOUND_BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 100
-            examType == ExaminationTypeDto.GYNECOLOGIST && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
+            examType == ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
             examType == ExaminationTypeDto.MAMMOGRAM && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 500
 
             examType == ExaminationTypeDto.UROLOGIST && sex == SexDto.MALE -> BadgeTypeDto.BELT to 300
@@ -31,14 +31,19 @@ object BadgesPointsProvider {
         when {
             selfExamType == SelfExaminationTypeDto.BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.SHIELD to 50
             selfExamType == SelfExaminationTypeDto.TESTICULAR && sex == SexDto.MALE -> BadgeTypeDto.SHIELD to 50
+            selfExamType == SelfExaminationTypeDto.SKIN -> BadgeTypeDto.PAULDRONS to 50
             else -> null
         }
 
     fun getSelfExaminationType(badgeTypeDto: BadgeTypeDto, sex: SexDto) =
         badgeTypeDto.takeIf {
-            badgeTypeDto == BadgeTypeDto.SHIELD
+            badgeTypeDto == BadgeTypeDto.SHIELD || badgeTypeDto == BadgeTypeDto.PAULDRONS
         }?.let {
-            if (sex == SexDto.FEMALE) SelfExaminationTypeDto.BREAST else SelfExaminationTypeDto.TESTICULAR
+            if (badgeTypeDto == BadgeTypeDto.SHIELD) {
+                if (sex == SexDto.FEMALE) SelfExaminationTypeDto.BREAST else SelfExaminationTypeDto.TESTICULAR
+            } else {
+                SelfExaminationTypeDto.SKIN
+            }
         }
 
     val GENERAL_BADGES_TO_EXAMS = mapOf(

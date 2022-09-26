@@ -14,13 +14,20 @@ import javax.servlet.http.HttpServletResponse
  * Fallback error controller when something or somebody calls [HttpServletResponse.sendError] instead of throwing.
  */
 @RestController
+@RequestMapping(headers = ["app-version"])
 class ErrorController : ErrorController {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @RequestMapping("/error", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun handleError(request: HttpServletRequest): ErrorDto {
-        logger.warn("Error should have been handled by throwing LoonoException. Message: ${request.getAttribute(RequestDispatcher.ERROR_MESSAGE)}")
+        logger.warn(
+            "Error should have been handled by throwing LoonoException. Message: ${
+            request.getAttribute(
+                RequestDispatcher.ERROR_MESSAGE
+            )
+            }"
+        )
 
         return ErrorDto(code = null, message = null)
     }

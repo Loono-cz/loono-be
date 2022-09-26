@@ -117,7 +117,7 @@ enum class CategoryValues(val value: String) {
     PNEUMOLOGY("Pneumologie, plicní"),
 
     // Praktik - všeobecné praktické lékařství
-    GENERAL_PRACTICAL_MEDICINE("Praktik"),
+    GENERAL_PRACTICAL_MEDICINE("Praktický lékař"),
 
     // Dětský lékař - dětské lékařství, pediatrie, praktické lékařství pro děti a dorost, dorostové lékařství
     PEDIATRICIAN("Dětský lékař"),

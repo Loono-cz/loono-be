@@ -33,8 +33,8 @@ object ExaminationIntervalProvider {
     private val rules = listOf(
         PreventionRule(
             examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
-            intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 2)),
+            intervalsMale = listOf(AgeInterval(fromAge = 18, intervalYears = 2)),
+            intervalsFemale = listOf(AgeInterval(fromAge = 18, intervalYears = 2)),
             priority = 1
         ),
         PreventionRule(
@@ -44,7 +44,7 @@ object ExaminationIntervalProvider {
             priority = 2
         ),
         PreventionRule(
-            examinationType = ExaminationTypeDto.GYNECOLOGIST,
+            examinationType = ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS,
             intervalsMale = listOf(),
             intervalsFemale = listOf(AgeInterval(fromAge = 15, intervalYears = 1)),
             priority = 3
@@ -63,35 +63,35 @@ object ExaminationIntervalProvider {
         ),
         PreventionRule(
             examinationType = ExaminationTypeDto.DERMATOLOGIST,
-            intervalsMale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, intervalYears = 1)),
+            intervalsMale = listOf(AgeInterval(fromAge = 18, intervalYears = 1)),
+            intervalsFemale = listOf(AgeInterval(fromAge = 18, intervalYears = 1)),
             priority = 6
         ),
         PreventionRule(
             examinationType = ExaminationTypeDto.ULTRASOUND_BREAST,
             intervalsMale = listOf(),
-            intervalsFemale = listOf(AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2)),
+            intervalsFemale = listOf(AgeInterval(fromAge = 18, toAge = 44, intervalYears = 2)),
             priority = 7
         ),
         PreventionRule(
             examinationType = ExaminationTypeDto.DENTIST,
             intervalsMale = listOf(
-                AgeInterval(fromAge = 19, intervalYears = 1)
+                AgeInterval(fromAge = 18, intervalYears = 1)
             ),
             intervalsFemale = listOf(
-                AgeInterval(fromAge = 19, intervalYears = 1)
+                AgeInterval(fromAge = 18, intervalYears = 1)
             ),
             priority = 8
         ),
         PreventionRule(
             examinationType = ExaminationTypeDto.OPHTHALMOLOGIST,
             intervalsMale = listOf(
-                AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2),
+                AgeInterval(fromAge = 18, toAge = 44, intervalYears = 2),
                 AgeInterval(fromAge = 45, toAge = 61, intervalYears = 4),
                 AgeInterval(fromAge = 62, intervalYears = 2)
             ),
             intervalsFemale = listOf(
-                AgeInterval(fromAge = 19, toAge = 44, intervalYears = 2),
+                AgeInterval(fromAge = 18, toAge = 44, intervalYears = 2),
                 AgeInterval(fromAge = 45, toAge = 61, intervalYears = 4),
                 AgeInterval(fromAge = 62, intervalYears = 2)
             ),

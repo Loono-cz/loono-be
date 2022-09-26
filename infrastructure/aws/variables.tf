@@ -12,7 +12,7 @@ variable "codename" {
 # to comply with best practices => it ensures the internal domain names are globally unique.
 variable "codename-domain" {
   type    = string
-  default = "loono.ceskodigital.net"
+  default = "devel.loono.cz"
 }
 
 variable "database-username" {
@@ -33,6 +33,10 @@ variable "google-app-credentials" {
 }
 
 variable "onesignal-api-key" {
+  type = string
+}
+
+variable "onesignal-app-id" {
   type = string
 }
 

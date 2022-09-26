@@ -16,6 +16,7 @@ import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.extensions.atUTCOffset
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -76,6 +77,7 @@ class PreventionService(
                 account = account,
                 uuid = null,
                 firstExam = false,
+                note = null,
                 status = ExaminationStatusDto.NEW
             )
         )
@@ -98,12 +100,12 @@ class PreventionService(
             uuid = sortedExamsOfType[0].uuid,
             examinationType = examinationInterval.examinationType,
             intervalYears = examinationInterval.intervalYears,
-            plannedDate = sortedExamsOfType[0].plannedDate,
+            plannedDate = sortedExamsOfType[0].plannedDate?.atUTCOffset(),
             firstExam = sortedExamsOfType[0].firstExam,
             priority = examinationInterval.priority,
             state = sortedExamsOfType[0].status,
             count = totalCountOfConfirmedExams,
-            lastConfirmedDate = lastConfirmedDate,
+            lastConfirmedDate = lastConfirmedDate?.atUTCOffset(),
             points = rewards.second,
             badge = rewards.first
         )
@@ -111,28 +113,28 @@ class PreventionService(
 
     private fun prepareSelfExaminationsStatuses(account: Account): List<SelfExaminationPreventionStatusDto> {
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
-        val selfExams = selfExaminationRecordRepository.findAllByAccount(account)
         SelfExaminationTypeDto.values().forEach { type ->
-            val filteredExams =
-                selfExams.filter { exam -> exam.type == type && exam.result != SelfExaminationResultDto.Result.NOT_OK }
+            val filteredExams = selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(account, type)
             val rewards = BadgesPointsProvider.getSelfExaminationBadgesAndPoints(type, account.getSexAsEnum())
             when {
                 filteredExams.isNotEmpty() && rewards != null -> {
-                    val activeExam =
-                        filteredExams.first { exam ->
-                            exam.status == SelfExaminationStatusDto.PLANNED ||
-                                exam.result == SelfExaminationResultDto.Result.FINDING
-                        }
-                    result.add(
-                        SelfExaminationPreventionStatusDto(
-                            lastExamUuid = activeExam.uuid,
-                            plannedDate = activeExam.dueDate,
-                            type = type,
-                            history = filteredExams.map(SelfExaminationRecord::status),
-                            points = rewards.second,
-                            badge = rewards.first
+                    if (filteredExams.last().result != SelfExaminationResultDto.Result.NOT_OK) {
+                        val activeExam =
+                            filteredExams.last { exam ->
+                                exam.status == SelfExaminationStatusDto.PLANNED ||
+                                    exam.result == SelfExaminationResultDto.Result.FINDING
+                            }
+                        result.add(
+                            SelfExaminationPreventionStatusDto(
+                                lastExamUuid = activeExam.uuid,
+                                plannedDate = activeExam.dueDate,
+                                type = type,
+                                history = filteredExams.map(SelfExaminationRecord::status),
+                                points = rewards.second,
+                                badge = rewards.first
+                            )
                         )
-                    )
+                    }
                 }
                 rewards != null -> {
                     result.add(
@@ -153,5 +155,6 @@ class PreventionService(
         when (type) {
             SelfExaminationTypeDto.BREAST -> sex == SexDto.FEMALE.name
             SelfExaminationTypeDto.TESTICULAR -> sex == SexDto.MALE.name
+            SelfExaminationTypeDto.SKIN -> true
         }
 }

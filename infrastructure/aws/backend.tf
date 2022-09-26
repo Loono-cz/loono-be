@@ -1,5 +1,6 @@
 # ----------
 # ECR (Docker repositories)
+# trigger commit for terraform github action
 # ----------
 
 resource "aws_ecr_repository" "backend" {
@@ -122,12 +123,13 @@ resource "aws_ecs_task_definition" "backend" {
     postgre-pwd            = var.database-password,
     google-app-credentials = var.google-app-credentials,
     onesignal-api-key      = var.onesignal-api-key,
+    onesignal-app-id      = var.onesignal-app-id,
     container-name         = "${var.codename}-backend",
   })
   network_mode          = "awsvpc"
   execution_role_arn    = aws_iam_role.ecs-task-execution-role.arn
   task_role_arn         = aws_iam_role.ecs-task-execution-role.arn
-  memory                = "512"
+  memory                = "1024"
   cpu                   = "256"
 }
 
