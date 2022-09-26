@@ -157,7 +157,7 @@ class AccountServiceTest(
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        type = ExaminationTypeDto.GYNECOLOGIST,
+                        type = ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
                     ),
@@ -192,7 +192,7 @@ class AccountServiceTest(
         ).isEqualTo(accountDto)
         assert(exams.size == 3)
         assert(exams.find { it.type == ExaminationTypeDto.GENERAL_PRACTITIONER } != null)
-        assert(exams.find { it.type == ExaminationTypeDto.GYNECOLOGIST } != null)
+        assert(exams.find { it.type == ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS } != null)
         assert(exams.find { it.type == ExaminationTypeDto.DENTIST } != null)
     }
 

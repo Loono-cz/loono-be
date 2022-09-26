@@ -272,7 +272,12 @@ class ExaminationRecordService(
                 plannedDate = examinationRecordDto.plannedDate?.toLocalDateTime(),
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
-                status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
+                status = examinationRecordDto.status ?: ExaminationStatusDto.NEW,
+                note = record.note,
+                customInterval = record.customInterval,
+                periodicExam = record.periodicExam,
+                examinationCategoryType = examinationRecordDto.examinationCategoryType,
+                examinationActionType = record.examinationActionType
             )
         ).toExaminationRecordDto()
     }

@@ -17,7 +17,7 @@ object BadgesPointsProvider {
             examType == ExaminationTypeDto.COLONOSCOPY -> BadgeTypeDto.SHOES to 1000
 
             examType == ExaminationTypeDto.ULTRASOUND_BREAST && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 100
-            examType == ExaminationTypeDto.GYNECOLOGIST && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
+            examType == ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS && sex == SexDto.FEMALE -> BadgeTypeDto.BELT to 200
             examType == ExaminationTypeDto.MAMMOGRAM && sex == SexDto.FEMALE -> BadgeTypeDto.TOP to 500
 
             examType == ExaminationTypeDto.UROLOGIST && sex == SexDto.MALE -> BadgeTypeDto.BELT to 300
