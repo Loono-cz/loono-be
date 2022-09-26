@@ -77,6 +77,7 @@ class PreventionService(
                 account = account,
                 uuid = null,
                 firstExam = false,
+                note = null,
                 status = ExaminationStatusDto.NEW
             )
         )

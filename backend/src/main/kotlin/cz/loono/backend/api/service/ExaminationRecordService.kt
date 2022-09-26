@@ -458,6 +458,10 @@ class ExaminationRecordService(
             type = type,
             plannedDate = plannedDate?.atUTCOffset(),
             firstExam = firstExam,
+            note = note,
+            periodicExam = periodicExam,
+            customInterval = customInterval,
+            examinationCategoryType = examinationCategoryType,
             status = status
         )
 }

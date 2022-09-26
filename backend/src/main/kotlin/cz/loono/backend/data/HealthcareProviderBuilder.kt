@@ -80,12 +80,15 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
 
     fun withHQDistrictAndRegionName(): HealthcareProviderBuilder {
         if (getColumnValue("OkresCodeSidlo", columns) != "OkresCodeSidlo") {
-            if (!getColumnValue("OkresCodeSidlo", columns).isNullOrEmpty()) {
-                hqDistrictName = District.valueOf(getColumnValue("OkresCodeSidlo", columns)).value
-                hqRegionName = Region.valueOf(getColumnValue("KrajCodeSidlo", columns)).value
-            } else {
-                hqDistrictName = District.CZ0999.toString()
-                hqRegionName = Region.valueOf(getColumnValue("KrajCodeSidlo", columns)).value
+            try {
+                if (getColumnValue("OkresCodeSidlo", columns).isEmpty()) {
+                    hqDistrictName = District.CZ0999.value
+                } else {
+                    hqDistrictName = District.valueOf(getColumnValue("OkresCodeSidlo", columns)).value
+                    hqRegionName = Region.valueOf(getColumnValue("KrajCodeSidlo", columns)).value
+                }
+            } catch (e: Exception) {
+                println(e)
             }
         }
         return this
