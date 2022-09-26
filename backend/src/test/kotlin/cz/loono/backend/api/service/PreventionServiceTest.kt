@@ -27,7 +27,6 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import kotlin.math.E
 
 class PreventionServiceTest {
 
@@ -564,7 +563,7 @@ class PreventionServiceTest {
         )
 
         val result = preventionService.getPreventionStatus(uuid)
-        assertEquals(emptyList<SelfExaminationStatusDto>(), result.selfexaminations)
+        assertEquals(emptyList<SelfExaminationPreventionStatusDto>(), result.selfexaminations)
     }
 
     @Test
