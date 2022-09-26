@@ -60,7 +60,7 @@ class AccountService(
         val acceptedExams = account.examinations.filter {
             it.type == ExaminationTypeDto.GENERAL_PRACTITIONER ||
                 it.type == ExaminationTypeDto.DENTIST ||
-                (it.type == ExaminationTypeDto.GYNECOLOGIST && account.sex == SexDto.FEMALE)
+                (it.type == ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS && account.sex == SexDto.FEMALE)
         }
         acceptedExams.forEach {
             examinationRecordService.createOrUpdateExam(it, storedAccount.uid)

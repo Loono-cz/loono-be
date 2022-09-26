@@ -273,10 +273,11 @@ class ExaminationRecordService(
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
                 status = examinationRecordDto.status ?: ExaminationStatusDto.NEW,
-                note = examinationRecordDto.note,
-                customInterval = examinationRecordDto.customInterval,
+                note = record.note,
+                customInterval = record.customInterval,
+                periodicExam = record.periodicExam,
                 examinationCategoryType = examinationRecordDto.examinationCategoryType,
-                periodicExam = examinationRecordDto.periodicExam
+                examinationActionType = record.examinationActionType
             )
         ).toExaminationRecordDto()
     }

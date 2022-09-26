@@ -18,6 +18,7 @@ class SelfExamReminderTask(
         val accounts = accountRepository.findAll()
         val today = LocalDate.now()
         accounts.forEach { account ->
+            // TODO kontrolu at nejsou 2 notifikace ve stejny den
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
             statuses.forEach {
                 if (account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null) {

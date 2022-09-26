@@ -1,5 +1,6 @@
 package cz.loono.backend.db.model
 
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -55,8 +56,25 @@ data class ExaminationRecord(
     @Column(nullable = false, columnDefinition = "TEXT")
     var status: ExaminationStatusDto = ExaminationStatusDto.NEW,
 
+    @Column(nullable = true)
+    val note: String? = null,
+
+    @Column(nullable = true)
+    val customInterval: Int? = null,
+
+    @Column(nullable = false)
+    val periodicExam: Boolean = true,
+
     @Column(unique = true, nullable = false, columnDefinition = "TEXT")
-    val uuid: String? = UUID.randomUUID().toString()
+    val uuid: String? = UUID.randomUUID().toString(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    var examinationActionType: ExaminationActionTypeDto = ExaminationActionTypeDto.EXAMINATION,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    var examinationCategoryType: ExaminationCategoryTypeDto = ExaminationCategoryTypeDto.MANDATORY,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
