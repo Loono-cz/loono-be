@@ -73,7 +73,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 tasks.withType<Test> {
-    // useJUnitPlatform()
+    useJUnitPlatform()
     maxHeapSize = "2048m"
 }
 
