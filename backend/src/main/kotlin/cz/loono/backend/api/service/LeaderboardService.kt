@@ -27,7 +27,7 @@ class LeaderboardService(
                 peers = peers,
                 myOrder = myOrder
             )
-        } catch (e: Exception){
+        } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.EXPECTATION_FAILED, "${e.localizedMessage}"
             )
