@@ -111,7 +111,8 @@ class PreventionService(
             examinationCategoryType = sortedExamsOfType[0].examinationCategoryType,
             periodicExam = sortedExamsOfType[0].periodicExam,
             customInterval = sortedExamsOfType[0].customInterval,
-            examinationActionType = sortedExamsOfType[0].examinationActionType
+            examinationActionType = sortedExamsOfType[0].examinationActionType,
+            note = sortedExamsOfType[0].note
         )
     }
 
