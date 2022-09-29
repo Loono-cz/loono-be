@@ -1,5 +1,7 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -58,8 +60,14 @@ class PreventionService(
             account
         )
 
+        val plannedExam = examinationRecordRepository.findAllByAccount(account)
+            .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+        val customExaminations = prepareCustomStatuses(plannedExam)
+
+        val joinedExaminations = customExaminations + examinations
+
         val selfExamsList = prepareSelfExaminationsStatuses(account)
-        return PreventionStatusDto(examinations = examinations, selfexaminations = selfExamsList)
+        return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
     }
 
     private fun prepareExaminationStatuses(
@@ -68,10 +76,9 @@ class PreventionService(
         account: Account
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
-        val sortedExamsOfType = examsOfType?.filter {
-            it.plannedDate != null ||
-                it.status != ExaminationStatusDto.CONFIRMED ||
-                it.status != ExaminationStatusDto.CANCELED
+        val examMandatory = examsOfType?.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+        val sortedExamsOfType = examMandatory?.filter {
+            it.plannedDate != null || it.status != ExaminationStatusDto.CONFIRMED || it.status != ExaminationStatusDto.CANCELED
         }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
             ExaminationRecord(
                 account = account,
@@ -85,6 +92,7 @@ class PreventionService(
         val confirmedExamsOfCurrentType = examsOfType?.filter {
             it.status == ExaminationStatusDto.CONFIRMED ||
                 (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+            it.status == ExaminationStatusDto.CONFIRMED || (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
         } ?: emptyList()
 
         // 1) Filter all the confirmed records
@@ -115,6 +123,32 @@ class PreventionService(
             note = sortedExamsOfType[0].note
         )
     }
+
+    private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> =
+        plannedExam.map { customExam ->
+            // TODO - last confirm date
+            // TODO - badge -> null or customBadge
+            // TODO - points for periodic exams
+
+            ExaminationPreventionStatusDto(
+                uuid = customExam.uuid,
+                examinationType = customExam.type,
+                intervalYears = customExam.customInterval ?: 0,
+                plannedDate = customExam.plannedDate?.atUTCOffset(),
+                firstExam = customExam.firstExam,
+                priority = 0,
+                state = customExam.status,
+                count = 0,
+                lastConfirmedDate = null,
+                points = 0,
+                badge = BadgeTypeDto.SHIELD,
+                examinationCategoryType = customExam.examinationCategoryType,
+                periodicExam = customExam.periodicExam,
+                customInterval = customExam.customInterval,
+                examinationActionType = customExam.examinationActionType,
+                note = customExam.note
+            )
+        }
 
     private fun prepareSelfExaminationsStatuses(account: Account): List<SelfExaminationPreventionStatusDto> {
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
