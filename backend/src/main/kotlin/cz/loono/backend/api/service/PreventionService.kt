@@ -90,8 +90,6 @@ class PreventionService(
         )
 
         val confirmedExamsOfCurrentType = examsOfType?.filter {
-            it.status == ExaminationStatusDto.CONFIRMED ||
-                (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
             it.status == ExaminationStatusDto.CONFIRMED || (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
         } ?: emptyList()
 
