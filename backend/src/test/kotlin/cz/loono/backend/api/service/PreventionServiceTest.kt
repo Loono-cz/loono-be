@@ -116,7 +116,8 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    lastConfirmedDate = null
+                    lastConfirmedDate = null,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[5].toString(),
@@ -132,7 +133,8 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.GLOVES,
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
-                    periodicExam = true
+                    periodicExam = true,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[3].toString(),
@@ -148,7 +150,8 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.HEADBAND,
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
-                    periodicExam = true
+                    periodicExam = true,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -164,7 +167,8 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    lastConfirmedDate = null
+                    lastConfirmedDate = null,
+                    examinationActionType = null
                 ),
             )
         ).isEqualTo(result.examinations)
@@ -218,7 +222,8 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    lastConfirmedDate = null
+                    lastConfirmedDate = null,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -234,7 +239,8 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.GLOVES,
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
-                    periodicExam = true
+                    periodicExam = true,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -250,7 +256,8 @@ class PreventionServiceTest {
                     badge = BadgeTypeDto.HEADBAND,
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
-                    periodicExam = true
+                    periodicExam = true,
+                    examinationActionType = null
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -266,7 +273,8 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    lastConfirmedDate = null
+                    lastConfirmedDate = null,
+                    examinationActionType = null
                 ),
             ),
             /* actual = */ result.examinations
