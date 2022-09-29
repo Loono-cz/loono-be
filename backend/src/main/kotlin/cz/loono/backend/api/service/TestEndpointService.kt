@@ -3,6 +3,8 @@ package cz.loono.backend.api.service
 import cz.loono.backend.db.repository.AccountRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class TestEndpointService(
@@ -15,7 +17,8 @@ class TestEndpointService(
         val accounts = accountRepository.findByUid(accountId)
         val today = LocalDate.now()
         var response = "${accounts?.uid}"
-
+        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        response = "$response local time: $time"
         accounts?.let { account ->
             response = "$response account found "
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
@@ -25,11 +28,12 @@ class TestEndpointService(
             response = "$response today ${todayNotifications.size}, first ${firstNotifications.size} "
 
             if (todayNotifications.isNotEmpty()) {
-                notificationService.sendSelfExamNotification(setOf(account))
+
+                notificationService.sendSelfExamNotificationTestEndpoint(setOf(account))
                 response = "$response normal notifacion + "
             }
             if (firstNotifications.isNotEmpty()) {
-                notificationService.sendFirstSelfExamNotification(setOf(account))
+                notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                 response = "$response first notifacion + "
             }
         }
