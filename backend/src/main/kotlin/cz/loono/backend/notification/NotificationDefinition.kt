@@ -4,6 +4,10 @@ import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.db.model.Account
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 object NotificationDefinition {
 
@@ -145,6 +149,39 @@ object NotificationDefinition {
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
             data = NotificationData(screen = "self")
+        )
+    }
+
+    fun getSelfExamNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
+        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        val name = "Self-exam notification"
+        val title = notificationTextManager.getText("self.common.title")
+        val text = notificationTextManager.getText("self.common.text")
+        return PushNotification(
+            appId = ONESIGNAL_APP_ID,
+            name = name,
+            headings = MultipleLangString(cs = title, en = title),
+            contents = MultipleLangString(cs = text, en = text),
+            includeExternalUserIds = accounts.map { it.uid },
+            scheduleTimeOfDay = time.toString(),
+            data = NotificationData(screen = "self"),
+        )
+    }
+
+    fun getFirstSelfExamNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
+        val name = "First self-exam notification"
+        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+
+        val title = notificationTextManager.getText("self.first.title")
+        val text = notificationTextManager.getText("self.first.text")
+        return PushNotification(
+            appId = ONESIGNAL_APP_ID,
+            name = name,
+            headings = MultipleLangString(cs = title, en = title),
+            contents = MultipleLangString(cs = text, en = text),
+            includeExternalUserIds = accounts.map { it.uid },
+            scheduleTimeOfDay = time.toString(),
+            data = NotificationData(screen = "self"),
         )
     }
 }
