@@ -151,7 +151,7 @@ object NotificationDefinition {
     }
 
     fun getSelfExamNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val name = "Self-exam notification"
         val title = notificationTextManager.getText("self.common.title")
         val text = notificationTextManager.getText("self.common.text")
@@ -168,8 +168,7 @@ object NotificationDefinition {
 
     fun getFirstSelfExamNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
         val name = "First self-exam notification"
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
-
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val title = notificationTextManager.getText("self.first.title")
         val text = notificationTextManager.getText("self.first.text")
         return PushNotification(

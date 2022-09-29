@@ -17,7 +17,7 @@ class TestEndpointService(
         val accounts = accountRepository.findByUid(accountId)
         val today = LocalDate.now()
         var response = "${accounts?.uid}"
-        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         response = "$response local time: $time"
         accounts?.let { account ->
             response = "$response account found "
