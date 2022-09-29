@@ -110,7 +110,8 @@ class PreventionService(
             badge = rewards.first,
             examinationCategoryType = sortedExamsOfType[0].examinationCategoryType,
             periodicExam = sortedExamsOfType[0].periodicExam,
-            customInterval = sortedExamsOfType[0].customInterval
+            customInterval = sortedExamsOfType[0].customInterval,
+            examinationActionType = sortedExamsOfType[0].examinationActionType
         )
     }
 
