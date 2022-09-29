@@ -1,6 +1,7 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
@@ -300,12 +301,14 @@ class ExaminationRecordService(
                         "Cannot plan an exam in past."
                     )
                 }
-                if (plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)) {
-                    throw LoonoBackendException(
-                        HttpStatus.UNPROCESSABLE_ENTITY,
-                        "422",
-                        "The time has NOT passed."
-                    )
+                if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+                    if (plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)) {
+                        throw LoonoBackendException(
+                            HttpStatus.UNPROCESSABLE_ENTITY,
+                            "422",
+                            "The time has NOT passed."
+                        )
+                    }
                 }
             }
         }
@@ -345,13 +348,16 @@ class ExaminationRecordService(
                 "The examination of this type already exists."
             )
         }
-        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
-        intervals.ifEmpty {
-            throw LoonoBackendException(
-                HttpStatus.BAD_REQUEST,
-                "400",
-                "The account doesn't have rights to create this type of examinations."
-            )
+        if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+            val intervals =
+                preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
+            intervals.ifEmpty {
+                throw LoonoBackendException(
+                    HttpStatus.BAD_REQUEST,
+                    "400",
+                    "The account doesn't have rights to create this type of examinations."
+                )
+            }
         }
     }
 
