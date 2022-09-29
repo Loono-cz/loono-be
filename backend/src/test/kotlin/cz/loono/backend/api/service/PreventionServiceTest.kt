@@ -1,6 +1,7 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
@@ -117,7 +118,7 @@ class PreventionServiceTest {
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
                     lastConfirmedDate = null,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[5].toString(),
@@ -134,7 +135,7 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[3].toString(),
@@ -151,7 +152,7 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -168,7 +169,7 @@ class PreventionServiceTest {
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
                     lastConfirmedDate = null,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
             )
         ).isEqualTo(result.examinations)
@@ -223,7 +224,7 @@ class PreventionServiceTest {
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
                     lastConfirmedDate = null,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -240,7 +241,7 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -257,7 +258,7 @@ class PreventionServiceTest {
                     customInterval = null,
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -274,7 +275,7 @@ class PreventionServiceTest {
                     examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
                     periodicExam = true,
                     lastConfirmedDate = null,
-                    examinationActionType = null
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
             ),
             /* actual = */ result.examinations
