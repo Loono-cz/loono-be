@@ -18,10 +18,12 @@ class TestEndpointService(
         var response = "${accounts?.uid}"
 
         accounts?.let { account ->
+            response.plus(" account found ")
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
 
             val todayNotifications = statuses.filter { it.plannedDate == today }
             val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null }
+            response.plus(" today ${todayNotifications.size}, first ${firstNotifications.size} ")
 
             if (todayNotifications.isNotEmpty()) {
                 notificationService.sendSelfExamNotification(setOf<Account>(account))
