@@ -20,7 +20,7 @@ class TestEndpointService(
         accounts?.let { account ->
             response.plus(" account found ")
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
-
+            response.plus(" statuses - ${statuses.size} ")
             val todayNotifications = statuses.filter { it.plannedDate == today }
             val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null }
             response.plus(" today ${todayNotifications.size}, first ${firstNotifications.size} ")
