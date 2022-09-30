@@ -1,6 +1,5 @@
 package cz.loono.backend.api.service
 
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
@@ -153,8 +152,8 @@ class PreventionService(
                     state = customExam.status,
                     count = 0,
                     lastConfirmedDate = null,
-                    points = 0,
-                    badge = BadgeTypeDto.SHIELD,
+                    points = if (customExam.periodicExam == true) { 50 } else { 0 },
+                    badge = null,
                     examinationCategoryType = customExam.examinationCategoryType,
                     periodicExam = customExam.periodicExam,
                     customInterval = customExam.customInterval,
