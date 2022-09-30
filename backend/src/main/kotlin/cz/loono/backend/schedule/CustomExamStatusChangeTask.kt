@@ -15,5 +15,13 @@ class CustomExamStatusChangeTask(
         val now = LocalDateTime.now()
         val plannedExams = examinationRecordRepository.findAllByStatus(status = ExaminationStatusDto.NEW)
         val customExams = plannedExams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+        customExams.forEach { record ->
+            record.plannedDate?.let { plannedDate ->
+                if (plannedDate.plusHours(2).isBefore(now)) {
+                    record.status = ExaminationStatusDto.CONFIRMED
+                    examinationRecordRepository.save(record)
+                }
+            }
+        }
     }
 }
