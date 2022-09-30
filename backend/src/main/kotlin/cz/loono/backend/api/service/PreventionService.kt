@@ -74,7 +74,7 @@ class PreventionService(
 
             val selfExamsList = prepareSelfExaminationsStatuses(account)
             return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.CONFLICT, "EXAMS GET failed - ${e.localizedMessage}"
             )
