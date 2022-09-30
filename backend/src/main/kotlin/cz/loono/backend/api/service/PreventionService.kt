@@ -60,14 +60,21 @@ class PreventionService(
             account
         )
 
-        val plannedExam = examinationRecordRepository.findAllByAccount(account)
+         val plannedExam = examinationRecordRepository.findAllByAccount(account)
             .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-        val customExaminations = prepareCustomStatuses(plannedExam)
+         val customExaminations = prepareCustomStatuses(plannedExam)
+         var joinedExaminations: List<ExaminationPreventionStatusDto>
+         try {
+             joinedExaminations = customExaminations + examinations
+         } catch (e: Exception) {
+             throw LoonoBackendException(
+                 HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
+             )
+         }
 
-        // val joinedExaminations = customExaminations + examinations
 
         val selfExamsList = prepareSelfExaminationsStatuses(account)
-        return PreventionStatusDto(examinations = examinations, selfexaminations = selfExamsList)
+        return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
     }
 
     private fun prepareExaminationStatuses(
@@ -122,31 +129,39 @@ class PreventionService(
         )
     }
 
-    private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> =
-        plannedExam.map { customExam ->
-            // TODO - last confirm date
-            // TODO - badge -> null or customBadge
-            // TODO - points for periodic exams
+    private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> {
+        try {
+            return plannedExam.map { customExam ->
+                // TODO - last confirm date
+                // TODO - badge -> null or customBadge
+                // TODO - points for periodic exams
 
-            ExaminationPreventionStatusDto(
-                uuid = customExam.uuid,
-                examinationType = customExam.type,
-                intervalYears = customExam.customInterval ?: 0,
-                plannedDate = customExam.plannedDate?.atUTCOffset(),
-                firstExam = customExam.firstExam,
-                priority = 0,
-                state = customExam.status,
-                count = 0,
-                lastConfirmedDate = null,
-                points = 0,
-                badge = BadgeTypeDto.SHIELD,
-                examinationCategoryType = customExam.examinationCategoryType,
-                periodicExam = customExam.periodicExam,
-                customInterval = customExam.customInterval,
-                examinationActionType = customExam.examinationActionType,
-                note = customExam.note
+                ExaminationPreventionStatusDto(
+                    uuid = customExam.uuid,
+                    examinationType = customExam.type,
+                    intervalYears = customExam.customInterval ?: 0,
+                    plannedDate = customExam.plannedDate?.atUTCOffset(),
+                    firstExam = customExam.firstExam,
+                    priority = 0,
+                    state = customExam.status,
+                    count = 0,
+                    lastConfirmedDate = null,
+                    points = 0,
+                    badge = BadgeTypeDto.SHIELD,
+                    examinationCategoryType = customExam.examinationCategoryType,
+                    periodicExam = customExam.periodicExam,
+                    customInterval = customExam.customInterval,
+                    examinationActionType = customExam.examinationActionType,
+                    note = customExam.note
+                )
+            }
+
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT, "Custom assert failed - ${e.localizedMessage}"
             )
         }
+    }
 
     private fun prepareSelfExaminationsStatuses(account: Account): List<SelfExaminationPreventionStatusDto> {
         val result = mutableListOf<SelfExaminationPreventionStatusDto>()
