@@ -28,7 +28,6 @@ class TestEndpointService(
             response = "$response today ${todayNotifications.size}, first ${firstNotifications.size} "
 
             if (todayNotifications.isNotEmpty()) {
-
                 notificationService.sendSelfExamNotificationTestEndpoint(setOf(account))
                 response = "$response normal notifacion + "
             }

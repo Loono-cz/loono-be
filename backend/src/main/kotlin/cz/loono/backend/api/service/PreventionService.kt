@@ -64,10 +64,10 @@ class PreventionService(
             .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
         val customExaminations = prepareCustomStatuses(plannedExam)
 
-        val joinedExaminations = customExaminations + examinations
+        // val joinedExaminations = customExaminations + examinations
 
         val selfExamsList = prepareSelfExaminationsStatuses(account)
-        return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
+        return PreventionStatusDto(examinations = examinations, selfexaminations = selfExamsList)
     }
 
     private fun prepareExaminationStatuses(

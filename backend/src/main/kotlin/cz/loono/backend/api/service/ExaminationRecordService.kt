@@ -10,6 +10,7 @@ import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.data.constants.Constants
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
@@ -262,6 +263,7 @@ class ExaminationRecordService(
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val account = findAccount(accountUuid)
+        checkCustomExamsAmount(account)
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
         addRewardIfEligible(examinationRecordDto, account, examinationRecordDto.status)
@@ -333,22 +335,35 @@ class ExaminationRecordService(
         return date.isBefore(lastConfirmed.first().plannedDate!!.plusMonths(intervalInMonths))
     }
 
+    private fun checkCustomExamsAmount(account: Account) {
+        val customExamsSize = examinationRecordRepository.findAllByAccount(account)
+            .filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }.size
+        if (customExamsSize >= Constants.MAXIMUM_CUSTOM_EXAMS){
+            throw LoonoBackendException(
+                HttpStatus.TOO_MANY_REQUESTS,
+                "404",
+                "Maximum amount of custom exam is exceeded."
+            )
+        }
+    }
     private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
             "404",
             "The account not found."
         )
-        val plannedExam = examinationRecordRepository.findAllByAccount(account)
-            .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
-        if (plannedExam.isNotEmpty() && record.uuid == null) {
-            throw LoonoBackendException(
-                HttpStatus.CONFLICT,
-                "409",
-                "The examination of this type already exists."
-            )
-        }
+
         if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+            val plannedExam = examinationRecordRepository.findAllByAccount(account)
+                .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
+            if (plannedExam.isNotEmpty() && record.uuid == null) {
+                throw LoonoBackendException(
+                    HttpStatus.CONFLICT,
+                    "409",
+                    "The examination of this type already exists."
+                )
+            }
+
             val intervals =
                 preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
             intervals.ifEmpty {

@@ -25,4 +25,6 @@ object Constants {
         "OdbornyZastupce", // Substitute
         "Lat", "Lng" // Geographical coords
     )
+
+    const val MAXIMUM_CUSTOM_EXAMS = 10
 }
