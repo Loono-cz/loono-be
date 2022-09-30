@@ -46,6 +46,8 @@ class PreventionService(
             HttpStatus.NOT_FOUND, "Account not found"
         )
         try {
+            val joinedExaminations: List<ExaminationPreventionStatusDto>
+
             val examinationRequests = getExaminationRequests(account)
 
             val examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>> =
@@ -59,13 +61,15 @@ class PreventionService(
                 examinationTypesToRecords,
                 account
             )
-
-            val plannedExam = examinationRecordRepository.findAllByAccount(account)
-                .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-            val customExaminations = prepareCustomStatuses(plannedExam)
-            var joinedExaminations: List<ExaminationPreventionStatusDto>
             try {
-                joinedExaminations = customExaminations + examinations
+                val filteredExaminations = examinations.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+
+                val plannedExam = examinationRecordRepository.findAllByAccount(account)
+
+                val listOfCustomExams = plannedExam.filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                val customExaminations = prepareCustomStatuses(listOfCustomExams)
+
+                joinedExaminations = customExaminations + filteredExaminations
             } catch (e: Exception) {
                 throw LoonoBackendException(
                     HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
@@ -87,8 +91,7 @@ class PreventionService(
         account: Account
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
-        val examMandatory = examsOfType?.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
-        val sortedExamsOfType = examMandatory?.filter {
+        val sortedExamsOfType = examsOfType?.filter {
             it.plannedDate != null || it.status != ExaminationStatusDto.CONFIRMED || it.status != ExaminationStatusDto.CANCELED
         }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
             ExaminationRecord(
