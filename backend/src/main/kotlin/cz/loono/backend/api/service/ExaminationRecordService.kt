@@ -1,6 +1,15 @@
 package cz.loono.backend.api.service
 
-import cz.loono.backend.api.dto.*
+import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
+import cz.loono.backend.api.dto.ExaminationRecordDto
+import cz.loono.backend.api.dto.ExaminationStatusDto
+import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
+import cz.loono.backend.api.dto.SelfExaminationFindingResponseDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
+import cz.loono.backend.api.dto.SelfExaminationStatusDto
+import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.data.constants.Constants
 import cz.loono.backend.db.model.Account
