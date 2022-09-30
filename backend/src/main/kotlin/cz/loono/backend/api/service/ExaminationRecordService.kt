@@ -1,6 +1,7 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
@@ -280,7 +281,7 @@ class ExaminationRecordService(
                 customInterval = examinationRecordDto.customInterval,
                 periodicExam = examinationRecordDto.periodicExam,
                 examinationCategoryType = examinationRecordDto.examinationCategoryType,
-                examinationActionType = record.examinationActionType
+                examinationActionType = examinationRecordDto.examinationActionType ?: ExaminationActionTypeDto.EXAMINATION
             )
         ).toExaminationRecordDto()
     }

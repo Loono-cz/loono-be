@@ -65,8 +65,9 @@ class PreventionService(
 
                 val plannedExam = examinationRecordRepository.findAllByAccount(account)
 
-                val listOfCustomExams = plannedExam.filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val customExaminations = prepareCustomStatuses(listOfCustomExams)
+                val listOfCustomExamsNew = plannedExam.filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                val listOfCustomExamsOther = plannedExam.filter { it.status != ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                val customExaminations = prepareCustomStatuses(listOfCustomExamsNew, listOfCustomExamsOther)
 
                 joinedExaminations = customExaminations + filteredExaminations
             } catch (e: Exception) {
@@ -135,13 +136,11 @@ class PreventionService(
         )
     }
 
-    private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> {
+    private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>, pastExams: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> {
         try {
             return plannedExam.map { customExam ->
                 // TODO - last confirm date
-                // TODO - badge -> null or customBadge
-                // TODO - points for periodic exams
-
+                val lastExam = pastExams.filter { it.type == customExam.type && it.plannedDate != null }
                 ExaminationPreventionStatusDto(
                     uuid = customExam.uuid,
                     examinationType = customExam.type,
@@ -151,7 +150,7 @@ class PreventionService(
                     priority = 0,
                     state = customExam.status,
                     count = 0,
-                    lastConfirmedDate = null,
+                    lastConfirmedDate = lastExam.mapNotNull(ExaminationRecord::plannedDate).maxOrNull()?.atUTCOffset(),
                     points = if (customExam.periodicExam == true) { 50 } else { 0 },
                     badge = null,
                     examinationCategoryType = customExam.examinationCategoryType,
