@@ -434,21 +434,23 @@ class ExaminationRecordService(
         acc: Account,
         newState: ExaminationStatusDto?
     ) {
-        val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
-        val isFirstExam = recordBeforeUpdate?.firstExam ?: true
-        val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState &&
-            (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+            val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
+            val isFirstExam = recordBeforeUpdate?.firstExam ?: true
+            val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
 
-        if (isEligibleForReward(
-                isFirstExam,
-                isStatusChangedToExpectedStates,
-                examinationRecordDto.plannedDate?.toLocalDateTime(),
-                newState
-            )
-        ) {
-            val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
-            val updatedAccount = updateWithBadgeAndPoints(reward, acc)
-            accountRepository.save(updatedAccount)
+            if (isEligibleForReward(
+                    isFirstExam,
+                    isStatusChangedToExpectedStates,
+                    examinationRecordDto.plannedDate?.toLocalDateTime(),
+                    newState
+                )
+            ) {
+                val reward =
+                    BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
+                val updatedAccount = updateWithBadgeAndPoints(reward, acc)
+                accountRepository.save(updatedAccount)
+            }
         }
     }
 

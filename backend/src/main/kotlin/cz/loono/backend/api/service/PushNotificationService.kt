@@ -46,7 +46,7 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        badgeTypeDto: BadgeTypeDto
+        badgeTypeDto: BadgeTypeDto?
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
