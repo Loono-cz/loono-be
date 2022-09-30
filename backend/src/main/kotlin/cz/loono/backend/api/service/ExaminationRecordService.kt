@@ -338,7 +338,7 @@ class ExaminationRecordService(
     private fun checkCustomExamsAmount(account: Account) {
         val customExamsSize = examinationRecordRepository.findAllByAccount(account)
             .filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }.size
-        if (customExamsSize >= Constants.MAXIMUM_CUSTOM_EXAMS){
+        if (customExamsSize >= Constants.MAXIMUM_CUSTOM_EXAMS) {
             throw LoonoBackendException(
                 HttpStatus.TOO_MANY_REQUESTS,
                 "404",
