@@ -45,35 +45,40 @@ class PreventionService(
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND, "Account not found"
         )
-
-        val examinationRequests = getExaminationRequests(account)
-
-        val examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>> =
-            examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
-                .groupBy(ExaminationRecord::type)
-                .mapNotNull { entry -> entry.key to entry.value }
-                .toMap()
-
-        val examinations = prepareExaminationStatuses(
-            examinationRequests,
-            examinationTypesToRecords,
-            account
-        )
-
-        val plannedExam = examinationRecordRepository.findAllByAccount(account)
-            .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-        val customExaminations = prepareCustomStatuses(plannedExam)
-        var joinedExaminations: List<ExaminationPreventionStatusDto>
         try {
-            joinedExaminations = customExaminations + examinations
-        } catch (e: Exception) {
+            val examinationRequests = getExaminationRequests(account)
+
+            val examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>> =
+                examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
+                    .groupBy(ExaminationRecord::type)
+                    .mapNotNull { entry -> entry.key to entry.value }
+                    .toMap()
+
+            val examinations = prepareExaminationStatuses(
+                examinationRequests,
+                examinationTypesToRecords,
+                account
+            )
+
+            val plannedExam = examinationRecordRepository.findAllByAccount(account)
+                .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+            val customExaminations = prepareCustomStatuses(plannedExam)
+            var joinedExaminations: List<ExaminationPreventionStatusDto>
+            try {
+                joinedExaminations = customExaminations + examinations
+            } catch (e: Exception) {
+                throw LoonoBackendException(
+                    HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
+                )
+            }
+
+            val selfExamsList = prepareSelfExaminationsStatuses(account)
+            return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
+        } catch (e: Exception){
             throw LoonoBackendException(
-                HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
+                HttpStatus.CONFLICT, "EXAMS GET failed - ${e.localizedMessage}"
             )
         }
-
-        val selfExamsList = prepareSelfExaminationsStatuses(account)
-        return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
     }
 
     private fun prepareExaminationStatuses(
