@@ -60,18 +60,17 @@ class PreventionService(
             account
         )
 
-         val plannedExam = examinationRecordRepository.findAllByAccount(account)
+        val plannedExam = examinationRecordRepository.findAllByAccount(account)
             .filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-         val customExaminations = prepareCustomStatuses(plannedExam)
-         var joinedExaminations: List<ExaminationPreventionStatusDto>
-         try {
-             joinedExaminations = customExaminations + examinations
-         } catch (e: Exception) {
-             throw LoonoBackendException(
-                 HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
-             )
-         }
-
+        val customExaminations = prepareCustomStatuses(plannedExam)
+        var joinedExaminations: List<ExaminationPreventionStatusDto>
+        try {
+            joinedExaminations = customExaminations + examinations
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT, "Custom and mandatory join failed - ${e.localizedMessage}"
+            )
+        }
 
         val selfExamsList = prepareSelfExaminationsStatuses(account)
         return PreventionStatusDto(examinations = joinedExaminations, selfexaminations = selfExamsList)
@@ -155,7 +154,6 @@ class PreventionService(
                     note = customExam.note
                 )
             }
-
         } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.CONFLICT, "Custom assert failed - ${e.localizedMessage}"
