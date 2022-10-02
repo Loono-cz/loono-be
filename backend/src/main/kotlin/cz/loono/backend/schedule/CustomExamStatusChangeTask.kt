@@ -2,6 +2,7 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
+import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -17,9 +18,8 @@ class CustomExamStatusChangeTask(
         val customExams = plannedExams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
         customExams.forEach { record ->
             record.plannedDate?.let { plannedDate ->
-                if (plannedDate.plusHours(2).isBefore(now)) {
-                    record.status = ExaminationStatusDto.CONFIRMED
-                    examinationRecordRepository.save(record)
+                if (now.isAfter(plannedDate)) {
+                    examinationRecordRepository.save(record.copy(status = ExaminationStatusDto.CONFIRMED))
                 }
             }
         }
