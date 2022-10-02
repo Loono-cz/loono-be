@@ -2,7 +2,6 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
