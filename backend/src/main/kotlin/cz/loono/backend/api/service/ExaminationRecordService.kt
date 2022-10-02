@@ -486,6 +486,7 @@ class ExaminationRecordService(
             periodicExam = periodicExam,
             customInterval = customInterval,
             examinationCategoryType = examinationCategoryType,
-            status = status
+            status = status,
+            examinationActionType = examinationActionType
         )
 }
