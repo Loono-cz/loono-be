@@ -17,9 +17,8 @@ class CustomExamStatusChangeTask(
         val customExams = plannedExams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
         customExams.forEach { record ->
             record.plannedDate?.let { plannedDate ->
-                if (plannedDate.plusHours(2).isBefore(now)) {
-                    record.status = ExaminationStatusDto.CONFIRMED
-                    examinationRecordRepository.save(record)
+                if (now.isAfter(plannedDate)) {
+                    examinationRecordRepository.save(record.copy(status = ExaminationStatusDto.CONFIRMED))
                 }
             }
         }
