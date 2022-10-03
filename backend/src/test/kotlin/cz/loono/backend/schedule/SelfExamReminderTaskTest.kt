@@ -37,6 +37,13 @@ class SelfExamReminderTaskTest {
                         badge = BadgeTypeDto.SHIELD,
                         points = 50,
                         history = emptyList()
+                    ),
+                    SelfExaminationPreventionStatusDto(
+                        type = SelfExaminationTypeDto.SKIN,
+                        plannedDate = null,
+                        badge = BadgeTypeDto.PAULDRONS,
+                        points = 50,
+                        history = emptyList()
                     )
                 )
             )
@@ -61,6 +68,13 @@ class SelfExamReminderTaskTest {
                         badge = BadgeTypeDto.SHIELD,
                         points = 50,
                         history = listOf(SelfExaminationStatusDto.COMPLETED, SelfExaminationStatusDto.PLANNED)
+                    ),
+                    SelfExaminationPreventionStatusDto(
+                        type = SelfExaminationTypeDto.SKIN,
+                        plannedDate = LocalDate.now(),
+                        badge = BadgeTypeDto.PAULDRONS,
+                        points = 50,
+                        history = emptyList()
                     )
                 )
             )

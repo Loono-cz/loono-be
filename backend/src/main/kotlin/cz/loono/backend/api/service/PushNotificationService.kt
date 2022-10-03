@@ -91,7 +91,19 @@ class PushNotificationService(
         sendPushNotification(NotificationDefinition.getFirstSelfExamNotificationTestEndpoint(accounts))
     fun sendSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
         sendPushNotification(NotificationDefinition.getSelfExamNotificationTestEndpoint(accounts))
+    fun sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
+        accounts: Set<Account>,
+        examinationTypeDto: ExaminationTypeDto,
+        interval: Int
+    ): String = sendPushNotification(
+        NotificationDefinition.getOrderNewExam2MonthsAheadNotificationTestEndpoint(
+            accounts,
+            examinationTypeDto,
+            interval
+        )
+    )
 
+    // TODO - end of testing endpoint
     fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
         sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
 

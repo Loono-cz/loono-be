@@ -182,4 +182,24 @@ object NotificationDefinition {
             data = NotificationData(screen = "self"),
         )
     }
+
+    fun getOrderNewExam2MonthsAheadNotificationTestEndpoint(
+        accounts: Set<Account>,
+        examinationTypeDto: ExaminationTypeDto,
+        interval: Int
+    ): PushNotification {
+        val name = "Order reminder 2 months ahead notification"
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+        val title = notificationTextManager.getText("order.2months.ahead.title", examinationTypeDto)
+        val text = notificationTextManager.getText("order.2months.ahead.text", interval)
+        return PushNotification(
+            appId = ONESIGNAL_APP_ID,
+            name = name,
+            headings = MultipleLangString(cs = title, en = title),
+            contents = MultipleLangString(cs = text, en = text),
+            includeExternalUserIds = accounts.map { it.uid },
+            scheduleTimeOfDay = time.toString(),
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+        )
+    }
 }
