@@ -73,16 +73,16 @@ class TestEndpointService(
         }
 
         try {
-            response = "$response + \n CUSTOM EXAMS 2 MONTHS NOTIFICATION"
+            response = "$response \n CUSTOM EXAMS 2 MONTHS NOTIFICATION"
             accounts?.let { account ->
                 val examStatuses = preventionService.getPreventionStatus(account.uid).examinations
                 examStatuses.forEach { status ->
                     status.lastConfirmedDate?.let {
-                        response = "$response + record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
+                        response = "$response \n record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
                         val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                         val passedMonths = period.years * 12 + period.months
                         if (passedMonths == (status.intervalYears * 12) - 2 && period.days == 0) {
-                            response = "$response + record 2 months ahead ${status.uuid} - ${status.lastConfirmedDate}"
+                            response = "$response \n SEND NOTIFICATION 2 MONTH ${status.uuid} - ${status.lastConfirmedDate} \n "
                             notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                 setOf(account),
                                 status.examinationType,
