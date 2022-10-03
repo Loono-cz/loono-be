@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -72,13 +73,31 @@ class TestEndpointService(
         }
 
         try {
-            response = "$response + \n CUSTOM EXAMS NOTIFICATION"
+            response = "$response + \n CUSTOM EXAMS 2 MONTHS NOTIFICATION"
+            accounts?.let { account ->
+                val examStatuses = preventionService.getPreventionStatus(account.uid).examinations
+                examStatuses.forEach { status ->
+                    status.lastConfirmedDate?.let {
+                        response = "$response + record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
+                        val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
+                        val passedMonths = period.years * 12 + period.months
+                        if (passedMonths == (status.intervalYears * 12) - 2 && period.days == 0) {
+                            response = "$response + record 2 months ahead ${status.uuid} - ${status.lastConfirmedDate}"
+                            notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
+                                setOf(account),
+                                status.examinationType,
+                                status.intervalYears
+                            )
+                        }
+                    }
+                }
+            }
         } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.CONFLICT, "test custom notification failed - ${e.localizedMessage}"
             )
         }
-        
+
         return response
     }
 }
