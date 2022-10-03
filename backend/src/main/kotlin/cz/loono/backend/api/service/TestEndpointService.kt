@@ -50,7 +50,7 @@ class TestEndpointService(
         }
 
         try {
-            response = "$response + CUSTOM EXAMS CONFIRMATION"
+            response = "$response + \n CUSTOM EXAMS CONFIRMATION"
             val now = LocalDateTime.now()
             val plannedExams = examinationRecordRepository.findAllByStatus(status = ExaminationStatusDto.NEW)
             val customExams = plannedExams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
@@ -71,6 +71,14 @@ class TestEndpointService(
             )
         }
 
+        try {
+            response = "$response + \n CUSTOM EXAMS NOTIFICATION"
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT, "test custom notification failed - ${e.localizedMessage}"
+            )
+        }
+        
         return response
     }
 }
