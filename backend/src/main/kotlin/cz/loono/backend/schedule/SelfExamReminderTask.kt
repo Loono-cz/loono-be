@@ -2,7 +2,6 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
-import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -18,15 +17,14 @@ class SelfExamReminderTask(
         val accounts = accountRepository.findAll()
         val today = LocalDate.now()
         accounts.forEach { account ->
-            // TODO kontrolu at nejsou 2 notifikace ve stejny den
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
-            statuses.forEach {
-                if (account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null) {
-                    notificationService.sendFirstSelfExamNotification(setOf<Account>(account))
-                }
-                if (it.plannedDate == today) {
-                    notificationService.sendSelfExamNotification(setOf<Account>(account))
-                }
+            val todayNotifications = statuses.filter { it.plannedDate == today }
+            val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null }
+            if (todayNotifications.isNotEmpty()) {
+                notificationService.sendSelfExamNotificationTestEndpoint(setOf(account))
+            }
+            if (firstNotifications.isNotEmpty()) {
+                notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
             }
         }
     }
