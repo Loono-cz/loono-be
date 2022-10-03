@@ -1,7 +1,10 @@
 package cz.loono.backend.api.service
 
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
+import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -12,7 +15,8 @@ import java.time.format.DateTimeFormatter
 class TestEndpointService(
     private val accountRepository: AccountRepository,
     private val preventionService: PreventionService,
-    private val notificationService: PushNotificationService
+    private val notificationService: PushNotificationService,
+    private val examinationRecordRepository: ExaminationRecordRepository
 ) {
 
     fun getTestEndpoint(accountId: String): String {
@@ -44,6 +48,29 @@ class TestEndpointService(
                 )
             }
         }
+
+        try {
+            response = "$response + CUSTOM EXAMS CONFIRMATION"
+            val now = LocalDateTime.now()
+            val plannedExams = examinationRecordRepository.findAllByStatus(status = ExaminationStatusDto.NEW)
+            val customExams = plannedExams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+            val customExamNonPeriodic = customExams.filter { it.periodicExam == false }
+            response = "$response + customExamNonPeriodic ${customExamNonPeriodic.size}"
+            customExamNonPeriodic.forEach { record ->
+                response = "$response + record ${record.id} - ${record.plannedDate}"
+                record.plannedDate?.let { plannedDate ->
+                    if (now.isAfter(plannedDate)) {
+                        response = "$response + CHANGE record ${record.id} - ${record.plannedDate}"
+                        examinationRecordRepository.save(record.copy(status = ExaminationStatusDto.CONFIRMED))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.CONFLICT, "test confirmation failed - ${e.localizedMessage}"
+            )
+        }
+
         return response
     }
 }
