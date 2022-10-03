@@ -71,7 +71,7 @@ class SelfExamReminderTaskTest {
                     ),
                     SelfExaminationPreventionStatusDto(
                         type = SelfExaminationTypeDto.SKIN,
-                        plannedDate = null,
+                        plannedDate = LocalDate.now(),
                         badge = BadgeTypeDto.PAULDRONS,
                         points = 50,
                         history = emptyList()

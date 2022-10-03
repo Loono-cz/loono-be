@@ -20,12 +20,12 @@ class SelfExamReminderTask(
         accounts.forEach { account ->
             val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
             val todayNotifications = statuses.filter { it.plannedDate == today }
-            val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null }
+            val firstNotifications = statuses.filter { it.plannedDate == null }
             if (todayNotifications.isNotEmpty()) {
-                notificationService.sendFirstSelfExamNotification(setOf<Account>(account))
+                notificationService.sendSelfExamNotification(setOf<Account>(account))
             }
             if (firstNotifications.isNotEmpty()) {
-                notificationService.sendSelfExamNotification(setOf<Account>(account))
+                notificationService.sendFirstSelfExamNotification(setOf<Account>(account))
             }
         }
     }
