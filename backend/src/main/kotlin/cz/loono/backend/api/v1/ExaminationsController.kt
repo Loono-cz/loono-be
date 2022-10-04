@@ -41,6 +41,18 @@ class ExaminationsController(
             recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
+    @PostMapping("/delete")
+    fun delete(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser,
+
+        @RequestBody
+        examinationIdDto: ExaminationIdDto
+    ) =
+        examinationIdDto.uuid?.let {
+            recordService.deleteExam(examinationIdDto.uuid, basicUser.uid)
+        } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+
     @PostMapping("/{self-type}/self")
     fun confirmSelf(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
