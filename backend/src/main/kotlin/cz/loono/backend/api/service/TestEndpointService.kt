@@ -47,7 +47,7 @@ class TestEndpointService(
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion "
                 }
-                if (statuses.isEmpty() && account.created.dayOfMonth == today.dayOfMonth){
+                if (statuses.isEmpty() && account.created.dayOfMonth == today.dayOfMonth) {
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion on empty list"
                 }
