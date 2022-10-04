@@ -57,7 +57,6 @@ class ExaminationRecordService(
     fun deleteExam(examUuid: String, accountUuid: String) =
         deleteExamByUUID(examUuid, accountUuid)
 
-
     fun confirmSelfExam(
         type: SelfExaminationTypeDto,
         result: SelfExaminationResultDto,
@@ -420,8 +419,7 @@ class ExaminationRecordService(
     private fun deleteExamByUUID(
         examUuid: String,
         accountUuid: String
-    )
-    {
+    ) {
         val account = findAccount(accountUuid)
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         return examinationRecordRepository.deleteById(exam.id)
