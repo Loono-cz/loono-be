@@ -80,7 +80,7 @@ class TestEndpointService(
                 val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
                 mandatoryExams.forEach { status ->
                     status.lastConfirmedDate?.let {
-                        response = "$response \n mandatory record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
+                        response = "$response \n M $status"
                         val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                         val passedMonths = period.years * 12 + period.months
                         response = "$response \n passedMonths = $passedMonths , status*12-2 = ${(status.intervalYears * 12) - 2} , periodDays = ${period.days} "
@@ -99,7 +99,19 @@ class TestEndpointService(
                 customExams.forEach { status ->
                     response = "$response \n custom record $status"
                     status.lastConfirmedDate?.let {
-                        response = "$response \n custom record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
+                        response = "$response \n HAS LAST DATE"
+                        if (status.periodicExam == true){
+                            response = "$response \n IS PERIODIC"
+                            val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
+                            response = "$response \n PERIOD IS $period"
+                            if (period.months == status.customInterval && period.days == 0){
+                                notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
+                                    setOf(account),
+                                    status.examinationType,
+                                    status.intervalYears
+                                )
+                            }
+                        }
                     }
                 }
             }
