@@ -2,9 +2,12 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
+import cz.loono.backend.api.dto.SelfExaminationResultDto
+import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,7 +20,8 @@ class TestEndpointService(
     private val accountRepository: AccountRepository,
     private val preventionService: PreventionService,
     private val notificationService: PushNotificationService,
-    private val examinationRecordRepository: ExaminationRecordRepository
+    private val examinationRecordRepository: ExaminationRecordRepository,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
 ) {
 
     fun getTestEndpoint(accountId: String): String {
@@ -29,19 +33,19 @@ class TestEndpointService(
         accounts?.let { account ->
             try {
                 response = "$response account found "
-                val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
-                response = "$response statuses ${statuses.size} "
-                val todayNotifications = statuses.filter { it.plannedDate == today }
-                val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null }
+                val statuses = selfExaminationRecordRepository.findAllByAccount(account)
+                response = "$response self exam statuses $statuses "
+                val todayNotifications = statuses.filter { it.dueDate == today && it.status != SelfExaminationStatusDto.WAITING_FOR_RESULT && it.result != SelfExaminationResultDto.Result.FINDING && it.result != SelfExaminationResultDto.Result.NOT_OK }
+                val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.dueDate == null }
                 response = "$response today ${todayNotifications.size}, first ${firstNotifications.size} "
 
                 if (todayNotifications.isNotEmpty()) {
                     notificationService.sendSelfExamNotificationTestEndpoint(setOf(account))
-                    response = "$response normal notifacion + "
+                    response = "$response normal notifacion "
                 }
                 if (firstNotifications.isNotEmpty()) {
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
-                    response = "$response first notifacion + "
+                    response = "$response first notifacion "
                 }
             } catch (e: Exception) {
                 throw LoonoBackendException(
@@ -104,7 +108,8 @@ class TestEndpointService(
                             response = "$response \n IS PERIODIC"
                             val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                             response = "$response \n PERIOD IS Y-${period.years} M-${period.months} D-${period.days}"
-                            if (period.months == status.customInterval && period.days == 0) {
+                            response = "$response \n ${period.months == status.customInterval?.minus(2) && period.days == 0} "
+                            if (period.months == (status.customInterval?.minus(2)) && period.days == 0) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
                                     status.examinationType,
