@@ -100,7 +100,6 @@ class TestEndpointService(
                     response = "$response \n custom record $status"
                     status.lastConfirmedDate?.let {
                         response = "$response \n custom record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
-
                     }
                 }
             }
