@@ -14,5 +14,4 @@ interface ExaminationRecordRepository : JpaRepository<ExaminationRecord, Long> {
     fun findAllByAccount(account: Account): Set<ExaminationRecord>
     fun findAllByStatus(status: ExaminationStatusDto): Set<ExaminationRecord>
     fun deleteAllByAccount(account: Account)
-    fun deleteByUuid(uuid: String, account: Account)
 }

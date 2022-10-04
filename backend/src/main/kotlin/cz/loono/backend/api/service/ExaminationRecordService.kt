@@ -52,6 +52,12 @@ class ExaminationRecordService(
     fun confirmExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
         changeState(examUuid, accountUuid, ExaminationStatusDto.CONFIRMED)
 
+    @Synchronized
+    @Transactional(rollbackFor = [Exception::class])
+    fun deleteExam(examUuid: String, accountUuid: String) =
+        deleteExamByUUID(examUuid, accountUuid)
+
+
     fun confirmSelfExam(
         type: SelfExaminationTypeDto,
         result: SelfExaminationResultDto,
@@ -409,6 +415,16 @@ class ExaminationRecordService(
         exam.status = state
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
+    }
+
+    private fun deleteExamByUUID(
+        examUuid: String,
+        accountUuid: String
+    )
+    {
+        val account = findAccount(accountUuid)
+        val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
+        return examinationRecordRepository.deleteById(exam.id)
     }
 
     private fun updateWithBadgeAndPoints(badgeToPoints: Pair<BadgeTypeDto, Int>, account: Account): Account {
