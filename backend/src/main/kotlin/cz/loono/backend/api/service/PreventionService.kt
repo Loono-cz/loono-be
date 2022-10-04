@@ -65,9 +65,9 @@ class PreventionService(
 
                 val plannedExam = examinationRecordRepository.findAllByAccount(account)
 
-                val listOfCustomExamsNew = plannedExam.filter { it.status == ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                val customExams = plannedExam.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
                 val listOfCustomExamsOther = plannedExam.filter { it.status != ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val customExaminations = prepareCustomStatuses(listOfCustomExamsNew, listOfCustomExamsOther)
+                val customExaminations = prepareCustomStatuses(customExams, listOfCustomExamsOther)
 
                 joinedExaminations = customExaminations + filteredExaminations
             } catch (e: Exception) {
@@ -139,7 +139,6 @@ class PreventionService(
     private fun prepareCustomStatuses(plannedExam: List<ExaminationRecord>, pastExams: List<ExaminationRecord>): List<ExaminationPreventionStatusDto> {
         try {
             return plannedExam.map { customExam ->
-                // TODO - last confirm date
                 val lastExam = pastExams.filter { it.type == customExam.type && it.plannedDate != null }
                 ExaminationPreventionStatusDto(
                     uuid = customExam.uuid,
