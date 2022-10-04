@@ -103,7 +103,7 @@ class TestEndpointService(
                         if (status.periodicExam == true) {
                             response = "$response \n IS PERIODIC"
                             val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
-                            response = "$response \n PERIOD IS $period"
+                            response = "$response \n PERIOD IS Y-${period.years} M-${period.months} D-${period.days}"
                             if (period.months == status.customInterval && period.days == 0) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
