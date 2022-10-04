@@ -47,6 +47,10 @@ class TestEndpointService(
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion "
                 }
+                if (statuses.isEmpty() && account.created.dayOfMonth == today.dayOfMonth) {
+                    notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
+                    response = "$response first notifacion on empty list"
+                }
             } catch (e: Exception) {
                 throw LoonoBackendException(
                     HttpStatus.CONFLICT, "test self exam fail - ${e.localizedMessage}"
@@ -110,6 +114,7 @@ class TestEndpointService(
                             response = "$response \n PERIOD IS Y-${period.years} M-${period.months} D-${period.days}"
                             response = "$response \n ${period.months == status.customInterval?.minus(2) && period.days == 0} "
                             if (period.months == (status.customInterval?.minus(2)) && period.days == 0) {
+                                response = "$response \n SEND ${setOf(account) } \n ${status.examinationType} \n ${status.intervalYears}"
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
                                     status.examinationType,
