@@ -76,7 +76,9 @@ class TestEndpointService(
             response = "$response \n CUSTOM EXAMS 2 MONTHS NOTIFICATION"
             accounts?.let { account ->
                 val examStatuses = preventionService.getPreventionStatus(account.uid).examinations
-                examStatuses.forEach { status ->
+                val mandatoryExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+                val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                mandatoryExams.forEach { status ->
                     status.lastConfirmedDate?.let {
                         response = "$response \n mandatory record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
                         val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
@@ -91,6 +93,13 @@ class TestEndpointService(
                                 status.intervalYears
                             )
                         }
+                    }
+                }
+
+                customExams.forEach { status ->
+                    response = "$response \n custom record $status"
+                    status.lastConfirmedDate?.let {
+                        response = "$response \n custom record with last conf date ${status.uuid} - ${status.lastConfirmedDate}"
                     }
                 }
             }
