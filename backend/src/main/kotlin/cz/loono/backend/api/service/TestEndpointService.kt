@@ -100,11 +100,11 @@ class TestEndpointService(
                     response = "$response \n custom record $status"
                     status.lastConfirmedDate?.let {
                         response = "$response \n HAS LAST DATE"
-                        if (status.periodicExam == true){
+                        if (status.periodicExam == true) {
                             response = "$response \n IS PERIODIC"
                             val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                             response = "$response \n PERIOD IS $period"
-                            if (period.months == status.customInterval && period.days == 0){
+                            if (period.months == status.customInterval && period.days == 0) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
                                     status.examinationType,
