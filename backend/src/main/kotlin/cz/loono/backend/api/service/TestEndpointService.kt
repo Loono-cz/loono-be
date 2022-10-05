@@ -2,7 +2,6 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.repository.AccountRepository
@@ -29,27 +28,27 @@ class TestEndpointService(
         val today = LocalDate.now()
         var response = "${accounts?.uid}"
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
-        response = "$response local time: $time"
+        response = "$response local time: $time \n"
         accounts?.let { account ->
             try {
-                response = "$response account found "
+                response = "$response account found \n "
                 val statuses = selfExaminationRecordRepository.findAllByAccount(account)
-                response = "$response self exam statuses $statuses "
-                val todayNotifications = statuses.filter { it.dueDate == today && it.status != SelfExaminationStatusDto.WAITING_FOR_RESULT && it.result != SelfExaminationResultDto.Result.FINDING && it.result != SelfExaminationResultDto.Result.NOT_OK }
+                response = "$response self exam statuses ${statuses.size} \n"
+                val todayNotifications = statuses.filter { it.dueDate == today && it.status == SelfExaminationStatusDto.PLANNED && it.result == null }
                 val firstNotifications = statuses.filter { account.created.dayOfMonth == today.dayOfMonth && it.dueDate == null }
-                response = "$response today ${todayNotifications.size}, first ${firstNotifications.size} "
+                response = "$response today ${todayNotifications.size}, first ${firstNotifications.size} \n"
 
                 if (todayNotifications.isNotEmpty()) {
                     notificationService.sendSelfExamNotificationTestEndpoint(setOf(account))
-                    response = "$response normal notifacion "
+                    response = "$response normal notifacion - $todayNotifications \n "
                 }
                 if (firstNotifications.isNotEmpty()) {
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
-                    response = "$response first notifacion "
+                    response = "$response first notifacion - $firstNotifications \n "
                 }
                 if (statuses.isEmpty() && account.created.dayOfMonth == today.dayOfMonth) {
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
-                    response = "$response first notifacion on empty list"
+                    response = "$response first notifacion on empty list \n"
                 }
             } catch (e: Exception) {
                 throw LoonoBackendException(
@@ -66,10 +65,10 @@ class TestEndpointService(
             val customExamNonPeriodic = customExams.filter { it.periodicExam == false }
             response = "$response + customExamNonPeriodic ${customExamNonPeriodic.size}"
             customExamNonPeriodic.forEach { record ->
-                response = "$response + record ${record.id} - ${record.plannedDate}"
+                response = "$response + record ${record.id} - ${record.plannedDate} \n"
                 record.plannedDate?.let { plannedDate ->
                     if (now.isAfter(plannedDate)) {
-                        response = "$response + CHANGE record ${record.id} - ${record.plannedDate}"
+                        response = "$response + CHANGE record ${record.id} - ${record.plannedDate} \n"
                         examinationRecordRepository.save(record.copy(status = ExaminationStatusDto.CONFIRMED))
                     }
                 }
@@ -88,7 +87,7 @@ class TestEndpointService(
                 val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
                 mandatoryExams.forEach { status ->
                     status.lastConfirmedDate?.let {
-                        response = "$response \n M $status"
+                        response = "$response \n M \n $status"
                         val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
                         val passedMonths = period.years * 12 + period.months
                         response = "$response \n passedMonths = $passedMonths , status*12-2 = ${(status.intervalYears * 12) - 2} , periodDays = ${period.days} "
@@ -98,7 +97,8 @@ class TestEndpointService(
                             notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                 setOf(account),
                                 status.examinationType,
-                                status.intervalYears
+                                status.intervalYears,
+                                status.examinationCategoryType
                             )
                         }
                     }
@@ -118,7 +118,8 @@ class TestEndpointService(
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
                                     status.examinationType,
-                                    status.intervalYears
+                                    status.intervalYears,
+                                    status.examinationCategoryType
                                 )
                             }
                         }

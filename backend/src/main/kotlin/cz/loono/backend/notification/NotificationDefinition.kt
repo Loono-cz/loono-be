@@ -1,6 +1,7 @@
 package cz.loono.backend.notification
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID
 import cz.loono.backend.db.model.Account
@@ -186,12 +187,13 @@ object NotificationDefinition {
     fun getOrderNewExam2MonthsAheadNotificationTestEndpoint(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): PushNotification {
         val name = "Order reminder 2 months ahead notification"
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val title = notificationTextManager.getText("order.2months.ahead.title", examinationTypeDto)
-        val text = notificationTextManager.getText("order.2months.ahead.text", interval)
+        val text = notificationTextManager.getText("order.2months.ahead.text", interval, examinationCategoryTypeDto)
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,
