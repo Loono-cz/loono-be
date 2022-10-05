@@ -2,7 +2,6 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.repository.AccountRepository
