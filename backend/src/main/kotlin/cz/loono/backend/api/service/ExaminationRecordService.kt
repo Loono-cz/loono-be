@@ -423,7 +423,7 @@ class ExaminationRecordService(
         try {
             val account = findAccount(accountUuid)
             val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
-            examinationRecordRepository.delete(exam)
+            examinationRecordRepository.deleteByExam(exam)
         } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.SERVICE_UNAVAILABLE, "Delete failed - ${e.localizedMessage}"
