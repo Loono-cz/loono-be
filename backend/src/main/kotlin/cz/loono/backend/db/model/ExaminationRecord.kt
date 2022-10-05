@@ -31,7 +31,7 @@ data class ExaminationRecord(
     val type: ExaminationTypeDto = ExaminationTypeDto.GENERAL_PRACTITIONER,
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = true, columnDefinition = "TEXT")
     val examinationCategoryType: ExaminationCategoryTypeDto = ExaminationCategoryTypeDto.MANDATORY,
 
     @Column
@@ -60,7 +60,7 @@ data class ExaminationRecord(
     val uuid: String? = UUID.randomUUID().toString(),
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = true, columnDefinition = "TEXT")
     var examinationActionType: ExaminationActionTypeDto = ExaminationActionTypeDto.EXAMINATION,
 ) {
     override fun equals(other: Any?): Boolean {

@@ -285,7 +285,7 @@ class ExaminationRecordService(
                 note = examinationRecordDto.note,
                 customInterval = examinationRecordDto.customInterval,
                 periodicExam = examinationRecordDto.periodicExam,
-                examinationCategoryType = examinationRecordDto.examinationCategoryType,
+                examinationCategoryType = examinationRecordDto.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
                 examinationActionType = examinationRecordDto.examinationActionType ?: ExaminationActionTypeDto.EXAMINATION
             )
         ).toExaminationRecordDto()

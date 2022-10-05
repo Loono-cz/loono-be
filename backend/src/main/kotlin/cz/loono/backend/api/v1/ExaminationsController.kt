@@ -14,6 +14,7 @@ import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -41,7 +42,7 @@ class ExaminationsController(
             recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
-    @PostMapping("/delete")
+    @DeleteMapping()
     fun delete(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
