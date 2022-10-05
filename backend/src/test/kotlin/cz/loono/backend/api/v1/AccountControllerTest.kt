@@ -41,11 +41,9 @@ class AccountControllerTest(
     fun `getAccount with missing account`() {
         val service = mock<AccountService>()
         val controller = AccountController(service, repo)
-
         val ex = assertThrows<LoonoBackendException> {
             controller.getAccount(createBasicUser(uid = "non-existing"))
         }
-
         assertEquals(HttpStatus.NOT_FOUND, ex.status)
     }
 
