@@ -1,6 +1,7 @@
 package cz.loono.backend.notification
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
@@ -28,6 +29,9 @@ class NotificationTextManager {
     fun getText(propertyName: String, interval: Int): String =
         replaceInterval(getText(propertyName), interval)
 
+    fun getText(propertyName: String, interval: Int, categoryType: ExaminationCategoryTypeDto): String =
+        replaceIntervalByCategory(getText(propertyName), interval, categoryType)
+
     fun getText(propertyName: String, sex: SexDto): String =
         replaceSelfExam(getText(propertyName), sex)
 
@@ -50,5 +54,23 @@ class NotificationTextManager {
             2, 3, 4 -> text.replace("_INTERVAL_", "$interval ${getText("years.2")}")
             in 5..100 -> text.replace("_INTERVAL_", "$interval ${getText("years.5")}")
             else -> throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+        }
+
+    private fun replaceIntervalByCategory(text: String, interval: Int, categoryType: ExaminationCategoryTypeDto): String =
+        if(categoryType == ExaminationCategoryTypeDto.MANDATORY){
+            when (interval) {
+                1 -> text.replace("_INTERVAL_", "$interval ${getText("years.1")}")
+                2, 3, 4 -> text.replace("_INTERVAL_", "$interval ${getText("years.2")}")
+                in 5..100 -> text.replace("_INTERVAL_", "$interval ${getText("years.5")}")
+                else -> throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+            }
+        } else {
+            when (interval) {
+                in 6..11 -> text.replace("_INTERVAL_", "$interval ${getText("months.6")}")
+                12 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.1")}")
+                in 12 .. 48 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.2")}")
+                in 48..1000 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.5")}")
+                else -> throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+            }
         }
 }
