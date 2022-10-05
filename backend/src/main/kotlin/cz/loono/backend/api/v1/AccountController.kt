@@ -41,6 +41,22 @@ class AccountController(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ): AccountDto {
+        try{
+            val accountExists = accountRepository.existsByUid(basicUser.uid)
+            if (!accountExists) {
+                throw LoonoBackendException(
+                    status = HttpStatus.BAD_REQUEST,
+                    errorCode = "400",
+                    errorMessage = "Account neexistuje posilas $basicUser s uid ${basicUser.uid}"
+                )
+            }
+        } catch (e: Exception){
+            throw LoonoBackendException(
+                status = HttpStatus.BAD_REQUEST,
+                errorCode = "400",
+                errorMessage = "$e"
+            )
+        }
         val account = accountRepository.findByUid(basicUser.uid)
         if (account == null) {
             logger.error(
