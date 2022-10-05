@@ -184,6 +184,22 @@ object NotificationDefinition {
         )
     }
 
+    fun getSelfExamIssueResultNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
+        val name = "Issue result of self-exam notification"
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+        val title = notificationTextManager.getText("self.result.title")
+        val text = notificationTextManager.getText("self.result.text")
+        return PushNotification(
+            appId = ONESIGNAL_APP_ID,
+            name = name,
+            headings = MultipleLangString(cs = title, en = title),
+            contents = MultipleLangString(cs = text, en = text),
+            includeExternalUserIds = accounts.map { it.uid },
+            scheduleTimeOfDay = time.toString(),
+            data = NotificationData(screen = "self")
+        )
+    }
+
     fun getOrderNewExam2MonthsAheadNotificationTestEndpoint(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,

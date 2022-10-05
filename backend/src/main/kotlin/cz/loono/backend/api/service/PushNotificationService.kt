@@ -87,11 +87,17 @@ class PushNotificationService(
     fun sendSelfExamNotification(accounts: Set<Account>): String =
         sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts))
 
+    fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
+        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
+
     // TODO - remove after testing
     fun sendFirstSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
         sendPushNotification(NotificationDefinition.getFirstSelfExamNotificationTestEndpoint(accounts))
     fun sendSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
         sendPushNotification(NotificationDefinition.getSelfExamNotificationTestEndpoint(accounts))
+    fun sendSelfExamIssueResultNotificationTestEndpoint(accounts: Set<Account>): String =
+        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotificationTestEndpoint(accounts))
+
     fun sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
@@ -107,8 +113,6 @@ class PushNotificationService(
     )
 
     // TODO - end of testing endpoint
-    fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
 
     private fun sendPushNotification(notification: PushNotification): String {
         val body = Gson().toJson(notification).toRequestBody()

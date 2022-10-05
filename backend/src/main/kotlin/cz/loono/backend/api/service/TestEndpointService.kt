@@ -50,6 +50,21 @@ class TestEndpointService(
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion on empty list \n"
                 }
+                selfExaminationRecordRepository.findAllByStatus(SelfExaminationStatusDto.WAITING_FOR_CHECKUP).forEach {
+                    if (it.account == account) {
+                        response = "$response WAITING FOR CHECKUP $it \n"
+                        if (it.waitingTo == LocalDate.now()) {
+                            selfExaminationRecordRepository.save(
+                                it.copy(
+                                    status = SelfExaminationStatusDto.WAITING_FOR_RESULT,
+                                    waitingTo = null
+                                )
+                            )
+                            response = "$response WAITING FOR CHECKUP SEND \n"
+                            notificationService.sendSelfExamIssueResultNotificationTestEndpoint(setOf(account))
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 throw LoonoBackendException(
                     HttpStatus.CONFLICT, "test self exam fail - ${e.localizedMessage}"
