@@ -2,6 +2,7 @@ package cz.loono.backend.api.service
 
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.NotificationLog
@@ -94,12 +95,14 @@ class PushNotificationService(
     fun sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotificationTestEndpoint(
             accounts,
             examinationTypeDto,
-            interval
+            interval,
+            examinationCategoryTypeDto
         )
     )
 

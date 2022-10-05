@@ -57,7 +57,7 @@ class NotificationTextManager {
         }
 
     private fun replaceIntervalByCategory(text: String, interval: Int, categoryType: ExaminationCategoryTypeDto): String =
-        if(categoryType == ExaminationCategoryTypeDto.MANDATORY){
+        if (categoryType == ExaminationCategoryTypeDto.MANDATORY) {
             when (interval) {
                 1 -> text.replace("_INTERVAL_", "$interval ${getText("years.1")}")
                 2, 3, 4 -> text.replace("_INTERVAL_", "$interval ${getText("years.2")}")
@@ -66,10 +66,10 @@ class NotificationTextManager {
             }
         } else {
             when (interval) {
+                12 -> text.replace("_INTERVAL_", "${interval / 12} ${getText("years.1")}")
                 in 6..11 -> text.replace("_INTERVAL_", "$interval ${getText("months.6")}")
-                12 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.1")}")
-                in 12 .. 48 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.2")}")
-                in 48..1000 -> text.replace("_INTERVAL_", "${interval/12} ${getText("years.5")}")
+                in 12..48 -> text.replace("_INTERVAL_", "${interval / 12} ${getText("years.2")}")
+                in 48..1000 -> text.replace("_INTERVAL_", "${interval / 12} ${getText("years.5")}")
                 else -> throw LoonoBackendException(HttpStatus.BAD_REQUEST)
             }
         }

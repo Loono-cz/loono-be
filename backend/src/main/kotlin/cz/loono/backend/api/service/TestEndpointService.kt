@@ -98,7 +98,8 @@ class TestEndpointService(
                             notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                 setOf(account),
                                 status.examinationType,
-                                status.intervalYears
+                                status.intervalYears,
+                                status.examinationCategoryType
                             )
                         }
                     }
@@ -118,7 +119,8 @@ class TestEndpointService(
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
                                     setOf(account),
                                     status.examinationType,
-                                    status.intervalYears
+                                    status.intervalYears,
+                                    status.examinationCategoryType
                                 )
                             }
                         }
