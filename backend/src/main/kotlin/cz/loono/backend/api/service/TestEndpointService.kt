@@ -113,7 +113,7 @@ class TestEndpointService(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.examinationCategoryType
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
                             )
                         }
                     }
@@ -134,7 +134,7 @@ class TestEndpointService(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
                                 )
                             }
                         }
