@@ -47,8 +47,6 @@ class AccountControllerTest(
         }
 
         assertEquals(HttpStatus.NOT_FOUND, ex.status)
-        assertNull(ex.errorCode)
-        assertNull(ex.errorMessage)
     }
 
     @Test

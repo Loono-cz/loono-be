@@ -45,14 +45,14 @@ class AccountController(
             val accountExists = accountRepository.existsByUid(basicUser.uid)
             if (!accountExists) {
                 throw LoonoBackendException(
-                    status = HttpStatus.BAD_REQUEST,
+                    status = HttpStatus.NOT_FOUND,
                     errorCode = "400",
                     errorMessage = "Account neexistuje posilas $basicUser s uid ${basicUser.uid}"
                 )
             }
         } catch (e: Exception) {
             throw LoonoBackendException(
-                status = HttpStatus.BAD_REQUEST,
+                status = HttpStatus.NOT_FOUND,
                 errorCode = "400",
                 errorMessage = "$e"
             )
