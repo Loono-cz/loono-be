@@ -429,7 +429,6 @@ class ExaminationRecordService(
                 HttpStatus.SERVICE_UNAVAILABLE, "Delete failed - ${e.localizedMessage}"
             )
         }
-
     }
 
     private fun updateWithBadgeAndPoints(badgeToPoints: Pair<BadgeTypeDto, Int>, account: Account): Account {

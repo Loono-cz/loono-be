@@ -65,7 +65,6 @@ class TestEndpointService(
                         }
                     }
                 }
-
             } catch (e: Exception) {
                 throw LoonoBackendException(
                     HttpStatus.CONFLICT, "test self exam fail - ${e.localizedMessage}"
