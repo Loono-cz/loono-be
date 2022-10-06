@@ -50,11 +50,12 @@ object NotificationDefinition {
     fun getOrderNewExam2MonthsAheadNotification(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): PushNotification {
         val name = "Order reminder 2 months ahead notification"
         val title = notificationTextManager.getText("order.2months.ahead.title", examinationTypeDto)
-        val text = notificationTextManager.getText("order.2months.ahead.text", interval)
+        val text = notificationTextManager.getText("order.2months.ahead.text", interval, examinationCategoryTypeDto)
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,
@@ -69,12 +70,12 @@ object NotificationDefinition {
     fun getOrderNewExamMonthAheadNotification(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): PushNotification {
         val name = "Order reminder 1 month ahead notification"
         val title = notificationTextManager.getText("order.month.ahead.title", examinationTypeDto)
-        val text = notificationTextManager.getText("order.month.ahead.text", interval)
-
+        val text = notificationTextManager.getText("order.month.ahead.text", interval, examinationCategoryTypeDto)
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,

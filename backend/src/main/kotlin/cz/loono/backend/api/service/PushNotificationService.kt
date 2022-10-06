@@ -45,24 +45,28 @@ class PushNotificationService(
     fun sendNewExamMonthAheadNotificationToOrder(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
             examinationTypeDto,
-            interval
+            interval,
+            examinationCategoryTypeDto
         )
     )
 
     fun sendNewExam2MonthsAheadNotificationToOrder(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotification(
             accounts,
             examinationTypeDto,
-            interval
+            interval,
+            examinationCategoryTypeDto
         )
     )
 

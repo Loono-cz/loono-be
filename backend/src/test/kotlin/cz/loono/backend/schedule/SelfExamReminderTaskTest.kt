@@ -13,6 +13,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import java.time.LocalDate
 
 class SelfExamReminderTaskTest {
 
@@ -44,12 +45,14 @@ class SelfExamReminderTaskTest {
                     uuid = "test1",
                     status = SelfExaminationStatusDto.PLANNED,
                     account = createAccount(),
+                    dueDate = LocalDate.now()
                 ),
                 SelfExaminationRecord(
                     type = SelfExaminationTypeDto.SKIN,
                     uuid = "test2",
                     status = SelfExaminationStatusDto.PLANNED,
                     account = createAccount(),
+                    dueDate = LocalDate.now()
                 )
             )
         )
