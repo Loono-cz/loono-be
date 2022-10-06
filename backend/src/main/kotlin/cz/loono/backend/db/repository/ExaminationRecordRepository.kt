@@ -16,13 +16,4 @@ interface ExaminationRecordRepository : JpaRepository<ExaminationRecord, Long> {
     fun findAllByAccount(account: Account): Set<ExaminationRecord>
     fun findAllByStatus(status: ExaminationStatusDto): Set<ExaminationRecord>
     fun deleteAllByAccount(account: Account)
-
-    @Language("SQL")
-    @Query(
-        """
-          DELETE FROM examinations_record where id=:id
-        """,
-        nativeQuery = true
-    )
-    fun deleteByID(id: Long)
 }
