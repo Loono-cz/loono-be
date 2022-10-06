@@ -111,7 +111,21 @@ class PushNotificationService(
             examinationCategoryTypeDto
         )
     )
-
+    fun sendNewExamMonthAheadNotificationToOrderTestEndpoint(
+        accounts: Set<Account>,
+        examinationTypeDto: ExaminationTypeDto,
+        interval: Int,
+        badgeTypeDto: BadgeTypeDto?,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+    ): String = sendPushNotification(
+        NotificationDefinition.getOrderNewExamMonthAheadNotificationTestEndpoint(
+            accounts,
+            examinationTypeDto,
+            interval,
+            badgeTypeDto,
+            examinationCategoryTypeDto
+        )
+    )
     // TODO - end of testing endpoint
 
     private fun sendPushNotification(notification: PushNotification): String {
