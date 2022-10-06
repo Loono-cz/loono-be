@@ -122,7 +122,6 @@ class TestEndpointService(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.badge,
                                 status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
                             )
                         }
@@ -153,7 +152,6 @@ class TestEndpointService(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.badge,
                                     status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
                                 )
                             }

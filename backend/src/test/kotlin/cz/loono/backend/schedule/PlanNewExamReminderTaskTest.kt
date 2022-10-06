@@ -98,8 +98,7 @@ class PlanNewExamReminderTaskTest {
         verify(notificationService, times(1)).sendNewExamMonthAheadNotificationToOrder(
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
-            2,
-            BadgeTypeDto.HEADBAND
+            2
         )
     }
 

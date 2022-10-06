@@ -2,7 +2,6 @@ package cz.loono.backend.api.service
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_API_KEY
@@ -106,8 +105,7 @@ class PushNotificationServiceTest(
             pushNotificationService.sendNewExamMonthAheadNotificationToOrder(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
-                2,
-                BadgeTypeDto.GLASSES
+                2
             )
 
         notifications.add(notificationId)

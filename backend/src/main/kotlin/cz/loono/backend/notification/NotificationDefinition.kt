@@ -70,12 +70,11 @@ object NotificationDefinition {
     fun getOrderNewExamMonthAheadNotification(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int,
-        badgeTypeDto: BadgeTypeDto?
+        interval: Int
     ): PushNotification {
         val name = "Order reminder 1 month ahead notification"
         val title = notificationTextManager.getText("order.month.ahead.title", examinationTypeDto)
-        val text = if (badgeTypeDto != null) { notificationTextManager.getText("order.month.ahead.text", interval, badgeTypeDto) } else { notificationTextManager.getText("order.month.ahead.text", interval) }
+        val text = notificationTextManager.getText("order.month.ahead.text", interval)
 
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
@@ -226,13 +225,12 @@ object NotificationDefinition {
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        badgeTypeDto: BadgeTypeDto?,
         examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): PushNotification {
         val name = "Order reminder 1 month ahead notification"
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val title = notificationTextManager.getText("order.month.ahead.title", examinationTypeDto)
-        val text = if (badgeTypeDto != null) { notificationTextManager.getText("order.month.ahead.text", interval, badgeTypeDto) } else { notificationTextManager.getText("order.month.ahead.text", interval, examinationCategoryTypeDto) }
+        val text = notificationTextManager.getText("order.month.ahead.text", interval, examinationCategoryTypeDto)
 
         return PushNotification(
             appId = ONESIGNAL_APP_ID,

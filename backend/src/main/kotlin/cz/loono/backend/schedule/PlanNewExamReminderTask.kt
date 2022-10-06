@@ -35,7 +35,6 @@ class PlanNewExamReminderTask(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.badge
                             )
                         }
                     }

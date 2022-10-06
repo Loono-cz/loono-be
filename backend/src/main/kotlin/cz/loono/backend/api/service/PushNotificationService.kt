@@ -46,14 +46,12 @@ class PushNotificationService(
     fun sendNewExamMonthAheadNotificationToOrder(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int,
-        badgeTypeDto: BadgeTypeDto?
+        interval: Int
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
             examinationTypeDto,
-            interval,
-            badgeTypeDto
+            interval
         )
     )
 
@@ -115,14 +113,12 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        badgeTypeDto: BadgeTypeDto?,
         examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotificationTestEndpoint(
             accounts,
             examinationTypeDto,
             interval,
-            badgeTypeDto,
             examinationCategoryTypeDto
         )
     )
