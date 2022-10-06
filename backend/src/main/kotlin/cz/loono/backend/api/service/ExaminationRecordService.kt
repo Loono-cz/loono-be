@@ -56,22 +56,22 @@ class ExaminationRecordService(
     @Transactional(rollbackFor = [Exception::class])
     fun deleteExam(examUuid: String, accountUuid: String) {
         try {
-            val exam = examinationRecordRepository.findByUuid(examUuid)
-            if (exam != null) {
-                examinationRecordRepository.delete(exam)
-                exam.uuid?.let {
-                    val test = examinationRecordRepository.findByUuid(it)
-                    if (test != null) {
-                        throw LoonoBackendException(
-                            HttpStatus.NOT_FOUND, "Delete failed - STILL FOUND}"
-                        )
-                    }
-                }
-            } else {
-                throw LoonoBackendException(
-                    HttpStatus.NOT_FOUND, "Delete failed - EXAM NOT FOUND $examUuid and $accountUuid and $exam"
-                )
-            }
+            examinationRecordRepository.deleteByUuid(examUuid)
+//            if (exam != null) {
+//                examinationRecordRepository.delete(exam)
+//                exam.uuid?.let {
+//                    val test = examinationRecordRepository.findByUuid(it)
+//                    if (test != null) {
+//                        throw LoonoBackendException(
+//                            HttpStatus.NOT_FOUND, "Delete failed - STILL FOUND}"
+//                        )
+//                    }
+//                }
+//            } else {
+//                throw LoonoBackendException(
+//                    HttpStatus.NOT_FOUND, "Delete failed - EXAM NOT FOUND $examUuid and $accountUuid and $exam"
+//                )
+//            }
         } catch (e: Exception) {
             throw LoonoBackendException(
                 HttpStatus.NOT_FOUND, "Delete failed catch - $e"
