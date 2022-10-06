@@ -52,10 +52,12 @@ class ExaminationRecordService(
     fun confirmExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
         changeState(examUuid, accountUuid, ExaminationStatusDto.CONFIRMED)
 
+    @Synchronized
     @Transactional(rollbackFor = [Exception::class])
     fun deleteExam(examUuid: String, accountUuid: String) {
         try {
-            val exam = examinationRecordRepository.findByUuid(examUuid)
+            val exam = accountRepository.findByUid(accountUuid)
+                ?.let { examinationRecordRepository.findByUuidAndAccount(examUuid, it) }
             if (exam != null) {
                 examinationRecordRepository.delete(exam)
                 exam.uuid?.let {
