@@ -58,6 +58,14 @@ class ExaminationRecordService(
             val exam = examinationRecordRepository.findByUuid(examUuid)
             if (exam != null) {
                 examinationRecordRepository.delete(exam)
+                exam.uuid?.let {
+                    val test = examinationRecordRepository.findByUuid(it)
+                    if (test != null) {
+                        throw LoonoBackendException(
+                            HttpStatus.NOT_FOUND, "Delete failed - STILL FOUND}"
+                        )
+                    }
+                }
             } else {
                 throw LoonoBackendException(
                     HttpStatus.NOT_FOUND, "Delete failed - NOT FOUND}"
