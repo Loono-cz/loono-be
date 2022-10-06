@@ -1,7 +1,6 @@
 package cz.loono.backend.api.service
 
 import com.google.gson.Gson
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.db.model.Account

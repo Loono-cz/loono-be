@@ -1,6 +1,5 @@
 package cz.loono.backend.notification
 
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_APP_ID

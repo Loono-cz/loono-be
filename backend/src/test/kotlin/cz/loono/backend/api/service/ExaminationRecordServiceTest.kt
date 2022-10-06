@@ -474,7 +474,7 @@ class ExaminationRecordServiceTest(
             type = ExaminationTypeDto.GENERAL_PRACTITIONER,
             uuid = "test12345"
         )
-        examinationRecordRepository.save(ExaminationRecord(type = exam.type, uuid = exam.uuid,  account = account))
+        examinationRecordRepository.save(ExaminationRecord(type = exam.type, uuid = exam.uuid, account = account))
         val examToDel = exam.uuid?.let { examinationRecordRepository.findByUuid(it) }
         if (examToDel != null) {
             examinationRecordRepository.delete(examToDel)
