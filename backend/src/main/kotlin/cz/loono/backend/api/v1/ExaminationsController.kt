@@ -42,7 +42,7 @@ class ExaminationsController(
             recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
-    @DeleteMapping()
+    @DeleteMapping
     fun delete(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
