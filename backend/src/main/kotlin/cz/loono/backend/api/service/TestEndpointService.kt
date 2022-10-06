@@ -13,6 +13,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Service
 class TestEndpointService(
@@ -116,6 +117,15 @@ class TestEndpointService(
                                 status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
                             )
                         }
+                        if (passedMonths == (status.intervalYears * 12) - 1 && period.days == 0) {
+                            notificationService.sendNewExamMonthAheadNotificationToOrderTestEndpoint(
+                                setOf(account),
+                                status.examinationType,
+                                status.intervalYears,
+                                status.badge,
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
+                            )
+                        }
                     }
                 }
 
@@ -137,6 +147,16 @@ class TestEndpointService(
                                     status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
                                 )
                             }
+                            if (period.months == (status.customInterval?.minus(1)) && period.days == 0) {
+                                response = "$response \n SEND ${setOf(account) } \n ${status.examinationType} \n ${status.intervalYears}"
+                                notificationService.sendNewExamMonthAheadNotificationToOrderTestEndpoint(
+                                    setOf(account),
+                                    status.examinationType,
+                                    status.intervalYears,
+                                    status.badge,
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
+                                )
+                            }
                         }
                     }
                 }
@@ -145,6 +165,32 @@ class TestEndpointService(
             throw LoonoBackendException(
                 HttpStatus.CONFLICT, "test custom notification failed - ${e.localizedMessage}"
             )
+        }
+
+        // TODO 24 hours before
+        response = "$response \n SEND 24 h"
+        val now = LocalDateTime.now()
+        val plannedExams = examinationRecordRepository.findAllByStatus(ExaminationStatusDto.NEW)
+        plannedExams.forEach { record ->
+            record.plannedDate?.let {
+                val hours = ChronoUnit.HOURS.between(record.plannedDate, now)
+                if (hours in -47..-24) {
+                    response = "$response \n SEND 24 h comming $record"
+                    notificationService.sendComingVisitNotification(
+                        setOf(record.account),
+                        record.type,
+                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+                    )
+                }
+                if (hours in 0..24) {
+                    response = "$response \n SEND 24 h completion $record"
+                    notificationService.sendCompletionNotification(
+                        setOf(record.account),
+                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm")),
+                        record.type
+                    )
+                }
+            }
         }
 
         return response

@@ -152,6 +152,7 @@ object NotificationDefinition {
         )
     }
 
+    // TODO test endpoints
     fun getSelfExamNotificationTestEndpoint(accounts: Set<Account>): PushNotification {
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val name = "Self-exam notification"
@@ -210,6 +211,29 @@ object NotificationDefinition {
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
         val title = notificationTextManager.getText("order.2months.ahead.title", examinationTypeDto)
         val text = notificationTextManager.getText("order.2months.ahead.text", interval, examinationCategoryTypeDto)
+        return PushNotification(
+            appId = ONESIGNAL_APP_ID,
+            name = name,
+            headings = MultipleLangString(cs = title, en = title),
+            contents = MultipleLangString(cs = text, en = text),
+            includeExternalUserIds = accounts.map { it.uid },
+            scheduleTimeOfDay = time.toString(),
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+        )
+    }
+
+    fun getOrderNewExamMonthAheadNotificationTestEndpoint(
+        accounts: Set<Account>,
+        examinationTypeDto: ExaminationTypeDto,
+        interval: Int,
+        badgeTypeDto: BadgeTypeDto?,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+    ): PushNotification {
+        val name = "Order reminder 1 month ahead notification"
+        val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+        val title = notificationTextManager.getText("order.month.ahead.title", examinationTypeDto)
+        val text = if (badgeTypeDto != null) { notificationTextManager.getText("order.month.ahead.text", interval, badgeTypeDto) } else { notificationTextManager.getText("order.month.ahead.text", interval, examinationCategoryTypeDto) }
+
         return PushNotification(
             appId = ONESIGNAL_APP_ID,
             name = name,
