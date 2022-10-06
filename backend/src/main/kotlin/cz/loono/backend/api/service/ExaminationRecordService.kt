@@ -52,10 +52,23 @@ class ExaminationRecordService(
     fun confirmExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
         changeState(examUuid, accountUuid, ExaminationStatusDto.CONFIRMED)
 
-    @Synchronized
     @Transactional(rollbackFor = [Exception::class])
-    fun deleteExam(examUuid: String, accountUuid: String) =
-        deleteExamByUUID(examUuid, accountUuid)
+    fun deleteExam(examUuid: String, accountUuid: String) {
+        try {
+            val exam = examinationRecordRepository.findByUuid(examUuid)
+            if (exam != null){
+                examinationRecordRepository.delete(exam)
+            }else{
+                throw LoonoBackendException(
+                    HttpStatus.NOT_FOUND, "Delete failed - NOT FOUND}"
+                )
+            }
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.SERVICE_UNAVAILABLE, "Delete failed - ${e.localizedMessage}"
+            )
+        }
+    }
 
     fun confirmSelfExam(
         type: SelfExaminationTypeDto,
@@ -414,22 +427,6 @@ class ExaminationRecordService(
         exam.status = state
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
-    }
-
-    private fun deleteExamByUUID(
-        examUuid: String,
-        accountUuid: String
-    ) {
-        try {
-            val account = findAccount(accountUuid)
-            val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
-            val mutableExam = mutableListOf(exam.id)
-            examinationRecordRepository.deleteAllById(mutableExam)
-        } catch (e: Exception) {
-            throw LoonoBackendException(
-                HttpStatus.SERVICE_UNAVAILABLE, "Delete failed - ${e.localizedMessage}"
-            )
-        }
     }
 
     private fun updateWithBadgeAndPoints(badgeToPoints: Pair<BadgeTypeDto, Int>, account: Account): Account {
