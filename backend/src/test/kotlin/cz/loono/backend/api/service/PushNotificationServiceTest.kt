@@ -2,7 +2,7 @@ package cz.loono.backend.api.service
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_API_KEY
@@ -54,7 +54,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Hola, hola, prevence volá!", storedNotification.headings.cs)
-        assertEquals("Mrkni, na které preventivní prohlídky se objednat.", storedNotification.contents.cs)
+        assertEquals("Mrkni, na které prohlídky se objednat.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "main"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
         assertEquals("10:00AM", storedNotification.delivery_time_of_day)
@@ -70,7 +70,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Zítra tě čeká prohlídka", storedNotification.headings.cs)
-        assertEquals("Zítra jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
+        assertEquals("Zítra jdeš k zubaři na prohlídku.", storedNotification.contents.cs)
         assertEquals(
             NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
             storedNotification.data
@@ -89,7 +89,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Byl/a jsi na prohlídce?", storedNotification.headings.cs)
-        assertEquals("Potvrď preventivní prohlídku v aplikaci a získej odměnu.", storedNotification.contents.cs)
+        assertEquals("Potvrď prohlídku v aplikaci a získej odměnu.", storedNotification.contents.cs)
         assertEquals(
             NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
             storedNotification.data
@@ -107,14 +107,14 @@ class PushNotificationServiceTest(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
                 2,
-                BadgeTypeDto.GLASSES
+                ExaminationCategoryTypeDto.MANDATORY
             )
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Nejvyšší čas zajít k zubaři", storedNotification.headings.cs)
         assertEquals(
-            "Jsou/je to už 2 roky od poslední prohlídky. Objednej se ještě dnes, ať neztratíš brýle.",
+            "Jsou/je to už 2 roky od poslední prohlídky. Objednej se na prohlídku ještě dnes!",
             storedNotification.contents.cs
         )
         assertEquals(
@@ -133,14 +133,15 @@ class PushNotificationServiceTest(
             pushNotificationService.sendNewExam2MonthsAheadNotificationToOrder(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
-                2
+                2,
+                ExaminationCategoryTypeDto.MANDATORY
             )
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Objednej se k zubaři", storedNotification.headings.cs)
         assertEquals(
-            "2 roky utekl/y jako voda, je čas se objednat na preventivní prohlídku.",
+            "2 roky utekl/y jako voda, je čas se objednat na prohlídku.",
             storedNotification.contents.cs
         )
         assertEquals(

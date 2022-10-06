@@ -47,7 +47,7 @@ class TestEndpointService(
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion - $firstNotifications \n "
                 }
-                if (statuses.isEmpty() && account.created.dayOfMonth == today.dayOfMonth) {
+                if (statuses.size < 2 && account.created.dayOfMonth == today.dayOfMonth) {
                     notificationService.sendFirstSelfExamNotificationTestEndpoint(setOf(account))
                     response = "$response first notifacion on empty list \n"
                 }
@@ -122,7 +122,6 @@ class TestEndpointService(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.badge,
                                 status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
                             )
                         }
@@ -153,7 +152,6 @@ class TestEndpointService(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.badge,
                                     status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
                                 )
                             }

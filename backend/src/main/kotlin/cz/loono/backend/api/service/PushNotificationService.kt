@@ -1,7 +1,6 @@
 package cz.loono.backend.api.service
 
 import com.google.gson.Gson
-import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.db.model.Account
@@ -47,25 +46,27 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        badgeTypeDto: BadgeTypeDto?
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
             examinationTypeDto,
             interval,
-            badgeTypeDto
+            examinationCategoryTypeDto
         )
     )
 
     fun sendNewExam2MonthsAheadNotificationToOrder(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        interval: Int
+        interval: Int,
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotification(
             accounts,
             examinationTypeDto,
-            interval
+            interval,
+            examinationCategoryTypeDto
         )
     )
 
@@ -115,14 +116,12 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        badgeTypeDto: BadgeTypeDto?,
         examinationCategoryTypeDto: ExaminationCategoryTypeDto
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotificationTestEndpoint(
             accounts,
             examinationTypeDto,
             interval,
-            badgeTypeDto,
             examinationCategoryTypeDto
         )
     )
