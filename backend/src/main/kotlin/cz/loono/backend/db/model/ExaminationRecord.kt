@@ -44,7 +44,7 @@ data class ExaminationRecord(
     val firstExam: Boolean = true,
 
     @Column(nullable = true)
-    val note: String? = null,
+    var note: String? = null,
 
     @Column(nullable = true)
     val customInterval: Int? = null,

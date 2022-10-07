@@ -423,6 +423,9 @@ class ExaminationRecordService(
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         addRewardIfEligible(exam.toExaminationRecordDto(), account, state)
         exam.status = state
+        if (state == ExaminationStatusDto.CANCELED) {
+            exam.note = null
+        }
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
