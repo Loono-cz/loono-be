@@ -43,7 +43,7 @@ class ExaminationsController(
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
     @DeleteMapping
-    fun delete(
+    fun deleteExam(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 

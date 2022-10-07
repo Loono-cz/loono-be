@@ -54,7 +54,7 @@ data class Account(
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = false, updatable = true, insertable = true)
-    val examinationRecords: List<ExaminationRecord> = mutableListOf(),
+    val examinationRecords: MutableList<ExaminationRecord> = mutableListOf(),
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = true, updatable = true, insertable = true)
