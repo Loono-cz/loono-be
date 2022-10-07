@@ -86,7 +86,7 @@ class BadgeDowngradeTaskTest(
         accountRepository.save(account)
         val withBadgesAndRecords = accountRepository.findByUid("uuid1")!!.copy(
             badges = badges,
-            examinationRecords = listOf(
+            examinationRecords = mutableListOf(
                 ExaminationRecord(
                     type = ExaminationTypeDto.OPHTHALMOLOGIST,
                     plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.00"),
@@ -145,7 +145,7 @@ class BadgeDowngradeTaskTest(
         accountRepository.save(account)
         val withBadgesAndRecords = accountRepository.findByUid("uuid1")!!.copy(
             badges = badges,
-            examinationRecords = listOf(
+            examinationRecords = mutableListOf(
                 ExaminationRecord(
                     type = ExaminationTypeDto.OPHTHALMOLOGIST,
                     plannedDate = LocalDateTime.parse("2020-02-11T17:14:06.00"),
