@@ -44,7 +44,7 @@ object ExaminationIntervalProvider {
             priority = 2
         ),
         PreventionRule(
-            examinationType = ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS,
+            examinationType = ExaminationTypeDto.GYNECOLOGIST,
             intervalsMale = listOf(),
             intervalsFemale = listOf(AgeInterval(fromAge = 15, intervalYears = 1)),
             priority = 3
