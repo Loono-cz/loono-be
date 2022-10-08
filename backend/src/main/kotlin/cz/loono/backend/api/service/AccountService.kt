@@ -54,7 +54,8 @@ class AccountService(
                 nickname = account.nickname,
                 sex = account.sex.name,
                 birthdate = account.birthdate,
-                preferredEmail = account.preferredEmail
+                preferredEmail = account.preferredEmail,
+                newsletterOptIn = account.newsletterOptIn
             )
         )
         val acceptedExams = account.examinations.filter {

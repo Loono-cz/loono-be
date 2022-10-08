@@ -70,7 +70,8 @@ class AccountServiceTest(
                 sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
-                examinations = emptyList()
+                examinations = emptyList(),
+                newsletterOptIn = false
             )
         )
 
@@ -115,7 +116,8 @@ class AccountServiceTest(
                     sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
-                    examinations = emptyList()
+                    examinations = emptyList(),
+                    newsletterOptIn = false
                 )
             )
         }
@@ -167,7 +169,8 @@ class AccountServiceTest(
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     )
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 
@@ -495,7 +498,8 @@ class AccountServiceTest(
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
                     ),
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 
@@ -538,7 +542,8 @@ class AccountServiceTest(
                     sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
-                    examinations = emptyList()
+                    examinations = emptyList(),
+                    newsletterOptIn = false
                 )
             )
         }
@@ -579,7 +584,8 @@ class AccountServiceTest(
                         status = ExaminationStatusDto.NEW,
                         firstExam = true
                     ),
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 
