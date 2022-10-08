@@ -61,13 +61,13 @@ class PreventionService(
                 account
             )
             try {
-                val filteredExaminations = examinations.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+                val filteredExaminations = examinations.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY || it.examinationCategoryType == null }
 
                 val plannedExam = examinationRecordRepository.findAllByAccount(account)
 
                 val customExams = plannedExam.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val listOfCustomExamsOther = plannedExam.filter { it.status != ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val customExaminations = prepareCustomStatuses(customExams, listOfCustomExamsOther)
+                val listOfPassedCustomExams = plannedExam.filter { it.status != ExaminationStatusDto.NEW && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                val customExaminations = prepareCustomStatuses(customExams, listOfPassedCustomExams)
 
                 joinedExaminations = customExaminations + filteredExaminations
             } catch (e: Exception) {
