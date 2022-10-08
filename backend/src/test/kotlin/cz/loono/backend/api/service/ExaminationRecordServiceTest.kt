@@ -208,7 +208,7 @@ class ExaminationRecordServiceTest(
         )
 
         val examRecord = ExaminationRecordDto(
-            type = ExaminationTypeDto.GYNECOLOGY_AND_OBSTETRICS,
+            type = ExaminationTypeDto.GYNECOLOGIST,
             plannedDate = OffsetDateTime.MAX
         )
 

@@ -22,6 +22,7 @@ class ExaminationCancellationTask(
         exams.forEach { exam ->
             val interval = preventionService.getExaminationRequests(exam.account)
                 .first { exam.type == it.examinationType }.intervalYears
+            // TODO - custom exam is in months
             val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
             if (now.isAfter(deadline)) {
                 exam.uuid?.let {
