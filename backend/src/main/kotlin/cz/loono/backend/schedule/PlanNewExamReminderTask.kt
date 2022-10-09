@@ -31,7 +31,8 @@ class PlanNewExamReminderTask(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
+                                status.uuid
                             )
                         }
                         if (passedMonths == (status.intervalYears * 12) - 1 && period.days == 0) {
@@ -39,7 +40,8 @@ class PlanNewExamReminderTask(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
+                                status.uuid
                             )
                         }
                     }
@@ -54,7 +56,8 @@ class PlanNewExamReminderTask(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.uuid
                                 )
                             }
                             if (period.months == (status.customInterval?.minus(1)) && period.days == 0) {
@@ -62,7 +65,8 @@ class PlanNewExamReminderTask(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.uuid
                                 )
                             }
                         }

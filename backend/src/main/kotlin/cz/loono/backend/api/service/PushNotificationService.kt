@@ -38,21 +38,24 @@ class PushNotificationService(
     fun sendCompletionNotification(
         accounts: Set<Account>,
         time: String,
-        examinationTypeDto: ExaminationTypeDto
+        examinationTypeDto: ExaminationTypeDto,
+        examinationUuid: String?
     ): String =
-        sendPushNotification(NotificationDefinition.getCompletionNotification(accounts, time, examinationTypeDto))
+        sendPushNotification(NotificationDefinition.getCompletionNotification(accounts, time, examinationTypeDto, examinationUuid))
 
     fun sendNewExamMonthAheadNotificationToOrder(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
             examinationTypeDto,
             interval,
-            examinationCategoryTypeDto
+            examinationCategoryTypeDto,
+            examinationUuid
         )
     )
 
@@ -60,25 +63,29 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotification(
             accounts,
             examinationTypeDto,
             interval,
-            examinationCategoryTypeDto
+            examinationCategoryTypeDto,
+            examinationUuid
         )
     )
 
     fun sendComingVisitNotification(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        time: String
+        time: String,
+        examinationUuid: String?
     ): String = sendPushNotification(
         NotificationDefinition.getComingVisitNotification(
             accounts,
             examinationTypeDto,
-            time
+            time,
+            examinationUuid
         )
     )
 
@@ -103,26 +110,30 @@ class PushNotificationService(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotificationTestEndpoint(
             accounts,
             examinationTypeDto,
             interval,
-            examinationCategoryTypeDto
+            examinationCategoryTypeDto,
+            examinationUuid
         )
     )
     fun sendNewExamMonthAheadNotificationToOrderTestEndpoint(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): String = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotificationTestEndpoint(
             accounts,
             examinationTypeDto,
             interval,
-            examinationCategoryTypeDto
+            examinationCategoryTypeDto,
+            examinationUuid
         )
     )
     // TODO - end of testing endpoint

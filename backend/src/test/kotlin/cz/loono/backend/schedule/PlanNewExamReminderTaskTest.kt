@@ -62,7 +62,8 @@ class PlanNewExamReminderTaskTest {
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
             2,
-            ExaminationCategoryTypeDto.MANDATORY
+            ExaminationCategoryTypeDto.MANDATORY,
+            "1"
         )
     }
 
@@ -106,7 +107,8 @@ class PlanNewExamReminderTaskTest {
             setOf(user),
             ExaminationTypeDto.DENTIST,
             2,
-            ExaminationCategoryTypeDto.MANDATORY
+            ExaminationCategoryTypeDto.MANDATORY,
+            "1"
         )
     }
 
@@ -146,7 +148,8 @@ class PlanNewExamReminderTaskTest {
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
             2,
-            ExaminationCategoryTypeDto.MANDATORY
+            ExaminationCategoryTypeDto.MANDATORY,
+            null
         )
     }
 
@@ -186,7 +189,8 @@ class PlanNewExamReminderTaskTest {
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
             2,
-            ExaminationCategoryTypeDto.MANDATORY
+            ExaminationCategoryTypeDto.MANDATORY,
+            null
         )
     }
 }

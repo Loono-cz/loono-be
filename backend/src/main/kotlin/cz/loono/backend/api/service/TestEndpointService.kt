@@ -114,7 +114,8 @@ class TestEndpointService(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
+                                status.uuid
                             )
                         }
                         if (passedMonths == (status.intervalYears * 12) - 1 && period.days == 0) {
@@ -122,7 +123,8 @@ class TestEndpointService(
                                 setOf(account),
                                 status.examinationType,
                                 status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY
+                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
+                                status.uuid
                             )
                         }
                     }
@@ -143,7 +145,8 @@ class TestEndpointService(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.uuid
                                 )
                             }
                             if (period.months == (status.customInterval?.minus(1)) && period.days == 0) {
@@ -152,7 +155,8 @@ class TestEndpointService(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.uuid
                                 )
                             }
                         }
@@ -177,7 +181,8 @@ class TestEndpointService(
                     notificationService.sendComingVisitNotification(
                         setOf(record.account),
                         record.type,
-                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm")),
+                        record.uuid
                     )
                 }
                 if (hours in 0..24) {
@@ -185,7 +190,8 @@ class TestEndpointService(
                     notificationService.sendCompletionNotification(
                         setOf(record.account),
                         record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm")),
-                        record.type
+                        record.type,
+                        record.uuid
                     )
                 }
             }

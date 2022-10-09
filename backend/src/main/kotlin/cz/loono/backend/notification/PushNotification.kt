@@ -35,5 +35,6 @@ data class MultipleLangString(
 
 data class NotificationData(
     val screen: String,
-    val examinationType: ExaminationTypeDto? = null
+    val examinationType: ExaminationTypeDto? = null,
+    val examinationUuid: String? = null
 )
