@@ -472,6 +472,9 @@ class ExaminationRecordService(
                 accountRepository.save(updatedAccount)
             }
         }
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM && examinationRecordDto.periodicExam == true && newState == ExaminationStatusDto.CONFIRMED) {
+            accountRepository.save(acc.copy(points = acc.points + 50))
+        }
     }
 
     private fun isEligibleForReward(
