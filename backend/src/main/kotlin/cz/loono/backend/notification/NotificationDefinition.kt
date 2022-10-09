@@ -31,7 +31,8 @@ object NotificationDefinition {
     fun getCompletionNotification(
         accounts: Set<Account>,
         time: String,
-        examinationTypeDto: ExaminationTypeDto
+        examinationTypeDto: ExaminationTypeDto,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Complete checkup notification"
         val title = notificationTextManager.getText("completion.title")
@@ -43,7 +44,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time, // time of the past exam - reminder after 24h
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 
@@ -51,7 +52,8 @@ object NotificationDefinition {
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Order reminder 2 months ahead notification"
         val title = notificationTextManager.getText("order.2months.ahead.title", examinationTypeDto)
@@ -63,7 +65,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = MORNING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 
@@ -71,7 +73,8 @@ object NotificationDefinition {
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Order reminder 1 month ahead notification"
         val title = notificationTextManager.getText("order.month.ahead.title", examinationTypeDto)
@@ -83,14 +86,15 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = MORNING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 
     fun getComingVisitNotification(
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
-        time: String
+        time: String,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Coming visit notification"
         val title = notificationTextManager.getText("coming.visit.title")
@@ -102,7 +106,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time, // time of the coming exam - reminder 24h ahead
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 
@@ -204,7 +208,8 @@ object NotificationDefinition {
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Order reminder 2 months ahead notification"
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -217,7 +222,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time.toString(),
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 
@@ -225,7 +230,8 @@ object NotificationDefinition {
         accounts: Set<Account>,
         examinationTypeDto: ExaminationTypeDto,
         interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto
+        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
+        examinationUuid: String?
     ): PushNotification {
         val name = "Order reminder 1 month ahead notification"
         val time = LocalDateTime.now().plusHours(2).plusMinutes(2).format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -239,7 +245,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time.toString(),
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
         )
     }
 }

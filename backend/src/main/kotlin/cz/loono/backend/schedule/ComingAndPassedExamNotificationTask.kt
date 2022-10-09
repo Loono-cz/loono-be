@@ -25,14 +25,16 @@ class ComingAndPassedExamNotificationTask(
                     notificationService.sendComingVisitNotification(
                         setOf(record.account),
                         record.type,
-                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm"))
+                        record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm")),
+                        record.uuid
                     )
                 }
                 if (hours in 0..24) {
                     notificationService.sendCompletionNotification(
                         setOf(record.account),
                         record.plannedDate.plusHours(2).format(DateTimeFormatter.ofPattern("HH:mm")),
-                        record.type
+                        record.type,
+                        record.uuid
                     )
                 }
             }

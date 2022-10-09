@@ -65,14 +65,14 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendComingVisitNotification(setOf(account), ExaminationTypeDto.DENTIST, "7:45")
+            pushNotificationService.sendComingVisitNotification(setOf(account), ExaminationTypeDto.DENTIST, "7:45", null)
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Zítra tě čeká prohlídka", storedNotification.headings.cs)
         assertEquals("Zítra jdeš k zubaři na prohlídku.", storedNotification.contents.cs)
         assertEquals(
-            NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
+            NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST, examinationUuid = null),
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
@@ -84,7 +84,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendCompletionNotification(setOf(account), "7:45", ExaminationTypeDto.DENTIST)
+            pushNotificationService.sendCompletionNotification(setOf(account), "7:45", ExaminationTypeDto.DENTIST, null)
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -107,7 +107,8 @@ class PushNotificationServiceTest(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
                 2,
-                ExaminationCategoryTypeDto.MANDATORY
+                ExaminationCategoryTypeDto.MANDATORY,
+                null
             )
 
         notifications.add(notificationId)
@@ -134,7 +135,8 @@ class PushNotificationServiceTest(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
                 2,
-                ExaminationCategoryTypeDto.MANDATORY
+                ExaminationCategoryTypeDto.MANDATORY,
+                null
             )
 
         notifications.add(notificationId)
