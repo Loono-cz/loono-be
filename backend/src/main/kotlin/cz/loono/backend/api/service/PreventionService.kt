@@ -49,8 +49,10 @@ class PreventionService(
 
             val examinationRequests = getExaminationRequests(account)
 
+            val examinationByAccountAndPlannedDate = examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
+            val filteredExaminationByAccountAndPlannedDate = examinationByAccountAndPlannedDate.filter { it.examinationCategoryType != ExaminationCategoryTypeDto.CUSTOM }
             val examinationTypesToRecords: Map<ExaminationTypeDto, List<ExaminationRecord>> =
-                examinationRecordRepository.findAllByAccountOrderByPlannedDateDesc(account)
+                filteredExaminationByAccountAndPlannedDate
                     .groupBy(ExaminationRecord::type)
                     .mapNotNull { entry -> entry.key to entry.value }
                     .toMap()
