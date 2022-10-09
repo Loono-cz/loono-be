@@ -372,7 +372,7 @@ class ExaminationRecordService(
 
         if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
             val plannedExam = examinationRecordRepository.findAllByAccount(account)
-                .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
+                .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW && it.examinationCategoryType != ExaminationCategoryTypeDto.CUSTOM }
             if (plannedExam.isNotEmpty() && record.uuid == null) {
                 throw LoonoBackendException(
                     HttpStatus.CONFLICT,
