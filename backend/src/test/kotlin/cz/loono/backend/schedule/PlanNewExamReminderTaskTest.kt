@@ -63,7 +63,7 @@ class PlanNewExamReminderTaskTest {
             ExaminationTypeDto.GENERAL_PRACTITIONER,
             2,
             ExaminationCategoryTypeDto.MANDATORY,
-            null
+            "1"
         )
     }
 
@@ -108,7 +108,7 @@ class PlanNewExamReminderTaskTest {
             ExaminationTypeDto.DENTIST,
             2,
             ExaminationCategoryTypeDto.MANDATORY,
-            null
+            "1"
         )
     }
 
