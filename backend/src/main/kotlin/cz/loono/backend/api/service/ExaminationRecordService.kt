@@ -280,7 +280,9 @@ class ExaminationRecordService(
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val account = findAccount(accountUuid)
-        checkCustomExamsAmount(account)
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM) {
+            checkCustomExamsAmount(account)
+        }
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
         addRewardIfEligible(examinationRecordDto, account, examinationRecordDto.status)
