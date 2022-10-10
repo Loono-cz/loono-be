@@ -344,10 +344,14 @@ class ExaminationRecordService(
                 it.type == record.type &&
                     (
                         it.status == ExaminationStatusDto.CONFIRMED ||
-                            (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+                            (
+                                it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null
+                                )
                         ) &&
-                        (it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY ||
-                                it.examinationCategoryType == null)
+                    (
+                        it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY ||
+                            it.examinationCategoryType == null
+                        )
             }
         lastConfirmed.ifEmpty { return false }
         val intervalInMonths = (interval.intervalYears.toLong() * 12) - 2
