@@ -68,8 +68,9 @@ class PreventionService(
                 val plannedExam = examinationRecordRepository.findAllByAccount(account)
 
                 val customExams = plannedExam.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val listOfPassedCustomExams = plannedExam.filter { (it.status == ExaminationStatusDto.CONFIRMED || it.status == ExaminationStatusDto.UNKNOWN) && it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                val customExaminations = prepareCustomStatuses(customExams, listOfPassedCustomExams)
+                val customExamsNotOnceConfirmed = customExams.filter { it.periodicExam == true || (it.periodicExam == false && it.status == ExaminationStatusDto.NEW) }
+                val listOfPassedCustomExams = customExamsNotOnceConfirmed.filter { (it.status == ExaminationStatusDto.CONFIRMED || it.status == ExaminationStatusDto.UNKNOWN) }
+                val customExaminations = prepareCustomStatuses(customExamsNotOnceConfirmed, listOfPassedCustomExams)
 
                 joinedExaminations = customExaminations + filteredExaminations
             } catch (e: Exception) {
