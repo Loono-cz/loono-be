@@ -454,7 +454,7 @@ class ExaminationRecordService(
         acc: Account,
         newState: ExaminationStatusDto?
     ) {
-        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY || examinationRecordDto.examinationCategoryType == null) {
             val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
             val isFirstExam = recordBeforeUpdate?.firstExam ?: true
             val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
