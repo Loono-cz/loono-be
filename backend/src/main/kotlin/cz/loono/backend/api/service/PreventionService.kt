@@ -142,6 +142,7 @@ class PreventionService(
         try {
             return plannedExam.map { customExam ->
                 val lastExam = pastExams.filter { it.type == customExam.type && it.plannedDate != null }
+                val countOfExamType = pastExams.filter { it.type == customExam.type && it.plannedDate != null }.size
                 ExaminationPreventionStatusDto(
                     uuid = customExam.uuid,
                     examinationType = customExam.type,
@@ -150,7 +151,7 @@ class PreventionService(
                     firstExam = customExam.firstExam,
                     priority = 0,
                     state = customExam.status,
-                    count = 0,
+                    count = countOfExamType,
                     lastConfirmedDate = lastExam.mapNotNull(ExaminationRecord::plannedDate).maxOrNull()?.atUTCOffset(),
                     points = if (customExam.periodicExam == true) { 50 } else { 0 },
                     badge = null,
