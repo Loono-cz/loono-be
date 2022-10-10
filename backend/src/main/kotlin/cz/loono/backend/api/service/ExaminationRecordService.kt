@@ -281,7 +281,12 @@ class ExaminationRecordService(
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val account = findAccount(accountUuid)
         if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM) {
-            checkCustomExamsAmount(account)
+            examinationRecordDto.uuid?.let {
+                val exam = examinationRecordRepository.findByUuid(it)
+                if (exam == null) {
+                    checkCustomExamsAmount(account) // is new exam, not update
+                }
+            }
         }
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
