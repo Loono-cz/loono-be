@@ -27,5 +27,5 @@ data class ServerProperties(
     var lastUpdate: LocalDate = LocalDate.now(),
 
     @Column(nullable = false)
-    var supportedAppVersion: String = "0.3.9"
+    var supportedAppVersion: String = "0.3.8"
 )
