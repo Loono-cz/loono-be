@@ -170,7 +170,7 @@ class TestEndpointService(
         }
 
         // TODO 24 hours before
-        response = "$response \n SEND 24 h"
+        response = "$response \n SEND 24 h "
         val now = LocalDateTime.now()
         val plannedExams = examinationRecordRepository.findAllByStatus(ExaminationStatusDto.NEW)
         plannedExams.forEach { record ->
