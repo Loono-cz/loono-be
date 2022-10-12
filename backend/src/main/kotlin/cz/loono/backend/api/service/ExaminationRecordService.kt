@@ -1,6 +1,8 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationRecordDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationCompletionInformationDto
@@ -9,6 +11,7 @@ import cz.loono.backend.api.dto.SelfExaminationResultDto
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.data.constants.Constants
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
@@ -48,6 +51,22 @@ class ExaminationRecordService(
     @Transactional(rollbackFor = [Exception::class])
     fun confirmExam(examUuid: String, accountUuid: String): ExaminationRecordDto =
         changeState(examUuid, accountUuid, ExaminationStatusDto.CONFIRMED)
+
+    @Transactional(rollbackFor = [Exception::class])
+    fun deleteExam(examUuid: String, accountUuid: String) {
+        try {
+            val account = accountRepository.findByUid(accountUuid)
+            account?.let {
+                val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
+                account.examinationRecords.remove(exam)
+                examinationRecordRepository.delete(exam)
+            }
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.NOT_FOUND, "Delete failed catch - $e"
+            )
+        }
+    }
 
     fun confirmSelfExam(
         type: SelfExaminationTypeDto,
@@ -135,7 +154,9 @@ class ExaminationRecordService(
             account.copy(points = account.points + reward.second)
         }
         accountRepository.save(updatedAccount)
-        val badgeLevel = updatedAccount.badges.find { it.type == BadgeTypeDto.SHIELD.toString() }?.level
+        val badgeLevel = updatedAccount.badges.find {
+            it.type == BadgeTypeDto.SHIELD.toString() || it.type == BadgeTypeDto.PAULDRONS.toString()
+        }?.level
             ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         return SelfExaminationCompletionInformationDto(
             points = reward.second,
@@ -259,6 +280,14 @@ class ExaminationRecordService(
     fun createOrUpdateExam(examinationRecordDto: ExaminationRecordDto, accountUuid: String): ExaminationRecordDto {
         validateAccountPrerequisites(examinationRecordDto, accountUuid)
         val account = findAccount(accountUuid)
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM) {
+            examinationRecordDto.uuid?.let {
+                val exam = examinationRecordRepository.findByUuid(it)
+                if (exam == null) {
+                    checkCustomExamsAmount(account) // is new exam, not update
+                }
+            }
+        }
         val record = validateUpdateAttempt(examinationRecordDto, accountUuid)
         validateDateInterval(examinationRecordDto, account)
         addRewardIfEligible(examinationRecordDto, account, examinationRecordDto.status)
@@ -270,7 +299,12 @@ class ExaminationRecordService(
                 plannedDate = examinationRecordDto.plannedDate?.toLocalDateTime(),
                 account = account,
                 firstExam = examinationRecordDto.firstExam ?: true,
-                status = examinationRecordDto.status ?: ExaminationStatusDto.NEW
+                status = examinationRecordDto.status ?: ExaminationStatusDto.NEW,
+                note = examinationRecordDto.note,
+                customInterval = examinationRecordDto.customInterval,
+                periodicExam = examinationRecordDto.periodicExam,
+                examinationCategoryType = examinationRecordDto.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
+                examinationActionType = examinationRecordDto.examinationActionType ?: ExaminationActionTypeDto.EXAMINATION
             )
         ).toExaminationRecordDto()
     }
@@ -293,12 +327,14 @@ class ExaminationRecordService(
                         "Cannot plan an exam in past."
                     )
                 }
-                if (plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)) {
-                    throw LoonoBackendException(
-                        HttpStatus.UNPROCESSABLE_ENTITY,
-                        "422",
-                        "The time has NOT passed."
-                    )
+                if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+                    if (plannedDateInAcceptedInterval(plannedLocalDateTime, account, record)) {
+                        throw LoonoBackendException(
+                            HttpStatus.UNPROCESSABLE_ENTITY,
+                            "422",
+                            "The time has NOT passed."
+                        )
+                    }
                 }
             }
         }
@@ -315,7 +351,13 @@ class ExaminationRecordService(
                 it.type == record.type &&
                     (
                         it.status == ExaminationStatusDto.CONFIRMED ||
-                            (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
+                            (
+                                it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null
+                                )
+                        ) &&
+                    (
+                        it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY ||
+                            it.examinationCategoryType == null
                         )
             }
         lastConfirmed.ifEmpty { return false }
@@ -323,28 +365,44 @@ class ExaminationRecordService(
         return date.isBefore(lastConfirmed.first().plannedDate!!.plusMonths(intervalInMonths))
     }
 
+    private fun checkCustomExamsAmount(account: Account) {
+        val customExamsSize = examinationRecordRepository.findAllByAccount(account)
+            .filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM && it.status == ExaminationStatusDto.NEW }.size
+        if (customExamsSize >= Constants.MAXIMUM_CUSTOM_EXAMS) {
+            throw LoonoBackendException(
+                HttpStatus.TOO_MANY_REQUESTS,
+                "404",
+                "Maximum amount of custom exam is exceeded."
+            )
+        }
+    }
     private fun validateAccountPrerequisites(record: ExaminationRecordDto, accountUuid: String) {
         val account = accountRepository.findByUid(accountUuid) ?: throw LoonoBackendException(
             HttpStatus.NOT_FOUND,
             "404",
             "The account not found."
         )
-        val plannedExam = examinationRecordRepository.findAllByAccount(account)
-            .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW }
-        if (plannedExam.isNotEmpty() && record.uuid == null) {
-            throw LoonoBackendException(
-                HttpStatus.CONFLICT,
-                "409",
-                "The examination of this type already exists."
-            )
-        }
-        val intervals = preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
-        intervals.ifEmpty {
-            throw LoonoBackendException(
-                HttpStatus.BAD_REQUEST,
-                "400",
-                "The account doesn't have rights to create this type of examinations."
-            )
+
+        if (record.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+            val plannedExam = examinationRecordRepository.findAllByAccount(account)
+                .filter { it.type == record.type && it.status == ExaminationStatusDto.NEW && it.examinationCategoryType != ExaminationCategoryTypeDto.CUSTOM }
+            if (plannedExam.isNotEmpty() && record.uuid == null) {
+                throw LoonoBackendException(
+                    HttpStatus.CONFLICT,
+                    "409",
+                    "The examination of this type already exists."
+                )
+            }
+
+            val intervals =
+                preventionService.getExaminationRequests(account).filter { it.examinationType == record.type }
+            intervals.ifEmpty {
+                throw LoonoBackendException(
+                    HttpStatus.BAD_REQUEST,
+                    "400",
+                    "The account doesn't have rights to create this type of examinations."
+                )
+            }
         }
     }
 
@@ -378,6 +436,9 @@ class ExaminationRecordService(
         val exam = examinationRecordRepository.findByUuidAndAccount(examUuid, account)
         addRewardIfEligible(exam.toExaminationRecordDto(), account, state)
         exam.status = state
+        if (state == ExaminationStatusDto.CANCELED) {
+            exam.note = null
+        }
 
         return examinationRecordRepository.save(exam).toExaminationRecordDto()
     }
@@ -406,21 +467,26 @@ class ExaminationRecordService(
         acc: Account,
         newState: ExaminationStatusDto?
     ) {
-        val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
-        val isFirstExam = recordBeforeUpdate?.firstExam ?: true
-        val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState &&
-            (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY || examinationRecordDto.examinationCategoryType == null) {
+            val recordBeforeUpdate = examinationRecordDto.uuid?.let { examinationRecordRepository.findByUuid(it) }
+            val isFirstExam = recordBeforeUpdate?.firstExam ?: true
+            val isStatusChangedToExpectedStates = recordBeforeUpdate?.status != newState && (newState in setOf(ExaminationStatusDto.CONFIRMED, ExaminationStatusDto.UNKNOWN))
 
-        if (isEligibleForReward(
-                isFirstExam,
-                isStatusChangedToExpectedStates,
-                examinationRecordDto.plannedDate?.toLocalDateTime(),
-                newState
-            )
-        ) {
-            val reward = BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
-            val updatedAccount = updateWithBadgeAndPoints(reward, acc)
-            accountRepository.save(updatedAccount)
+            if (isEligibleForReward(
+                    isFirstExam,
+                    isStatusChangedToExpectedStates,
+                    examinationRecordDto.plannedDate?.toLocalDateTime(),
+                    newState
+                )
+            ) {
+                val reward =
+                    BadgesPointsProvider.getGeneralBadgesAndPoints(examinationRecordDto.type, acc.getSexAsEnum())
+                val updatedAccount = updateWithBadgeAndPoints(reward, acc)
+                accountRepository.save(updatedAccount)
+            }
+        }
+        if (examinationRecordDto.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM && examinationRecordDto.periodicExam == true && newState == ExaminationStatusDto.CONFIRMED) {
+            accountRepository.save(acc.copy(points = acc.points + 50))
         }
     }
 
@@ -451,6 +517,11 @@ class ExaminationRecordService(
             type = type,
             plannedDate = plannedDate?.atUTCOffset(),
             firstExam = firstExam,
-            status = status
+            note = note,
+            periodicExam = periodicExam,
+            customInterval = customInterval,
+            examinationCategoryType = examinationCategoryType,
+            status = status,
+            examinationActionType = examinationActionType
         )
 }

@@ -43,12 +43,14 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
 
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql:42.4.1")
     implementation("org.hibernate:hibernate-envers:$hibernateVersion")
     implementation("org.hibernate:hibernate-entitymanager:$hibernateVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core:8.5.1")
     implementation("org.zalando:logbook-spring-boot-starter:2.14.0")
+
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
 
     testRuntimeOnly("com.h2database:h2")
 

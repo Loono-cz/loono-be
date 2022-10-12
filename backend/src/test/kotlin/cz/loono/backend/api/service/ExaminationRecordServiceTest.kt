@@ -460,4 +460,27 @@ class ExaminationRecordServiceTest(
 
         assertThat(accountRepository.findByUid("101")?.badges?.first()?.level).isEqualTo(1)
     }
+
+    @Test
+    fun `Delete examination by uuid`() {
+        val account = accountRepository.save(
+            createAccount(
+                uid = "101",
+                sex = SexDto.MALE.value,
+                birthday = LocalDate.of(1990, 9, 9)
+            )
+        )
+        val exam = ExaminationRecordDto(
+            type = ExaminationTypeDto.GENERAL_PRACTITIONER,
+            uuid = "test12345"
+        )
+        examinationRecordRepository.save(ExaminationRecord(type = exam.type, uuid = exam.uuid, account = account))
+        val examToDel = exam.uuid?.let { examinationRecordRepository.findByUuid(it) }
+        if (examToDel != null) {
+            examinationRecordRepository.delete(examToDel)
+        }
+        // Assert
+        val delEx = exam.uuid?.let { examinationRecordRepository.findByUuid(it) }
+        assertThat(delEx == null)
+    }
 }

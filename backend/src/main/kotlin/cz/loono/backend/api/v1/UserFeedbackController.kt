@@ -4,9 +4,11 @@ import cz.loono.backend.api.dto.UserFeedbackDto
 import cz.loono.backend.api.service.UserFeedbackService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping(headers = ["app-version"])
 class UserFeedbackController(
     private val userFeedbackService: UserFeedbackService
 ) {

@@ -1,6 +1,8 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationActionTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -111,7 +113,12 @@ class PreventionServiceTest {
                     count = 0,
                     plannedDate = now.atUTCOffset(),
                     points = 200,
-                    badge = BadgeTypeDto.COAT
+                    badge = BadgeTypeDto.COAT,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    lastConfirmedDate = null,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[5].toString(),
@@ -124,7 +131,11 @@ class PreventionServiceTest {
                     state = ExaminationStatusDto.CONFIRMED,
                     count = 1,
                     points = 200,
-                    badge = BadgeTypeDto.GLOVES
+                    badge = BadgeTypeDto.GLOVES,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[3].toString(),
@@ -137,7 +148,11 @@ class PreventionServiceTest {
                     count = 1,
                     lastConfirmedDate = OffsetDateTime.of(LocalDate.MIN, LocalTime.MIN, ZoneOffset.UTC),
                     points = 300,
-                    badge = BadgeTypeDto.HEADBAND
+                    badge = BadgeTypeDto.HEADBAND,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -149,7 +164,12 @@ class PreventionServiceTest {
                     state = ExaminationStatusDto.NEW,
                     count = 0,
                     points = 100,
-                    badge = BadgeTypeDto.GLASSES
+                    badge = BadgeTypeDto.GLASSES,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    lastConfirmedDate = null,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
             )
         ).isEqualTo(result.examinations)
@@ -163,7 +183,6 @@ class PreventionServiceTest {
             examsUUIDs[it] = UUID.randomUUID().toString()
         }
         val age: Long = 45
-        val now = OffsetDateTime.now()
         val account = createAccount(
             sex = "MALE",
             birthday = LocalDate.now().minusYears(age)
@@ -174,7 +193,6 @@ class PreventionServiceTest {
             listOf(
                 ExaminationRecord(
                     id = 1,
-                    plannedDate = now.toLocalDateTime(),
                     type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                     uuid = examsUUIDs[0]!!,
                     account = account
@@ -199,9 +217,14 @@ class PreventionServiceTest {
                     priority = 1,
                     state = ExaminationStatusDto.NEW,
                     count = 0,
-                    plannedDate = now,
+                    plannedDate = null,
                     points = 200,
-                    badge = BadgeTypeDto.COAT
+                    badge = BadgeTypeDto.COAT,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    lastConfirmedDate = null,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -214,7 +237,11 @@ class PreventionServiceTest {
                     state = ExaminationStatusDto.NEW,
                     count = 0,
                     points = 200,
-                    badge = BadgeTypeDto.GLOVES
+                    badge = BadgeTypeDto.GLOVES,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = examsUUIDs[1].toString(),
@@ -227,7 +254,11 @@ class PreventionServiceTest {
                     count = 0,
                     lastConfirmedDate = null,
                     points = 300,
-                    badge = BadgeTypeDto.HEADBAND
+                    badge = BadgeTypeDto.HEADBAND,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
                     uuid = null,
@@ -239,7 +270,12 @@ class PreventionServiceTest {
                     state = ExaminationStatusDto.NEW,
                     count = 0,
                     points = 100,
-                    badge = BadgeTypeDto.GLASSES
+                    badge = BadgeTypeDto.GLASSES,
+                    customInterval = null,
+                    examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                    periodicExam = true,
+                    lastConfirmedDate = null,
+                    examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
             ),
             /* actual = */ result.examinations
@@ -316,6 +352,61 @@ class PreventionServiceTest {
             )
         )
 
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
+                account,
+                SelfExaminationTypeDto.SKIN
+            )
+        ).thenReturn(
+            listOf(
+                SelfExaminationRecord(
+                    id = 8,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.MISSED,
+                    result = null,
+                    uuid = examsUUIDs[2]!!,
+                    account = account
+                ),
+                SelfExaminationRecord(
+                    id = 9,
+                    dueDate = now.minusMonths(2L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.OK,
+                    uuid = examsUUIDs[3]!!,
+                    account = account
+                ),
+                SelfExaminationRecord(
+                    id = 10,
+                    dueDate = now.minusMonths(3L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.MISSED,
+                    result = null,
+                    uuid = examsUUIDs[4]!!,
+                    account = account
+                ),
+                SelfExaminationRecord(
+                    id = 7,
+                    dueDate = now,
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.OK,
+                    uuid = examsUUIDs[1]!!,
+                    account = account
+                ),
+                SelfExaminationRecord(
+                    id = 6,
+                    dueDate = now.plusMonths(1L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.PLANNED,
+                    result = null,
+                    uuid = examsUUIDs[0]!!,
+                    account = account
+                )
+            )
+        )
+
         val result = preventionService.getPreventionStatus(uuid)
         assertEquals(
             /* expected = */ listOf(
@@ -332,6 +423,20 @@ class PreventionServiceTest {
                     ),
                     points = 50,
                     badge = BadgeTypeDto.SHIELD
+                ),
+                SelfExaminationPreventionStatusDto(
+                    lastExamUuid = examsUUIDs[0],
+                    type = SelfExaminationTypeDto.SKIN,
+                    plannedDate = now.plusMonths(1L),
+                    history = listOf(
+                        SelfExaminationStatusDto.MISSED,
+                        SelfExaminationStatusDto.COMPLETED,
+                        SelfExaminationStatusDto.MISSED,
+                        SelfExaminationStatusDto.COMPLETED,
+                        SelfExaminationStatusDto.PLANNED
+                    ),
+                    points = 50,
+                    badge = BadgeTypeDto.PAULDRONS
                 ),
             ),
             /* actual = */ result.selfexaminations
@@ -369,6 +474,25 @@ class PreventionServiceTest {
             )
         )
 
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
+                account,
+                SelfExaminationTypeDto.SKIN
+            )
+        ).thenReturn(
+            listOf(
+                SelfExaminationRecord(
+                    id = 4,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.FINDING,
+                    uuid = examsUUID,
+                    account = account
+                )
+            )
+        )
+
         val result = preventionService.getPreventionStatus(uuid)
         assertEquals(
             /* expected = */ listOf(
@@ -381,6 +505,16 @@ class PreventionServiceTest {
                     ),
                     points = 50,
                     badge = BadgeTypeDto.SHIELD
+                ),
+                SelfExaminationPreventionStatusDto(
+                    lastExamUuid = examsUUID,
+                    type = SelfExaminationTypeDto.SKIN,
+                    plannedDate = now.minusMonths(1L),
+                    history = listOf(
+                        SelfExaminationStatusDto.COMPLETED
+                    ),
+                    points = 50,
+                    badge = BadgeTypeDto.PAULDRONS
                 ),
             ),
             /* actual = */ result.selfexaminations
@@ -418,8 +552,27 @@ class PreventionServiceTest {
             )
         )
 
+        whenever(
+            selfExaminationRecordRepository.findAllByAccountAndTypeOrderByDueDateAsc(
+                account,
+                SelfExaminationTypeDto.SKIN
+            )
+        ).thenReturn(
+            listOf(
+                SelfExaminationRecord(
+                    id = 4,
+                    dueDate = now.minusMonths(1L),
+                    type = SelfExaminationTypeDto.SKIN,
+                    status = SelfExaminationStatusDto.COMPLETED,
+                    result = SelfExaminationResultDto.Result.NOT_OK,
+                    uuid = examsUUID,
+                    account = account
+                )
+            )
+        )
+
         val result = preventionService.getPreventionStatus(uuid)
-        assertEquals(emptyList<SelfExaminationStatusDto>(), result.selfexaminations)
+        assertEquals(emptyList<SelfExaminationPreventionStatusDto>(), result.selfexaminations)
     }
 
     @Test
@@ -444,6 +597,14 @@ class PreventionServiceTest {
                     history = emptyList(),
                     points = 50,
                     badge = BadgeTypeDto.SHIELD
+                ),
+                SelfExaminationPreventionStatusDto(
+                    lastExamUuid = null,
+                    type = SelfExaminationTypeDto.SKIN,
+                    plannedDate = null,
+                    history = emptyList(),
+                    points = 50,
+                    badge = BadgeTypeDto.PAULDRONS
                 ),
             ),
             /* actual = */ result.selfexaminations

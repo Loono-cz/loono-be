@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class AccountController(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository
@@ -41,6 +41,22 @@ class AccountController(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ): AccountDto {
+        try {
+            val accountExists = accountRepository.existsByUid(basicUser.uid)
+            if (!accountExists) {
+                throw LoonoBackendException(
+                    status = HttpStatus.NOT_FOUND,
+                    errorCode = "400",
+                    errorMessage = "Account neexistuje posilas $basicUser s uid ${basicUser.uid}"
+                )
+            }
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                status = HttpStatus.NOT_FOUND,
+                errorCode = "400",
+                errorMessage = "$e"
+            )
+        }
         val account = accountRepository.findByUid(basicUser.uid)
         if (account == null) {
             logger.error(

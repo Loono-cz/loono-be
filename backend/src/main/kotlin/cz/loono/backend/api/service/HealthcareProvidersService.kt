@@ -94,6 +94,7 @@ class HealthcareProvidersService(
         try {
             input = URL(OPEN_DATA_URL).openStream()
         } catch (e: ConnectException) {
+            updating = false
             throw LoonoBackendException(
                 HttpStatus.SERVICE_UNAVAILABLE,
                 errorCode = HttpStatus.SERVICE_UNAVAILABLE.value().toString(),
@@ -112,6 +113,7 @@ class HealthcareProvidersService(
                 updating = false
             }
         } else {
+            updating = false
             throw LoonoBackendException(
                 HttpStatus.UNPROCESSABLE_ENTITY,
                 errorCode = HttpStatus.UNPROCESSABLE_ENTITY.value().toString(),

@@ -14,6 +14,7 @@ import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class ExaminationsController(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService
@@ -39,6 +40,18 @@ class ExaminationsController(
     ): ExaminationRecordDto =
         examinationIdDto.uuid?.let {
             recordService.confirmExam(examinationIdDto.uuid, basicUser.uid)
+        } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
+
+    @DeleteMapping
+    fun deleteExam(
+        @RequestAttribute(Attributes.ATTR_BASIC_USER)
+        basicUser: BasicUser,
+
+        @RequestBody
+        examinationIdDto: ExaminationIdDto
+    ) =
+        examinationIdDto.uuid?.let {
+            recordService.deleteExam(examinationIdDto.uuid, basicUser.uid)
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
     @PostMapping("/{self-type}/self")

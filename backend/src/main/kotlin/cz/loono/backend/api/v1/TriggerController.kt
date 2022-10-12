@@ -5,9 +5,11 @@ import cz.loono.backend.schedule.PlanNewExamReminderTask
 import cz.loono.backend.schedule.PreventionReminderTask
 import cz.loono.backend.schedule.SelfExamReminderTask
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping(headers = ["app-version"])
 class TriggerController(
     private val comingAndPassedExamNotificationTask: ComingAndPassedExamNotificationTask,
     private val planNewExamReminderTask: PlanNewExamReminderTask,

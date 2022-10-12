@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/leaderboard", produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("/v1/leaderboard", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class LeaderboardController(
     private val leaderboardService: LeaderboardService
 ) {

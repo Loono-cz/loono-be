@@ -2,9 +2,11 @@ package cz.loono.backend.api.service
 
 import cz.loono.backend.api.dto.LeaderboardDto
 import cz.loono.backend.api.dto.LeaderboardUserDto
+import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,17 +15,23 @@ class LeaderboardService(
 ) {
 
     fun getLeaderboard(uuid: String): LeaderboardDto {
-        val top3 = findTop3Accounts(uuid)
-        val currentAcc = accountRepository.findByUid(uuid)
-        val (myOrder, peers) = currentAcc?.points?.let { points ->
-            positionInLeaderBoard(points) to findAccountPeers(points, uuid)
-        } ?: (0 to emptyList())
+        try {
+            val top3 = findTop3Accounts(uuid)
+            val currentAcc = accountRepository.findByUid(uuid)
+            val (myOrder, peers) = currentAcc?.points?.let { points ->
+                positionInLeaderBoard(points) to findAccountPeers(points, uuid)
+            } ?: (0 to emptyList())
 
-        return LeaderboardDto(
-            top = top3,
-            peers = peers,
-            myOrder = myOrder
-        )
+            return LeaderboardDto(
+                top = top3,
+                peers = peers,
+                myOrder = myOrder
+            )
+        } catch (e: Exception) {
+            throw LoonoBackendException(
+                HttpStatus.EXPECTATION_FAILED, "${e.localizedMessage}"
+            )
+        }
     }
 
     private fun findAccountPeers(

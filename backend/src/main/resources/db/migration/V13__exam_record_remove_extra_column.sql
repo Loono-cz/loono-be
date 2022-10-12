@@ -1,0 +1,2 @@
+ALTER TABLE examination_record DROP COLUMN examination_category;
+ALTER TABLE examination_record_aud DROP COLUMN examination_category;

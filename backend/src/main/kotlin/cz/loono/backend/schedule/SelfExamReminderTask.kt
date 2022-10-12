@@ -1,31 +1,30 @@
 package cz.loono.backend.schedule
 
-import cz.loono.backend.api.service.PreventionService
+import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.service.PushNotificationService
-import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
 class SelfExamReminderTask(
     private val accountRepository: AccountRepository,
-    private val preventionService: PreventionService,
-    private val notificationService: PushNotificationService
+    private val notificationService: PushNotificationService,
+    private val selfExaminationRecordRepository: SelfExaminationRecordRepository
 ) : DailySchedulerTask {
 
     override fun run() {
         val accounts = accountRepository.findAll()
         val today = LocalDate.now()
         accounts.forEach { account ->
-            val statuses = preventionService.getPreventionStatus(account.uid).selfexaminations
-            statuses.forEach {
-                if (account.created.dayOfMonth == today.dayOfMonth && it.plannedDate == null) {
-                    notificationService.sendFirstSelfExamNotification(setOf<Account>(account), account.getSexAsEnum())
-                }
-                if (it.plannedDate == today) {
-                    notificationService.sendSelfExamNotification(setOf<Account>(account), account.getSexAsEnum())
-                }
+            val statuses = selfExaminationRecordRepository.findAllByAccount(account)
+            val todayNotifications = statuses.filter { it.dueDate == today && it.status == SelfExaminationStatusDto.PLANNED && it.result == null }
+            if (todayNotifications.isNotEmpty()) {
+                notificationService.sendSelfExamNotification(setOf(account))
+            }
+            if (statuses.size < 2 && account.created.dayOfMonth == today.dayOfMonth) {
+                notificationService.sendFirstSelfExamNotification(setOf(account))
             }
         }
     }

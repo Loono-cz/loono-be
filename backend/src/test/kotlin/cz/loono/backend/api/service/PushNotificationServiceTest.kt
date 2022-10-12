@@ -2,7 +2,7 @@ package cz.loono.backend.api.service
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.service.PushNotificationService.Companion.ONESIGNAL_API_KEY
@@ -54,7 +54,7 @@ class PushNotificationServiceTest(
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Hola, hola, prevence volá!", storedNotification.headings.cs)
-        assertEquals("Mrkni, na které preventivní prohlídky se objednat.", storedNotification.contents.cs)
+        assertEquals("Mrkni, na které prohlídky se objednat.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "main"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
         assertEquals("10:00AM", storedNotification.delivery_time_of_day)
@@ -65,14 +65,14 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendComingVisitNotification(setOf(account), ExaminationTypeDto.DENTIST, "7:45")
+            pushNotificationService.sendComingVisitNotification(setOf(account), ExaminationTypeDto.DENTIST, "7:45", null)
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Zítra tě čeká prohlídka", storedNotification.headings.cs)
-        assertEquals("Zítra jdeš k zubaři na preventivní prohlídku.", storedNotification.contents.cs)
+        assertEquals("Zítra jdeš k zubaři na prohlídku.", storedNotification.contents.cs)
         assertEquals(
-            NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
+            NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST, examinationUuid = null),
             storedNotification.data
         )
         assertEquals("timezone", storedNotification.delayed_option)
@@ -84,12 +84,12 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendCompletionNotification(setOf(account), "7:45", ExaminationTypeDto.DENTIST)
+            pushNotificationService.sendCompletionNotification(setOf(account), "7:45", ExaminationTypeDto.DENTIST, null)
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Byl/a jsi na prohlídce?", storedNotification.headings.cs)
-        assertEquals("Potvrď preventivní prohlídku v aplikaci a získej odměnu.", storedNotification.contents.cs)
+        assertEquals("Potvrď prohlídku v aplikaci a získej odměnu.", storedNotification.contents.cs)
         assertEquals(
             NotificationData(screen = "checkup", examinationType = ExaminationTypeDto.DENTIST),
             storedNotification.data
@@ -107,14 +107,15 @@ class PushNotificationServiceTest(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
                 2,
-                BadgeTypeDto.GLASSES
+                ExaminationCategoryTypeDto.MANDATORY,
+                null
             )
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Nejvyšší čas zajít k zubaři", storedNotification.headings.cs)
         assertEquals(
-            "Jsou/je to už 2 roky od poslední prohlídky. Objednej se ještě dnes, ať neztratíš brýle.",
+            "Jsou/je to už 2 roky od poslední prohlídky. Objednej se na prohlídku ještě dnes!",
             storedNotification.contents.cs
         )
         assertEquals(
@@ -133,14 +134,16 @@ class PushNotificationServiceTest(
             pushNotificationService.sendNewExam2MonthsAheadNotificationToOrder(
                 setOf(account),
                 ExaminationTypeDto.DENTIST,
-                2
+                2,
+                ExaminationCategoryTypeDto.MANDATORY,
+                null
             )
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Objednej se k zubaři", storedNotification.headings.cs)
         assertEquals(
-            "2 roky utekl/y jako voda, je čas se objednat na preventivní prohlídku.",
+            "2 roky utekl/y jako voda, je čas se objednat na prohlídku.",
             storedNotification.contents.cs
         )
         assertEquals(
@@ -156,7 +159,7 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendFirstSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendFirstSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
@@ -172,12 +175,12 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
         assertEquals("Je čas na samovyšetření", storedNotification.headings.cs)
-        assertEquals("Po měsíci přišel čas si sáhnout na varlata.", storedNotification.contents.cs)
+        assertEquals("Po měsíci přišel čas se vyšetřit, zda je vše v pořádku.", storedNotification.contents.cs)
         assertEquals(NotificationData(screen = "self"), storedNotification.data)
         assertEquals("timezone", storedNotification.delayed_option)
         assertEquals("6:00PM", storedNotification.delivery_time_of_day)
@@ -188,13 +191,13 @@ class PushNotificationServiceTest(
         val account = createAccount()
 
         val notificationId =
-            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account), account.getSexAsEnum())
+            pushNotificationService.sendSelfExamIssueResultNotification(setOf(account))
 
         notifications.add(notificationId)
         val storedNotification = OneSignalTestClient.viewNotification(notificationId)
-        assertEquals("Máš varlata zdravá?", storedNotification.headings.cs)
+        assertEquals("Je vše v pořádku?", storedNotification.headings.cs)
         assertEquals(
-            "Před časem se ti na varlatech něco nezdálo. Jak dopadla prohlídka u lékaře?",
+            "Před časem se ti při samovyšetření něco nezdálo. Jak dopadla prohlídka u lékaře?",
             storedNotification.contents.cs
         )
         assertEquals(NotificationData(screen = "self"), storedNotification.data)
