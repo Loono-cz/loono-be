@@ -1,5 +1,6 @@
 package cz.loono.backend
 
+import cz.loono.backend.metrics.LoonoMXBean
 import cz.loono.backend.security.AccountCreatingInterceptor
 import cz.loono.backend.security.BearerTokenAuthenticator
 import cz.loono.backend.security.SupportedAppVersionInterceptor
@@ -13,6 +14,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.lang.management.ManagementFactory
+import java.rmi.registry.LocateRegistry
+import javax.management.MBeanServer
+import javax.management.ObjectName
+import javax.management.remote.JMXConnectorServerFactory
+import javax.management.remote.JMXServiceURL
 
 @SpringBootApplication
 @EntityScan(basePackages = ["cz.loono.backend.db.model"])
@@ -22,6 +29,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class Application
 
 fun main(args: Array<String>) {
+    setupMBeans()
     runApplication<Application>(*args)
 }
 
@@ -76,4 +84,15 @@ class Config(
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         registry.addResourceHandler("/**").addResourceLocations("classpath:static/")
     }
+}
+fun setupMBeans() {
+    LocateRegistry.createRegistry(49185)
+    val mBeanServer: MBeanServer = ManagementFactory.getPlatformMBeanServer()
+    val url = JMXServiceURL("service:jmx:rmi://localhost/jndi/rmi://localhost:49185/jmxrmi")
+    val svr = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer)
+    val objName = ObjectName("cz.loono.backend:type=basic,name=LoonoMXBean")
+    val loonoMBean = LoonoMXBean()
+    mBeanServer.registerMBean(loonoMBean, objName)
+    svr.start()
+
 }
