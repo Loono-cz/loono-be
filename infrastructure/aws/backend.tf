@@ -138,7 +138,7 @@ resource "aws_ecs_service" "backend" {
   cluster                            = aws_ecs_cluster.backend.id
   task_definition                    = aws_ecs_task_definition.backend.arn
   launch_type                        = "FARGATE"
-  desired_count                      = 1
+  desired_count                      = 2
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
   health_check_grace_period_seconds  = 20
@@ -219,7 +219,8 @@ resource "aws_lb_target_group" "backend-tg" {
   target_type = "ip"
   health_check {
     path                = "/actuator/health"
-    unhealthy_threshold = 10
+    unhealthy_threshold = 3
+    interval            = 10
     enabled             = true
     port                = 8080
     matcher             = "200"
