@@ -94,5 +94,4 @@ fun setupMBeans() {
     val loonoMBean = LoonoMXBean()
     mBeanServer.registerMBean(loonoMBean, objName)
     svr.start()
-
 }
