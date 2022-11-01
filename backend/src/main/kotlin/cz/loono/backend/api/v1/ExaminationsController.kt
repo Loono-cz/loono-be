@@ -14,6 +14,8 @@ import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.jmx.export.annotation.ManagedOperation
+import org.springframework.jmx.export.annotation.ManagedResource
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,11 +28,13 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/v1/examinations", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
+@ManagedResource(objectName = "LoonoMBean:category=MBeans,name=examinationsBean")
 class ExaminationsController(
     private val recordService: ExaminationRecordService,
     private val preventionService: PreventionService
 ) {
     @PostMapping("/confirm")
+    @ManagedOperation
     fun confirm(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -43,6 +47,7 @@ class ExaminationsController(
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
     @DeleteMapping
+    @ManagedOperation
     fun deleteExam(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -55,6 +60,7 @@ class ExaminationsController(
         } ?: throw LoonoBackendException(HttpStatus.BAD_REQUEST)
 
     @PostMapping("/{self-type}/self")
+    @ManagedOperation
     fun confirmSelf(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -72,6 +78,7 @@ class ExaminationsController(
         }
 
     @PostMapping("/{self-type}/result")
+    @ManagedOperation
     fun selfExamResult(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -89,6 +96,7 @@ class ExaminationsController(
         }
 
     @PostMapping("/cancel")
+    @ManagedOperation
     fun cancel(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -103,6 +111,7 @@ class ExaminationsController(
         }
 
     @PostMapping
+    @ManagedOperation
     fun updateOrCreate(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -113,6 +122,7 @@ class ExaminationsController(
     ): ExaminationRecordDto = recordService.createOrUpdateExam(examinationRecordDto, basicUser.uid)
 
     @GetMapping
+    @ManagedOperation
     fun getPreventionStatus(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
