@@ -219,8 +219,7 @@ resource "aws_lb_target_group" "backend-tg" {
   target_type = "ip"
   health_check {
     path                = "/actuator/health"
-    unhealthy_threshold = 3
-    interval            = 10
+    unhealthy_threshold = 10
     enabled             = true
     port                = 8080
     matcher             = "200"
