@@ -129,8 +129,8 @@ resource "aws_ecs_task_definition" "backend" {
   network_mode          = "awsvpc"
   execution_role_arn    = aws_iam_role.ecs-task-execution-role.arn
   task_role_arn         = aws_iam_role.ecs-task-execution-role.arn
-  memory                = "1024"
-  cpu                   = "256"
+  memory                = "2048"
+  cpu                   = "512"
 }
 
 resource "aws_ecs_service" "backend" {
@@ -138,10 +138,10 @@ resource "aws_ecs_service" "backend" {
   cluster                            = aws_ecs_cluster.backend.id
   task_definition                    = aws_ecs_task_definition.backend.arn
   launch_type                        = "FARGATE"
-  desired_count                      = 1
+  desired_count                      = 2
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
-  health_check_grace_period_seconds  = 100
+  health_check_grace_period_seconds  = 250
 
   network_configuration {
     security_groups = [
@@ -220,6 +220,8 @@ resource "aws_lb_target_group" "backend-tg" {
   health_check {
     path                = "/actuator/health"
     unhealthy_threshold = 10
+    interval            = 30
+    timeout             = 9
     enabled             = true
     port                = 8080
     matcher             = "200"
