@@ -12,4 +12,4 @@ COPY --from=gradle --chown=nonroot:nonroot /home/gradle/backend/backend/build/di
 WORKDIR "/app"
 USER nonroot
 
-ENTRYPOINT ["java","-Xmx256m","-jar","./loono-be.jar"]
+ENTRYPOINT ["java","-Xmx1024m","-jar","./loono-be.jar"]
