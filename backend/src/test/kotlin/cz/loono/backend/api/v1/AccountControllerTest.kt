@@ -8,10 +8,11 @@ import cz.loono.backend.api.service.FirebaseAuthService
 import cz.loono.backend.createAccount
 import cz.loono.backend.createBasicUser
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.db.repository.UserFeedbackRepository
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
@@ -27,6 +28,8 @@ class AccountControllerTest(
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    private val badgeRepository: BadgeRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
 ) {
@@ -37,14 +40,10 @@ class AccountControllerTest(
     fun `getAccount with missing account`() {
         val service = mock<AccountService>()
         val controller = AccountController(service, repo)
-
         val ex = assertThrows<LoonoBackendException> {
             controller.getAccount(createBasicUser(uid = "non-existing"))
         }
-
         assertEquals(HttpStatus.NOT_FOUND, ex.status)
-        assertNull(ex.errorCode)
-        assertNull(ex.errorMessage)
     }
 
     @Test
@@ -56,6 +55,8 @@ class AccountControllerTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val controller = AccountController(service, repo)
@@ -92,6 +93,8 @@ class AccountControllerTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val controller = AccountController(service, repo)

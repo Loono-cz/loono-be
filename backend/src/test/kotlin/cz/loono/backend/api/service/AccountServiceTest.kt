@@ -12,8 +12,10 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.db.repository.UserFeedbackRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -22,7 +24,7 @@ import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
@@ -31,6 +33,8 @@ class AccountServiceTest(
     private val examinationRecordService: ExaminationRecordService,
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
+    private val badgeRepository: BadgeRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
 ) {
@@ -54,7 +58,9 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
-            pageSize,
+            badgeRepository,
+            userFeedbackRepository,
+            pageSize
         )
 
         val accountDto = service.onboardAccount(
@@ -64,7 +70,8 @@ class AccountServiceTest(
                 sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
-                examinations = emptyList()
+                examinations = emptyList(),
+                newsletterOptIn = false
             )
         )
 
@@ -96,6 +103,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -107,7 +116,8 @@ class AccountServiceTest(
                     sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
-                    examinations = emptyList()
+                    examinations = emptyList(),
+                    newsletterOptIn = false
                 )
             )
         }
@@ -123,6 +133,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -135,13 +147,13 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(1),
+                        plannedDate = OffsetDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
@@ -152,31 +164,35 @@ class AccountServiceTest(
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(1),
+                        plannedDate = OffsetDateTime.now().minusYears(1),
                         type = ExaminationTypeDto.COLONOSCOPY,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     )
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 
         val exams = repo.findByUid(account.uid)!!.examinationRecords
-        assert(
-            accountDto == AccountDto(
+        assertThat(
+            AccountDto(
                 uid = account.uid,
                 nickname = account.nickname,
                 sex = account.getSexAsEnum(),
                 preferredEmail = account.preferredEmail,
                 birthdate = account.birthdate,
                 points = 500,
-                badges = listOf(BadgeDto(BadgeTypeDto.COAT, 1), BadgeDto(BadgeTypeDto.HEADBAND, 1)),
+                badges = listOf(
+                    BadgeDto(BadgeTypeDto.COAT, 1),
+                    BadgeDto(BadgeTypeDto.HEADBAND, 1)
+                ),
                 newsletterOptIn = false,
                 appointmentReminderEmailsOptIn = true,
                 leaderboardAnonymizationOptIn = true,
                 profileImageUrl = null
             )
-        )
+        ).isEqualTo(accountDto)
         assert(exams.size == 3)
         assert(exams.find { it.type == ExaminationTypeDto.GENERAL_PRACTITIONER } != null)
         assert(exams.find { it.type == ExaminationTypeDto.GYNECOLOGIST } != null)
@@ -193,6 +209,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -226,6 +244,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -260,6 +280,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         repo.save(account)
@@ -300,6 +322,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         repo.save(account)
@@ -342,6 +366,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val storedAccount = repo.save(account)
@@ -377,6 +403,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("toDelete")
@@ -398,6 +426,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("uid")
@@ -419,6 +449,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
         val existingAccount = createAccount("uid")
@@ -441,6 +473,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -453,18 +487,19 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now().minusYears(2).plusDays(1),
+                        plannedDate = OffsetDateTime.now().minusYears(2).plusDays(1),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.UNKNOWN,
                         firstExam = true
                     ),
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 
@@ -494,6 +529,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -505,7 +542,8 @@ class AccountServiceTest(
                     sex = account.getSexAsEnum(),
                     preferredEmail = account.preferredEmail,
                     birthdate = account.birthdate,
-                    examinations = emptyList()
+                    examinations = emptyList(),
+                    newsletterOptIn = false
                 )
             )
         }
@@ -521,6 +559,8 @@ class AccountServiceTest(
             selfExaminationRecordRepository,
             firebaseAuthService,
             examinationRecordService,
+            badgeRepository,
+            userFeedbackRepository,
             pageSize
         )
 
@@ -533,18 +573,19 @@ class AccountServiceTest(
                 birthdate = account.birthdate,
                 examinations = listOf(
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                         status = ExaminationStatusDto.CONFIRMED,
                         firstExam = true
                     ),
                     ExaminationRecordDto(
-                        plannedDate = LocalDateTime.now(),
+                        plannedDate = OffsetDateTime.now(),
                         type = ExaminationTypeDto.DENTIST,
                         status = ExaminationStatusDto.NEW,
                         firstExam = true
                     ),
-                )
+                ),
+                newsletterOptIn = false
             )
         )
 

@@ -1,0 +1,2 @@
+ALTER TABLE examination_record ADD examination_category_type text;
+ALTER TABLE examination_record_aud ADD examination_category_type text;

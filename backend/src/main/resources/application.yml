@@ -20,6 +20,10 @@ spring:
   web:
     resources:
       add-mappings: false
+  jmx:
+    enabled: true
+    unique-names: true
+    domain: 'cz.loono.backend'
 # Logger configuration
 logging:
   pattern:
@@ -29,6 +33,7 @@ logging:
     cz.loono.backend: INFO
     org.springframework: WARN
     org.hibernate: WARN
+    org.zalando.logbook: TRACE
     org.flywaydb: INFO
 # Server configuration
 server:
@@ -39,6 +44,14 @@ management.endpoint.health.show-details: always
 management.health:
   db.enabled: true
   diskspace.enabled: false
+# JMX
+management.endpoint.web.exposure.include: '*'
+management.endpoint.jmx:
+  domain: 'cz.loono.backend'
+  enabled: true
+  unique-names: true
+
+# Cron
 scheduler.cron:
   daily-task: "0 0 3 * * ?"
   data-update: "0 0 2 2 * ?"
@@ -46,3 +59,7 @@ scheduler.cron:
 task.badge-downgrade:
   page-size: 100
   tolerance-months: 0
+# swagger
+springdoc:
+  swagger-ui:
+    enabled: true

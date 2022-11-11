@@ -1,6 +1,7 @@
 package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.BadgeTypeDto
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
@@ -16,7 +17,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class PlanNewExamReminderTaskTest {
 
@@ -47,7 +48,8 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusMonths(22)
+                        lastConfirmedDate = OffsetDateTime.now().minusMonths(22),
+                        examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY
                     )
                 ),
                 emptyList()
@@ -59,7 +61,9 @@ class PlanNewExamReminderTaskTest {
         verify(notificationService, times(1)).sendNewExam2MonthsAheadNotificationToOrder(
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
-            2
+            2,
+            ExaminationCategoryTypeDto.MANDATORY,
+            "1"
         )
     }
 
@@ -77,7 +81,7 @@ class PlanNewExamReminderTaskTest {
                 listOf(
                     ExaminationPreventionStatusDto(
                         uuid = "1",
-                        examinationType = ExaminationTypeDto.GENERAL_PRACTITIONER,
+                        examinationType = ExaminationTypeDto.DENTIST,
                         intervalYears = 2,
                         firstExam = false,
                         priority = 1,
@@ -86,7 +90,11 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusMonths(23)
+                        lastConfirmedDate = OffsetDateTime.now().minusMonths(23),
+                        examinationCategoryType = ExaminationCategoryTypeDto.MANDATORY,
+                        periodicExam = true,
+                        customInterval = null,
+                        note = null
                     )
                 ),
                 emptyList()
@@ -97,9 +105,10 @@ class PlanNewExamReminderTaskTest {
 
         verify(notificationService, times(1)).sendNewExamMonthAheadNotificationToOrder(
             setOf(user),
-            ExaminationTypeDto.GENERAL_PRACTITIONER,
+            ExaminationTypeDto.DENTIST,
             2,
-            BadgeTypeDto.HEADBAND
+            ExaminationCategoryTypeDto.MANDATORY,
+            "1"
         )
     }
 
@@ -138,7 +147,9 @@ class PlanNewExamReminderTaskTest {
         verify(notificationService, times(0)).sendNewExam2MonthsAheadNotificationToOrder(
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
-            2
+            2,
+            ExaminationCategoryTypeDto.MANDATORY,
+            null
         )
     }
 
@@ -165,7 +176,7 @@ class PlanNewExamReminderTaskTest {
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
                         plannedDate = null,
-                        lastConfirmedDate = LocalDateTime.now().minusYears(1)
+                        lastConfirmedDate = OffsetDateTime.now().minusYears(1)
                     )
                 ),
                 emptyList()
@@ -177,7 +188,9 @@ class PlanNewExamReminderTaskTest {
         verify(notificationService, times(0)).sendNewExam2MonthsAheadNotificationToOrder(
             setOf(user),
             ExaminationTypeDto.GENERAL_PRACTITIONER,
-            2
+            2,
+            ExaminationCategoryTypeDto.MANDATORY,
+            null
         )
     }
 }

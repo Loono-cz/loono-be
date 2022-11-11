@@ -54,7 +54,7 @@ data class Account(
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = false, updatable = true, insertable = true)
-    val examinationRecords: List<ExaminationRecord> = mutableListOf(),
+    val examinationRecords: MutableList<ExaminationRecord> = mutableListOf(),
 
     @OneToMany(orphanRemoval = false, cascade = [CascadeType.ALL], mappedBy = "account", fetch = FetchType.EAGER)
     @Column(nullable = true, updatable = true, insertable = true)
@@ -91,4 +91,3 @@ data class Account(
             "appointmentReminderEmailsOptIn=$appointmentReminderEmailsOptIn, " +
             "newsletterOptIn=$newsletterOptIn, points=$points, examinationRecords=$examinationRecords)"
 }
-// psql -h database.internal.loono.ceskodigital.net -p 5432 -U loono -d loonodevelopment -f data_dump.sql\

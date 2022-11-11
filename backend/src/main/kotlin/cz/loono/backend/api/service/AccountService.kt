@@ -9,8 +9,10 @@ import cz.loono.backend.api.dto.SexDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
+import cz.loono.backend.db.repository.UserFeedbackRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -29,6 +31,8 @@ class AccountService(
     private val selfRecordRepository: SelfExaminationRecordRepository,
     private val firebaseAuthService: FirebaseAuthService,
     private val examinationRecordService: ExaminationRecordService,
+    private val badgeRepository: BadgeRepository,
+    private val userFeedbackRepository: UserFeedbackRepository,
     @Value("\${task.badge-downgrade.page-size}")
     private val pageSize: Int,
 ) {
@@ -50,7 +54,8 @@ class AccountService(
                 nickname = account.nickname,
                 sex = account.sex.name,
                 birthdate = account.birthdate,
-                preferredEmail = account.preferredEmail
+                preferredEmail = account.preferredEmail,
+                newsletterOptIn = account.newsletterOptIn
             )
         )
         val acceptedExams = account.examinations.filter {
@@ -90,9 +95,12 @@ class AccountService(
             errorMessage = "The account not found."
         )
         examinationRecordRepository.deleteAllByAccount(account)
+        badgeRepository.deleteAllByAccount(account)
+        userFeedbackRepository.deleteAllByAccount(account)
         selfRecordRepository.deleteAllByAccount(account)
         accountRepository.delete(account)
-        firebaseAuthService.deleteAccount(uid)
+
+        accountRepository.findByUid(uid) ?: firebaseAuthService.deleteAccount(uid)
     }
 
     @Transactional(rollbackFor = [Exception::class])
