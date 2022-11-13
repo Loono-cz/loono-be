@@ -5,7 +5,8 @@ import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import org.springframework.stereotype.Component
-import java.time.*
+import java.time.LocalDate
+import java.time.Period
 
 @Component
 class PlanNewExamReminderTask(
