@@ -1,6 +1,7 @@
 package cz.loono.backend.schedule
 
-import cz.loono.backend.api.dto.*
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
+import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
