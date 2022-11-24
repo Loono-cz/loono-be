@@ -7,7 +7,7 @@ import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 
 @Component
 class PlanNewExamReminderTask(
@@ -25,7 +25,7 @@ class PlanNewExamReminderTask(
                 val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
                 mandatoryExams.forEach { status ->
                     status.lastConfirmedDate?.let {
-                        if (status.isNewExamAhead(2, today)) {
+                        if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.MANDATORY)) {
                             notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
@@ -34,7 +34,7 @@ class PlanNewExamReminderTask(
                                 status.uuid
                             )
                         }
-                        if (status.isNewExamAhead(1, today)) {
+                        if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.MANDATORY)) {
                             notificationService.sendNewExamMonthAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
@@ -49,7 +49,7 @@ class PlanNewExamReminderTask(
                 customExams.forEach { status ->
                     status.lastConfirmedDate?.let {
                         if (status.periodicExam == true) {
-                            if (status.isNewExamAhead(2, today)) {
+                            if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.CUSTOM)) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
@@ -58,7 +58,7 @@ class PlanNewExamReminderTask(
                                     status.uuid
                                 )
                             }
-                            if (status.isNewExamAhead(1, today)) {
+                            if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.CUSTOM)) {
                                 notificationService.sendNewExamMonthAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
@@ -74,13 +74,24 @@ class PlanNewExamReminderTask(
         }
     }
 
-    companion object {
-        private fun ExaminationPreventionStatusDto.isNewExamAhead(months: Long, now: LocalDate): Boolean {
-            val last = this.lastConfirmedDate ?: return false
+    private fun ExaminationPreventionStatusDto.isNewExamAhead(months: Long, today: LocalDate, category: ExaminationCategoryTypeDto): Boolean {
+        val lastDayOfCurrentMonth = today.withDayOfMonth(today.month.length(today.isLeapYear))
+        val last = this.lastConfirmedDate ?: return false
 
-            val period = Period.between(last.toLocalDate(), now)
-            val interval = (this.customInterval ?: (this.intervalYears * 12)) - months
-            return period.toTotalMonths() == interval && period.days == 0
+        val monthsPeriod = ChronoUnit.MONTHS.between(last.toLocalDate().withDayOfMonth(1), today.withDayOfMonth(1))
+        val daysPeriod = last.toLocalDate().dayOfMonth - today.dayOfMonth
+        val interval = if (category == ExaminationCategoryTypeDto.CUSTOM) {
+            this.customInterval
+        } else {
+            (this.intervalYears * 12) - months
         }
+        if (monthsPeriod == interval){
+            if (daysPeriod == 0)
+                return true
+
+            if (lastDayOfCurrentMonth == today && last.toLocalDate().dayOfMonth > today.dayOfMonth)
+                return true
+        }
+        return false
     }
 }
