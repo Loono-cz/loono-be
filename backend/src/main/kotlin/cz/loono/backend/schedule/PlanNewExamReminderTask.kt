@@ -85,7 +85,7 @@ class PlanNewExamReminderTask(
         } else {
             (this.intervalYears * 12) - months
         }
-        if (monthsPeriod == interval){
+        if (monthsPeriod == interval) {
             if (daysPeriod == 0)
                 return true
 
