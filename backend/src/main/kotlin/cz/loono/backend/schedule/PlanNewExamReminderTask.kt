@@ -1,12 +1,13 @@
 package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
+import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 
 @Component
 class PlanNewExamReminderTask(
@@ -24,9 +25,7 @@ class PlanNewExamReminderTask(
                 val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
                 mandatoryExams.forEach { status ->
                     status.lastConfirmedDate?.let {
-                        val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
-                        val passedMonths = period.years * 12 + period.months
-                        if (passedMonths == (status.intervalYears * 12) - 2 && period.days == 0) {
+                        if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.MANDATORY)) {
                             notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
@@ -35,7 +34,7 @@ class PlanNewExamReminderTask(
                                 status.uuid
                             )
                         }
-                        if (passedMonths == (status.intervalYears * 12) - 1 && period.days == 0) {
+                        if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.MANDATORY)) {
                             notificationService.sendNewExamMonthAheadNotificationToOrder(
                                 setOf(account),
                                 status.examinationType,
@@ -50,8 +49,7 @@ class PlanNewExamReminderTask(
                 customExams.forEach { status ->
                     status.lastConfirmedDate?.let {
                         if (status.periodicExam == true) {
-                            val period = Period.between(status.lastConfirmedDate.toLocalDate(), today)
-                            if (period.months == (status.customInterval?.minus(2)) && period.days == 0) {
+                            if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.CUSTOM)) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
@@ -60,7 +58,7 @@ class PlanNewExamReminderTask(
                                     status.uuid
                                 )
                             }
-                            if (period.months == (status.customInterval?.minus(1)) && period.days == 0) {
+                            if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.CUSTOM)) {
                                 notificationService.sendNewExamMonthAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
@@ -74,5 +72,26 @@ class PlanNewExamReminderTask(
                 }
             }
         }
+    }
+
+    private fun ExaminationPreventionStatusDto.isNewExamAhead(months: Long, today: LocalDate, category: ExaminationCategoryTypeDto): Boolean {
+        val lastDayOfCurrentMonth = today.withDayOfMonth(today.month.length(today.isLeapYear))
+        val last = this.lastConfirmedDate ?: return false
+
+        val monthsPeriod = ChronoUnit.MONTHS.between(last.toLocalDate().withDayOfMonth(1), today.withDayOfMonth(1))
+        val daysPeriod = last.toLocalDate().dayOfMonth - today.dayOfMonth
+        val interval = if (category == ExaminationCategoryTypeDto.CUSTOM) {
+            this.customInterval
+        } else {
+            (this.intervalYears * 12) - months
+        }
+        if (monthsPeriod == interval) {
+            if (daysPeriod == 0)
+                return true
+
+            if (lastDayOfCurrentMonth == today && last.toLocalDate().dayOfMonth > today.dayOfMonth)
+                return true
+        }
+        return false
     }
 }
