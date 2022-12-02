@@ -198,9 +198,7 @@ class ExaminationRecordService(
             throw LoonoBackendException(HttpStatus.BAD_REQUEST)
         }
         val now = LocalDate.now()
-        val threeDaysBefore = dueDate.minusDays(3)
-        val threeDaysAfter = dueDate.plusDays(3)
-        if (!(now.isAfter(threeDaysBefore) && now.isBefore(threeDaysAfter))) {
+        if (dueDate.isAfter(now)) {
             throw LoonoBackendException(
                 HttpStatus.BAD_REQUEST,
                 "400",
