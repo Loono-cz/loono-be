@@ -110,7 +110,7 @@ object NotificationDefinition {
         )
     }
 
-    fun getFirstSelfExamNotification(accounts: Set<Account>): PushNotification {
+    fun getFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
         val name = "First self-exam notification"
         val title = notificationTextManager.getText("self.first.title")
         val text = notificationTextManager.getText("self.first.text")
@@ -121,11 +121,11 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "self"),
+            data = NotificationData(screen = "self", examinationUuid = examinationUuid),
         )
     }
 
-    fun getSelfExamNotification(accounts: Set<Account>): PushNotification {
+    fun getSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
         val name = "Self-exam notification"
         val title = notificationTextManager.getText("self.common.title")
         val text = notificationTextManager.getText("self.common.text")
@@ -136,11 +136,11 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "self"),
+            data = NotificationData(screen = "self", examinationUuid = examinationUuid),
         )
     }
 
-    fun getSelfExamIssueResultNotification(accounts: Set<Account>): PushNotification {
+    fun getSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
         val name = "Issue result of self-exam notification"
         val title = notificationTextManager.getText("self.result.title")
         val text = notificationTextManager.getText("self.result.text")
@@ -151,7 +151,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = EVENING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "self")
+            data = NotificationData(screen = "self", examinationUuid = examinationUuid)
         )
     }
 

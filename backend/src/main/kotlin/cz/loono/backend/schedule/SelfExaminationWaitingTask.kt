@@ -22,7 +22,7 @@ class SelfExaminationWaitingTask(
                     )
                 )
                 notificationService.sendSelfExamIssueResultNotification(
-                    setOf(it.account)
+                    setOf(it.account), it.uuid
                 )
             }
         }

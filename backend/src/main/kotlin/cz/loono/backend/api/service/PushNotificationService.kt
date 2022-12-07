@@ -89,14 +89,14 @@ class PushNotificationService(
         )
     )
 
-    fun sendFirstSelfExamNotification(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts))
+    fun sendFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+        sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts, examinationUuid))
 
-    fun sendSelfExamNotification(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts))
+    fun sendSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+        sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts, examinationUuid))
 
-    fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
+    fun sendSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts, examinationUuid))
 
     // TODO - remove after testing
     fun sendFirstSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
