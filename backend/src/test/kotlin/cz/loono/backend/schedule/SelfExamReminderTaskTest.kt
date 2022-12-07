@@ -9,10 +9,7 @@ import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import java.time.LocalDate
 
 class SelfExamReminderTaskTest {
@@ -31,7 +28,7 @@ class SelfExamReminderTaskTest {
 
         selfExaminationReminderTask.run()
 
-        verify(notificationService, times(1)).sendFirstSelfExamNotification(any())
+        verify(notificationService, times(1)).sendFirstSelfExamNotification(any(),  eq(""))
     }
 
     @Test
@@ -59,6 +56,6 @@ class SelfExamReminderTaskTest {
 
         selfExaminationReminderTask.run()
 
-        verify(notificationService, times(1)).sendSelfExamNotification(any())
+        verify(notificationService, times(1)).sendSelfExamNotification(any(), eq(""))
     }
 }
