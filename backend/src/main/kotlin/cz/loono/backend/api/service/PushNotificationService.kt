@@ -32,8 +32,8 @@ class PushNotificationService(
         }
     }
 
-    fun sendPreventionNotification(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getPreventionNotification(accounts))
+    fun sendPreventionNotification(accounts: Set<Account>, examinationUuid: String? = null): String =
+        sendPushNotification(NotificationDefinition.getPreventionNotification(accounts, examinationUuid))
 
     fun sendCompletionNotification(
         accounts: Set<Account>,
@@ -89,13 +89,13 @@ class PushNotificationService(
         )
     )
 
-    fun sendFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+    fun sendFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String? = null): String =
         sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts, examinationUuid))
 
-    fun sendSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+    fun sendSelfExamNotification(accounts: Set<Account>, examinationUuid: String? = null): String =
         sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts, examinationUuid))
 
-    fun sendSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String = ""): String =
+    fun sendSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String? = null): String =
         sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts, examinationUuid))
 
     // TODO - remove after testing

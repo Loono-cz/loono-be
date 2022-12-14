@@ -22,6 +22,7 @@ class PreventionReminderTask(
                 Period.between(it.created, today).months % 3 == 0
             }
             val notificationAccounts = mutableSetOf<Account>()
+            var examinationUuid: String? = null
             selectedAccounts.forEach { account ->
                 val status = preventionService.getPreventionStatus(account.uid)
                 status.examinations.forEach examsLoop@{ exam ->
@@ -29,13 +30,14 @@ class PreventionReminderTask(
                         val period = Period.between(it.toLocalDate(), today)
                         if (exam.plannedDate == null && period.years >= exam.intervalYears) {
                             notificationAccounts.add(account)
+                            examinationUuid = exam.uuid
                             return@examsLoop
                         }
                     }
                 }
             }
             if (notificationAccounts.isNotEmpty()) {
-                notificationService.sendPreventionNotification(notificationAccounts)
+                notificationService.sendPreventionNotification(notificationAccounts, examinationUuid)
             }
         }
     }

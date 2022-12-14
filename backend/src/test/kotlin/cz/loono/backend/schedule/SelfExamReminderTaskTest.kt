@@ -56,6 +56,6 @@ class SelfExamReminderTaskTest {
 
         selfExaminationReminderTask.run()
 
-        verify(notificationService, times(1)).sendSelfExamNotification(any(), eq(""))
+        verify(notificationService, times(1)).sendSelfExamNotification(any(), eq("test1"))
     }
 }

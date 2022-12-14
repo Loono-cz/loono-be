@@ -13,7 +13,7 @@ object NotificationDefinition {
     private const val EVENING_TIME_TO_NOTIFY = "6:00PM"
     private val notificationTextManager = NotificationTextManager()
 
-    fun getPreventionNotification(accounts: Set<Account>): PushNotification {
+    fun getPreventionNotification(accounts: Set<Account>, examinationUuid: String? = null): PushNotification {
         val name = "Prevention notification"
         val title = notificationTextManager.getText("prevention.title")
         val text = notificationTextManager.getText("prevention.text")
@@ -24,7 +24,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = MORNING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "main")
+            data = NotificationData(screen = "checkup", examinationUuid = examinationUuid)
         )
     }
 
@@ -110,7 +110,7 @@ object NotificationDefinition {
         )
     }
 
-    fun getFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
+    fun getFirstSelfExamNotification(accounts: Set<Account>, examinationUuid: String? = null): PushNotification {
         val name = "First self-exam notification"
         val title = notificationTextManager.getText("self.first.title")
         val text = notificationTextManager.getText("self.first.text")
@@ -125,7 +125,7 @@ object NotificationDefinition {
         )
     }
 
-    fun getSelfExamNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
+    fun getSelfExamNotification(accounts: Set<Account>, examinationUuid: String? = null): PushNotification {
         val name = "Self-exam notification"
         val title = notificationTextManager.getText("self.common.title")
         val text = notificationTextManager.getText("self.common.text")
@@ -140,7 +140,7 @@ object NotificationDefinition {
         )
     }
 
-    fun getSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String = ""): PushNotification {
+    fun getSelfExamIssueResultNotification(accounts: Set<Account>, examinationUuid: String? = null): PushNotification {
         val name = "Issue result of self-exam notification"
         val title = notificationTextManager.getText("self.result.title")
         val text = notificationTextManager.getText("self.result.text")

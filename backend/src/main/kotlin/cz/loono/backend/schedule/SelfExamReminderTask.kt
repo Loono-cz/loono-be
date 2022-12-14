@@ -24,7 +24,7 @@ class SelfExamReminderTask(
                 notificationService.sendSelfExamNotification(setOf(account), todayNotifications.first().uuid)
             }
             if (statuses.size < 2 && account.created.dayOfMonth == today.dayOfMonth) {
-                val uuid = if(statuses.isNotEmpty()) statuses.first().uuid else ""
+                val uuid = if(statuses.isNotEmpty()) statuses.first().uuid else null
                 notificationService.sendFirstSelfExamNotification(setOf(account), uuid)
             }
         }

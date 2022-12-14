@@ -12,10 +12,7 @@ import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Account
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
@@ -59,7 +56,7 @@ class PreventionReminderTaskTest {
 
         preventionReminderTask.run()
 
-        verify(notificationService, times(1)).sendPreventionNotification(setOf(user1, user2))
+        verify(notificationService, times(1)).sendPreventionNotification(setOf(user1, user2), eq("1"))
     }
 
     @Test
@@ -94,7 +91,7 @@ class PreventionReminderTaskTest {
 
         preventionReminderTask.run()
 
-        verify(notificationService, times(1)).sendPreventionNotification(setOf(user))
+        verify(notificationService, times(1)).sendPreventionNotification(setOf(user), eq("1"))
     }
 
     @Test
@@ -129,6 +126,6 @@ class PreventionReminderTaskTest {
 
         preventionReminderTask.run()
 
-        verify(notificationService, times(0)).sendPreventionNotification(setOf(user))
+        verify(notificationService, times(0)).sendPreventionNotification(setOf(user), eq("1"))
     }
 }
