@@ -15,6 +15,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class PushNotificationService(
@@ -156,7 +157,8 @@ class PushNotificationService(
                 scheduleTimeOfDay = notification.scheduleTimeOfDay,
                 delayedOption = notification.delayedOption,
                 largeImage = notification.largeImage,
-                iosAttachments = notification.iosAttachments.toString()
+                iosAttachments = notification.iosAttachments.toString(),
+                createdAt = LocalDateTime.now().toString()
             )
         )
 
