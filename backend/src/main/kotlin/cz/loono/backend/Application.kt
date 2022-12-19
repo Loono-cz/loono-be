@@ -1,6 +1,5 @@
 package cz.loono.backend
 
-import cz.loono.backend.metrics.LoonoMXBean
 import cz.loono.backend.security.AccountCreatingInterceptor
 import cz.loono.backend.security.BearerTokenAuthenticator
 import cz.loono.backend.security.SupportedAppVersionInterceptor
