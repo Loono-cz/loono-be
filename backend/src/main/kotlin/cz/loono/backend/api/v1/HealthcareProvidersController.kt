@@ -7,8 +7,6 @@ import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.service.HealthcareProvidersService
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.MediaType
-import org.springframework.jmx.export.annotation.ManagedOperation
-import org.springframework.jmx.export.annotation.ManagedResource
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,24 +17,20 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/v1/providers", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
-@ManagedResource(objectName = "LoonoMBean:category=MBeans,name=healthcareProvidersBean")
 class HealthcareProvidersController(
     private var healthCareProvidersService: HealthcareProvidersService
 ) {
 
     @GetMapping(value = ["/lastupdate"])
-    @ManagedOperation
     fun lastUpdate(): HealthcareProviderLastUpdateDto =
         HealthcareProviderLastUpdateDto(
             lastUpdate = healthCareProvidersService.lastUpdate
         )
 
     @GetMapping(value = ["/update"])
-    @ManagedOperation
     fun updateData(): UpdateStatusMessageDto = healthCareProvidersService.updateData()
 
     @GetMapping(value = ["/all"], produces = ["application/zip"])
-    @ManagedOperation
     fun getAll(response: HttpServletResponse): FileSystemResource =
         healthCareProvidersService.getAllSimpleData().let { path ->
             response.setHeader(
@@ -47,7 +41,6 @@ class HealthcareProvidersController(
         }
 
     @PostMapping(value = ["/details"])
-    @ManagedOperation
     fun getDetail(
         @RequestBody
         @Valid
