@@ -63,6 +63,7 @@ class Config(
         "$apiVersion/providers/lastupdate",
         "$apiVersion/feedback",
         "$apiVersion/testCall",
+        "$apiVersion/testEmail",
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
