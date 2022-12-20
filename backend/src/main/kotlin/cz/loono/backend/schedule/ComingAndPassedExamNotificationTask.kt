@@ -2,8 +2,8 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.service.PushNotificationService
-import cz.loono.backend.db.model.CronControl
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.model.CronLog
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit
 class ComingAndPassedExamNotificationTask(
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val notificationService: PushNotificationService,
-    private val cronControlRepository: CronControlRepository
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     override fun run() {
@@ -44,8 +44,8 @@ class ComingAndPassedExamNotificationTask(
                     }
                 }
             }
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "ComingAndPassedExamNotificationTask",
                     status = "PASSED",
                     message = null,
@@ -53,8 +53,8 @@ class ComingAndPassedExamNotificationTask(
                 )
             )
         } catch (e: Exception) {
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "ComingAndPassedExamNotificationTask",
                     status = "ERROR",
                     message = "$e",

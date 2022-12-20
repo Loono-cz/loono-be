@@ -2,8 +2,8 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
-import cz.loono.backend.db.model.CronControl
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.model.CronLog
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 @Component
 class CustomExamStatusChangeTask(
     private val examinationRecordRepository: ExaminationRecordRepository,
-    private val cronControlRepository: CronControlRepository
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     override fun run() {
@@ -28,8 +28,8 @@ class CustomExamStatusChangeTask(
                     }
                 }
             }
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "CustomExamStatusChangeTask",
                     status = "PASSED",
                     message = null,
@@ -37,8 +37,8 @@ class CustomExamStatusChangeTask(
                 )
             )
         } catch (e: Exception) {
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "CustomExamStatusChangeTask",
                     status = "ERROR",
                     message = "$e",

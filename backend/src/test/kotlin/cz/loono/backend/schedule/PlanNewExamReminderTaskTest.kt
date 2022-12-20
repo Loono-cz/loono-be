@@ -11,7 +11,7 @@ import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Account
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.repository.CronLogRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -25,11 +25,11 @@ class PlanNewExamReminderTaskTest {
     private val accountService: AccountService = mock()
     private val preventionService: PreventionService = mock()
     private val notificationService: PushNotificationService = mock()
-    private val cronControlRepository: CronControlRepository = mock()
+    private val cronLogRepository: CronLogRepository = mock()
 
     @Test
     fun `two months ahead notification`() {
-        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronControlRepository)
+        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronLogRepository)
         val user = createAccount()
 
         `when`(accountService.paginateOverAccounts(any())).then { invocation ->
@@ -71,7 +71,7 @@ class PlanNewExamReminderTaskTest {
 
     @Test
     fun `a month ahead notification`() {
-        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronControlRepository)
+        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronLogRepository)
         val user = createAccount()
 
         `when`(accountService.paginateOverAccounts(any())).then { invocation ->
@@ -116,7 +116,7 @@ class PlanNewExamReminderTaskTest {
 
     @Test
     fun `no last confirmed`() {
-        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronControlRepository)
+        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronLogRepository)
         val user = createAccount()
 
         `when`(accountService.paginateOverAccounts(any())).then { invocation ->
@@ -157,7 +157,7 @@ class PlanNewExamReminderTaskTest {
 
     @Test
     fun `without notification`() {
-        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronControlRepository)
+        val planNewExamReminderTask = PlanNewExamReminderTask(accountService, preventionService, notificationService, cronLogRepository)
         val user = createAccount()
 
         `when`(accountService.paginateOverAccounts(any())).then { invocation ->

@@ -4,8 +4,8 @@ import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.db.model.Account
-import cz.loono.backend.db.model.CronControl
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.model.CronLog
+import cz.loono.backend.db.repository.CronLogRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.Period
@@ -15,7 +15,7 @@ class PreventionReminderTask(
     private val accountService: AccountService,
     private val preventionService: PreventionService,
     private val notificationService: PushNotificationService,
-    private val cronControlRepository: CronControlRepository
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     override fun run() {
@@ -42,8 +42,8 @@ class PreventionReminderTask(
                     notificationService.sendPreventionNotification(notificationAccounts)
                 }
             }
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "PreventionReminderTask",
                     status = "PASSED",
                     message = null,
@@ -51,8 +51,8 @@ class PreventionReminderTask(
                 )
             )
         } catch (e: Exception) {
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "PreventionReminderTask",
                     status = "ERROR",
                     message = "$e",
