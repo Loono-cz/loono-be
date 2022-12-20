@@ -2,17 +2,17 @@ name: 'Terraform Apply on push'
 on:
   push:
     branches:
-      - devel
+      - production
     paths:
       - 'infrastructure/aws/**'
 env:
   tf_version: '1.1.6'
   tf_working_dir: 'infrastructure/aws'
-  TF_VAR_database-password: ${{ secrets.DEVEL_DATABASE_PASSWORD }}
-  TF_VAR_certificate-arn: ${{ secrets.DEVEL_CERTIFICATE_ARN }}
-  TF_VAR_google-app-credentials: ${{ secrets.DEVEL_GOOGLE_APPLICATION_CREDENTIALS }}
-  TF_VAR_onesignal-api-key: ${{ secrets.DEVEL_ONESIGNAL_API_KEY }}
-  TF_VAR_onesignal-app-id: ${{ secrets.DEVEL_ONESIGNAL_APP_ID }}
+  TF_VAR_database-password: ${{ secrets.PROD_DATABASE_PASSWORD }}
+  TF_VAR_certificate-arn: ${{ secrets.PROD_CERTIFICATE_ARN }}
+  TF_VAR_google-app-credentials: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
+  TF_VAR_onesignal-api-key: ${{ secrets.PROD_ONESIGNAL_API_KEY }}
+  TF_VAR_onesignal-app-id: ${{ secrets.PROD_ONESIGNAL_APP_ID }}
 jobs:
   terraform:
     name: 'Terraform'
@@ -28,8 +28,8 @@ jobs:
           tf_actions_working_dir: ${{ env.tf_working_dir }}
           tf_actions_comment: false
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEVEL_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVEL_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
       - name: 'Terraform Apply'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -38,5 +38,5 @@ jobs:
           tf_actions_working_dir: ${{ env.tf_working_dir }}
           tf_actions_comment: false
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEVEL_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVEL_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}

@@ -17,8 +17,9 @@ jobs:
 
       - name: Build with Gradle
         env:
-          ONESIGNAL_API_KEY: ${{ secrets.DEVEL_ONESIGNAL_API_KEY}}
-          ONESIGNAL_APP_ID: ${{ secrets.DEVEL_ONESIGNAL_APP_ID}}
+          ONESIGNAL_API_KEY: ${{ secrets.PROD_ONESIGNAL_API_KEY}}
+          ONESIGNAL_APP_ID: ${{ secrets.PROD_ONESIGNAL_APP_ID}}
+          ENABLE_SWAGGER: ${{ secrets.PROD_ENABLE_SWAGGER}}
         run: |
           ./gradlew build -x ktlintMainSourceSetCheck 
 

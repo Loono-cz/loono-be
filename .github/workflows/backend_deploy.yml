@@ -3,10 +3,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - devel
+      - production
 env:
-  region: ${{ secrets.DEVEL_AWS_REGION }}
-  repository: ${{ secrets.DEVEL_AWS_REPOSITORY }}
+  region: ${{ secrets.PROD_AWS_REGION }}
+  repository: ${{ secrets.PROD_AWS_REPOSITORY }}
   serviceName: 'loono-backend'
 jobs:
   deploy:
@@ -18,8 +18,8 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ env.region }} | docker login --username AWS --password-stdin ${{ env.repository }}/${{ env.serviceName }}
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEVEL_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVEL_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
       - name: 'Build Docker image'
         run: |
           docker build -t ${{ env.serviceName }} .
@@ -31,5 +31,5 @@ jobs:
         run: |
           aws --region ${{ env.region }} ecs update-service --cluster ${{ env.serviceName }} --service ${{ env.serviceName }} --force-new-deployment
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEVEL_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVEL_AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
