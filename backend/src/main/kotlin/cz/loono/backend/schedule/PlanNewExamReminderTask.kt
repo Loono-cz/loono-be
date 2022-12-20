@@ -5,6 +5,8 @@ import cz.loono.backend.api.dto.ExaminationPreventionStatusDto
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.api.service.PushNotificationService
+import cz.loono.backend.db.model.CronControl
+import cz.loono.backend.db.repository.CronControlRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -13,64 +15,84 @@ import java.time.temporal.ChronoUnit
 class PlanNewExamReminderTask(
     private val accountService: AccountService,
     private val preventionService: PreventionService,
-    private val notificationService: PushNotificationService
+    private val notificationService: PushNotificationService,
+    private val cronControlRepository: CronControlRepository
 ) : DailySchedulerTask {
 
     override fun run() {
-        val today = LocalDate.now()
-        accountService.paginateOverAccounts { listOfAccounts ->
-            listOfAccounts.forEach { account ->
-                val examStatuses = preventionService.getPreventionStatus(account.uid).examinations
-                val mandatoryExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
-                val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
-                mandatoryExams.forEach { status ->
-                    status.lastConfirmedDate?.let {
-                        if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.MANDATORY)) {
-                            notificationService.sendNewExam2MonthsAheadNotificationToOrder(
-                                setOf(account),
-                                status.examinationType,
-                                status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
-                                status.uuid
-                            )
-                        }
-                        if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.MANDATORY)) {
-                            notificationService.sendNewExamMonthAheadNotificationToOrder(
-                                setOf(account),
-                                status.examinationType,
-                                status.intervalYears,
-                                status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
-                                status.uuid
-                            )
-                        }
-                    }
-                }
-
-                customExams.forEach { status ->
-                    status.lastConfirmedDate?.let {
-                        if (status.periodicExam == true) {
-                            if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.CUSTOM)) {
+        try {
+            val today = LocalDate.now()
+            accountService.paginateOverAccounts { listOfAccounts ->
+                listOfAccounts.forEach { account ->
+                    val examStatuses = preventionService.getPreventionStatus(account.uid).examinations
+                    val mandatoryExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+                    val customExams = examStatuses.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.CUSTOM }
+                    mandatoryExams.forEach { status ->
+                        status.lastConfirmedDate?.let {
+                            if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.MANDATORY)) {
                                 notificationService.sendNewExam2MonthsAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
                                     status.uuid
                                 )
                             }
-                            if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.CUSTOM)) {
+                            if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.MANDATORY)) {
                                 notificationService.sendNewExamMonthAheadNotificationToOrder(
                                     setOf(account),
                                     status.examinationType,
                                     status.intervalYears,
-                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                    status.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
                                     status.uuid
                                 )
+                            }
+                        }
+                    }
+
+                    customExams.forEach { status ->
+                        status.lastConfirmedDate?.let {
+                            if (status.periodicExam == true) {
+                                if (status.isNewExamAhead(2, today, ExaminationCategoryTypeDto.CUSTOM)) {
+                                    notificationService.sendNewExam2MonthsAheadNotificationToOrder(
+                                        setOf(account),
+                                        status.examinationType,
+                                        status.intervalYears,
+                                        status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                        status.uuid
+                                    )
+                                }
+                                if (status.isNewExamAhead(1, today, ExaminationCategoryTypeDto.CUSTOM)) {
+                                    notificationService.sendNewExamMonthAheadNotificationToOrder(
+                                        setOf(account),
+                                        status.examinationType,
+                                        status.intervalYears,
+                                        status.examinationCategoryType ?: ExaminationCategoryTypeDto.CUSTOM,
+                                        status.uuid
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+            cronControlRepository.save(
+                CronControl(
+                    functionName = "PlanNewExamReminderTask",
+                    status = "PASSED",
+                    message = null,
+                    createdAt = LocalDate.now().toString()
+                )
+            )
+        } catch (e: Exception) {
+            cronControlRepository.save(
+                CronControl(
+                    functionName = "PlanNewExamReminderTask",
+                    status = "ERROR",
+                    message = "$e",
+                    createdAt = LocalDate.now().toString()
+                )
+            )
         }
     }
 
