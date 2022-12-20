@@ -5,6 +5,7 @@ import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.SelfExaminationRecord
+import cz.loono.backend.db.repository.CronControlRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -18,10 +19,11 @@ class SelfExaminationWaitingTaskTest {
 
     private var selfExaminationRecordRepository: SelfExaminationRecordRepository = mock()
     private val notificationService: PushNotificationService = mock()
+    private val cronControlRepository: CronControlRepository = mock()
 
     @Test
     fun `still waiting`() {
-        val selfExaminationWaitingTask = SelfExaminationWaitingTask(selfExaminationRecordRepository, notificationService)
+        val selfExaminationWaitingTask = SelfExaminationWaitingTask(selfExaminationRecordRepository, notificationService, cronControlRepository)
         `when`(selfExaminationRecordRepository.findAllByStatus(any()))
             .thenReturn(
                 setOf(
@@ -41,7 +43,7 @@ class SelfExaminationWaitingTaskTest {
 
     @Test
     fun `waiting finished`() {
-        val selfExaminationWaitingTask = SelfExaminationWaitingTask(selfExaminationRecordRepository, notificationService)
+        val selfExaminationWaitingTask = SelfExaminationWaitingTask(selfExaminationRecordRepository, notificationService, cronControlRepository)
         `when`(selfExaminationRecordRepository.findAllByStatus(any()))
             .thenReturn(
                 setOf(
