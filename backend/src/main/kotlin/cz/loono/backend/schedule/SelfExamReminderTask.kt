@@ -2,9 +2,9 @@ package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.service.PushNotificationService
-import cz.loono.backend.db.model.CronControl
+import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.repository.AccountRepository
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -14,7 +14,7 @@ class SelfExamReminderTask(
     private val accountRepository: AccountRepository,
     private val notificationService: PushNotificationService,
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
-    private val cronControlRepository: CronControlRepository
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     override fun run() {
@@ -31,8 +31,8 @@ class SelfExamReminderTask(
                     notificationService.sendFirstSelfExamNotification(setOf(account))
                 }
             }
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "SelfExamReminderTask",
                     status = "PASSED",
                     message = null,
@@ -40,8 +40,8 @@ class SelfExamReminderTask(
                 )
             )
         } catch (e: Exception) {
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "SelfExamReminderTask",
                     status = "ERROR",
                     message = "$e",

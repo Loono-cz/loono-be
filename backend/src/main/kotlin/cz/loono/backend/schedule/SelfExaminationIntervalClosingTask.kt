@@ -1,9 +1,9 @@
 package cz.loono.backend.schedule
 
 import cz.loono.backend.api.dto.SelfExaminationStatusDto
-import cz.loono.backend.db.model.CronControl
+import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.model.SelfExaminationRecord
-import cz.loono.backend.db.repository.CronControlRepository
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -11,7 +11,7 @@ import java.time.LocalDate
 @Component
 class SelfExaminationIntervalClosingTask(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
-    private val cronControlRepository: CronControlRepository
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     override fun run() {
@@ -31,8 +31,8 @@ class SelfExaminationIntervalClosingTask(
                     )
                 }
             }
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "SelfExaminationIntervalClosingTask",
                     status = "PASSED",
                     message = null,
@@ -40,8 +40,8 @@ class SelfExaminationIntervalClosingTask(
                 )
             )
         } catch (e: Exception) {
-            cronControlRepository.save(
-                CronControl(
+            cronLogRepository.save(
+                CronLog(
                     functionName = "SelfExaminationIntervalClosingTask",
                     status = "ERROR",
                     message = "$e",
