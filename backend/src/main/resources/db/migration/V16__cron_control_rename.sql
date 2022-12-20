@@ -1,0 +1,1 @@
+ALTER TABLE cron_control RENAME TO cron_log;
