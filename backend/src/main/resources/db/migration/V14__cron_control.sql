@@ -7,7 +7,7 @@ CREATE SEQUENCE cron_control_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE TABLE user_feedback (
+CREATE TABLE cron_control (
                                   id bigint PRIMARY KEY DEFAULT nextval('cron_control_seq'),
                                   message text,
                                   created_at text
