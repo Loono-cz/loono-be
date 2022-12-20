@@ -38,7 +38,7 @@ class SelfExaminationWaitingTask(
                     createdAt = LocalDate.now().toString()
                 )
             )
-        } catch (e: Exception){
+        } catch (e: Exception) {
             cronControlRepository.save(
                 CronControl(
                     functionName = "SelfExaminationWaitingTask",

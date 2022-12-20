@@ -9,7 +9,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "cron_control")
-data class CronControl (
+data class CronControl(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
