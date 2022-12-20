@@ -37,5 +37,8 @@ data class NotificationLog(
     val largeImage: String? = null,
 
     @Column(columnDefinition = "TEXT")
-    val iosAttachments: String? = null
+    val iosAttachments: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val createdAt: String? = null
 )

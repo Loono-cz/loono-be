@@ -6,6 +6,7 @@ import cz.loono.backend.api.service.PushNotificationService
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.SelfExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -20,10 +21,11 @@ class SelfExamReminderTaskTest {
     private val accountRepository: AccountRepository = mock()
     private val notificationService: PushNotificationService = mock()
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository = mock()
+    private val cronLogRepository: CronLogRepository = mock()
 
     @Test
     fun `first self-exam`() {
-        val selfExaminationReminderTask = SelfExamReminderTask(accountRepository, notificationService, selfExaminationRecordRepository)
+        val selfExaminationReminderTask = SelfExamReminderTask(accountRepository, notificationService, selfExaminationRecordRepository, cronLogRepository)
         `when`(accountRepository.findAll()).thenReturn(listOf(createAccount()))
         `when`(selfExaminationRecordRepository.findAllByAccount(any())).thenReturn(
             setOf()
@@ -36,7 +38,7 @@ class SelfExamReminderTaskTest {
 
     @Test
     fun `self-exam trigger`() {
-        val selfExaminationReminderTask = SelfExamReminderTask(accountRepository, notificationService, selfExaminationRecordRepository)
+        val selfExaminationReminderTask = SelfExamReminderTask(accountRepository, notificationService, selfExaminationRecordRepository, cronLogRepository)
         `when`(accountRepository.findAll()).thenReturn(listOf(createAccount()))
         `when`(selfExaminationRecordRepository.findAllByAccount(any())).thenReturn(
             setOf(

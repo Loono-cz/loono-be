@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserFeedbackController(
     private val userFeedbackService: UserFeedbackService
 ) {
-
     @PostMapping("v1/feedback")
     fun storeFeedback(
         @RequestBody
