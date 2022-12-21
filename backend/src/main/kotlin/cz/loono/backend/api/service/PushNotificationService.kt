@@ -122,7 +122,7 @@ class PushNotificationService(
         notificationLog.name?.let { nameNotNull ->
             notificationLog.includeExternalUserIds?.let { userIds ->
                 val notificationLogFound = notificationLogRepository.findByNameAndIncludeExternalUserIdsAndCreatedAt(name = nameNotNull, includeExternalUserIds = userIds, createdAt = LocalDate.now().toString())
-                if (notificationLogFound.isEmpty()){
+                if (notificationLogFound.isEmpty()) {
                     notificationLogRepository.save(notificationLog)
 
                     val call: Call = OkHttpClient().newCall(request)
