@@ -5,4 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface NotificationLogRepository : CrudRepository<NotificationLog, Long>
+interface NotificationLogRepository : CrudRepository<NotificationLog, Long> {
+    fun findByNameAndIncludeExternalUserIdsAndCreatedAt(name: String, includeExternalUserIds: String, createdAt: String): Set<NotificationLog>
+}
