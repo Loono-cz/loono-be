@@ -1,5 +1,6 @@
 package cz.loono.backend.schedule
 
+import cz.loono.backend.api.dto.ExaminationCategoryTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.PreventionService
@@ -25,13 +26,15 @@ class ExaminationCancellationTask(
 
             val now = LocalDateTime.now()
             exams.forEach { exam ->
-                val interval = preventionService.getExaminationRequests(exam.account)
-                    .first { exam.type == it.examinationType }.intervalYears
-                // TODO - custom exam is in months
-                val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
-                if (now.isAfter(deadline)) {
-                    exam.uuid?.let {
-                        examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
+                // TODO - custom exam 
+                if (exam.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
+                    val interval = preventionService.getExaminationRequests(exam.account)
+                        .first { exam.type == it.examinationType }.intervalYears
+                    val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
+                    if (now.isAfter(deadline)) {
+                        exam.uuid?.let {
+                            examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
+                        }
                     }
                 }
             }
