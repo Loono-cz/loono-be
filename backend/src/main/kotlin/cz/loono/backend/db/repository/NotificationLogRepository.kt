@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface NotificationLogRepository : CrudRepository<NotificationLog, Long> {
-    fun findByNameAndIncludeExternalUserIdsAndCreatedAt(name: String, includeExternalUserIds: String, createdAt: String): Set<NotificationLog>
+    fun findByHeadingAndIncludeExternalUserIdsAndCreatedAt(heading: String, includeExternalUserIds: String, createdAt: String): Set<NotificationLog>
 }

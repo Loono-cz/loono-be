@@ -119,9 +119,9 @@ class PushNotificationService(
             iosAttachments = notification.iosAttachments.toString(),
             createdAt = LocalDate.now().toString()
         )
-        notificationLog.name?.let { nameNotNull ->
+        notificationLog.heading?.let { nameNotNull ->
             notificationLog.includeExternalUserIds?.let { userIds ->
-                val notificationLogFound = notificationLogRepository.findByNameAndIncludeExternalUserIdsAndCreatedAt(name = nameNotNull, includeExternalUserIds = userIds, createdAt = LocalDate.now().toString())
+                val notificationLogFound = notificationLogRepository.findByHeadingAndIncludeExternalUserIdsAndCreatedAt(heading = nameNotNull, includeExternalUserIds = userIds, createdAt = LocalDate.now().toString())
                 if (notificationLogFound.isEmpty()) {
                     notificationLogRepository.save(notificationLog)
                     val call: Call = OkHttpClient().newCall(request)
