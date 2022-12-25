@@ -39,6 +39,13 @@ management.endpoint.health.show-details: always
 management.health:
   db.enabled: true
   diskspace.enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
 scheduler.cron:
   daily-task: "0 0 3 * * ?"
   data-update: "0 0 2 2 * ?"

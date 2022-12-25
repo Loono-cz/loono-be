@@ -18,6 +18,7 @@ import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import io.micrometer.core.annotation.Counted
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -213,6 +214,9 @@ class HealthcareProvidersService(
         zipFilePath = filePath
     }
 
+    @Counted(
+        "healthcare_providers_get_all_data",
+        description = "Total number of getting all healthcare providers simple data")
     fun getAllSimpleData(): Path {
         if (updating) {
             throw throw LoonoBackendException(

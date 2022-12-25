@@ -35,6 +35,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
     implementation("com.google.firebase:firebase-admin:8.1.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
