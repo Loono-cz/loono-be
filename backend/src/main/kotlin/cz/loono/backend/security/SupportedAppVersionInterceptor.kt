@@ -1,6 +1,8 @@
 package cz.loono.backend.security
 
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import org.apache.http.HttpStatus
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -10,7 +12,8 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class SupportedAppVersionInterceptor(
-    private val serverPropertiesRepository: ServerPropertiesRepository
+    private val serverPropertiesRepository: ServerPropertiesRepository,
+    meterRegistry: MeterRegistry
 ) : HandlerInterceptor {
 
     private val supportedVersion: Int by lazy {
@@ -18,9 +21,14 @@ class SupportedAppVersionInterceptor(
     }
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val counter: Counter
+
+    init {
+        counter = meterRegistry.counter("supported.version.counter")
+    }
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-
+        counter.increment()
         val appVersion = request.getHeader("app-version")
         val supported = isSupported(appVersion)
 

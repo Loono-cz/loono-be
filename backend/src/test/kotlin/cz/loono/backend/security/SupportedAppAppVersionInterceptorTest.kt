@@ -2,6 +2,7 @@ package cz.loono.backend.security
 
 import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -12,7 +13,7 @@ class SupportedAppAppVersionInterceptorTest {
 
     private val response: HttpServletResponse = mock()
     private val serverPropertiesRepository: ServerPropertiesRepository = mock()
-    private val interceptor = SupportedAppVersionInterceptor(serverPropertiesRepository)
+    private val interceptor = SupportedAppVersionInterceptor(serverPropertiesRepository, SimpleMeterRegistry())
 
     @Test
     fun `latest App version`() {

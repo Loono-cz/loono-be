@@ -62,11 +62,12 @@ The server uses Spring Actuator for the Health Check. The Health Check is hidden
 </p>
 <h3>Basic health check endpoints</h3>
 <p>
-Activated only default and database checks. We can enable more if needed.
+Activated only default, database checks and metrics for Prometheus. We can enable more if needed.
 </p>
 <ul>
 <li>Overall status: /actuator/health</li>
 <li>Database status: /actuator/health/db</li>
+<li>Prometheus metrics: /actuator/prometheus</li>
 </ul>
 <h2>API documentation</h2>
 <ul>

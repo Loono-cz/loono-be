@@ -42,6 +42,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 
     runtimeOnly("org.postgresql:postgresql:42.4.1")
     implementation("org.hibernate:hibernate-envers:$hibernateVersion")
