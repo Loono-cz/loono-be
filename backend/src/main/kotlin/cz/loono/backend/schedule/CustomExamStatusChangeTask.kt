@@ -14,7 +14,6 @@ class CustomExamStatusChangeTask(
     private val examinationRecordRepository: ExaminationRecordRepository,
     private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
-
     override fun run() {
         try {
             val now = LocalDateTime.now()
