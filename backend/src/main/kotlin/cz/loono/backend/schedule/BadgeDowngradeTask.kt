@@ -9,14 +9,17 @@ import cz.loono.backend.api.service.ExaminationInterval
 import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.Badge
+import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import cz.loono.backend.extensions.toLocalDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Clock
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Component
@@ -29,40 +32,61 @@ class BadgeDowngradeTask(
     private val accountService: AccountService,
     private val preventionService: PreventionService,
     private val clock: Clock,
-    private val selfExaminationRecordRepo: SelfExaminationRecordRepository
+    private val selfExaminationRecordRepo: SelfExaminationRecordRepository,
+    private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun run() {
-        logger.info(
-            "BadgeDowngradeTask executed with the following settings 'toleranceMonths '$toleranceMonths', pageSize '$pageSize'"
-        )
-        accountService.paginateOverAccounts { nextPage ->
-            val accountsToUpdate = nextPage.mapNotNull { account ->
-                val now = clock.instant().toLocalDateTime()
-                val userBadges = account.badges
-                // Don't do anything when no badges to downgrade
-                userBadges.ifEmpty {
-                    return@mapNotNull null
+        try {
+
+            logger.info(
+                "BadgeDowngradeTask executed with the following settings 'toleranceMonths '$toleranceMonths', pageSize '$pageSize'"
+            )
+            accountService.paginateOverAccounts { nextPage ->
+                val accountsToUpdate = nextPage.mapNotNull { account ->
+                    val now = clock.instant().toLocalDateTime()
+                    val userBadges = account.badges
+                    // Don't do anything when no badges to downgrade
+                    userBadges.ifEmpty {
+                        return@mapNotNull null
+                    }
+
+                    val examsRequests = preventionService.getExaminationRequests(account)
+
+                    val downgradedBadges = userBadges.map { badge ->
+                        getSelfExaminationType(badge.getBadgeAsEnum(), account.getSexAsEnum())?.let {
+                            downgradeSelfExaminationBadge(account, badge, it)
+                        } ?: downgradeGeneralBadge(account, badge, examsRequests, now)
+                    }.toSet()
+
+                    if (downgradedBadges != account.badges) account.copy(badges = downgradedBadges) else null
                 }
+                val accountsWithDowngradedBadges = removeZeroLevelBadges(accountsToUpdate)
+                logger.debug("Updating badges for the following accounts '$accountsWithDowngradedBadges'")
 
-                val examsRequests = preventionService.getExaminationRequests(account)
-
-                val downgradedBadges = userBadges.map { badge ->
-                    getSelfExaminationType(badge.getBadgeAsEnum(), account.getSexAsEnum())?.let {
-                        downgradeSelfExaminationBadge(account, badge, it)
-                    } ?: downgradeGeneralBadge(account, badge, examsRequests, now)
-                }.toSet()
-
-                if (downgradedBadges != account.badges) account.copy(badges = downgradedBadges) else null
+                accountRepository.saveAll(accountsWithDowngradedBadges)
             }
-            val accountsWithDowngradedBadges = removeZeroLevelBadges(accountsToUpdate)
-            logger.debug("Updating badges for the following accounts '$accountsWithDowngradedBadges'")
-
-            accountRepository.saveAll(accountsWithDowngradedBadges)
+            logger.info("BadgeDowngradeTask finished")
+            cronLogRepository.save(
+                CronLog(
+                    functionName = "BadgeDowngradeTask",
+                    status = "PASSED",
+                    message = null,
+                    createdAt = LocalDate.now().toString()
+                )
+            )
+        } catch (e: Exception) {
+            cronLogRepository.save(
+                CronLog(
+                    functionName = "BadgeDowngradeTask",
+                    status = "ERROR",
+                    message = "$e",
+                    createdAt = LocalDate.now().toString()
+                )
+            )
         }
-        logger.info("BadgeDowngradeTask finished")
     }
 
     private fun downgradeSelfExaminationBadge(
