@@ -16,7 +16,6 @@ class SelfExamReminderTask(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
     private val cronLogRepository: CronLogRepository
 ) : DailySchedulerTask {
-
     override fun run() {
         try {
             val accounts = accountRepository.findAll()
