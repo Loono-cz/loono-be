@@ -52,7 +52,6 @@ class BadgeDowngradeTask(
                     userBadges.ifEmpty {
                         return@mapNotNull null
                     }
-
                     val examsRequests = preventionService.getExaminationRequests(account)
 
                     val downgradedBadges = userBadges.map { badge ->
@@ -82,7 +81,7 @@ class BadgeDowngradeTask(
                 CronLog(
                     functionName = "BadgeDowngradeTask",
                     status = "ERROR",
-                    message = "$e",
+                    message = "$e ${e.cause}",
                     createdAt = LocalDate.now().toString()
                 )
             )
