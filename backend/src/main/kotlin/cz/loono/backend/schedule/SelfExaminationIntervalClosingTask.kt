@@ -21,14 +21,16 @@ class SelfExaminationIntervalClosingTask(
                 val dueDatePlus3Days = it.dueDate?.plusDays(3)
                 if (dueDatePlus3Days?.isBefore(now) == true) {
                     selfExaminationRecordRepository.save(it.copy(status = SelfExaminationStatusDto.MISSED))
-                    selfExaminationRecordRepository.save(
-                        SelfExaminationRecord(
-                            type = it.type,
-                            status = SelfExaminationStatusDto.PLANNED,
-                            account = it.account,
-                            dueDate = it.dueDate.plusMonths(1)
+                    if (selfExaminationRecordRepository.getSelfExaminationByAccountAndTypeAndDueDate(it.account, it.type, it.dueDate.plusMonths(1)) == null) {
+                        selfExaminationRecordRepository.save(
+                            SelfExaminationRecord(
+                                type = it.type,
+                                status = SelfExaminationStatusDto.PLANNED,
+                                account = it.account,
+                                dueDate = it.dueDate.plusMonths(1)
+                            )
                         )
-                    )
+                    }
                 }
             }
             cronLogRepository.save(
