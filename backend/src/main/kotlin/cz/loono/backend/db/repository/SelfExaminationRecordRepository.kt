@@ -6,6 +6,7 @@ import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.SelfExaminationRecord
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Repository
 interface SelfExaminationRecordRepository : CrudRepository<SelfExaminationRecord, Long> {
@@ -15,4 +16,5 @@ interface SelfExaminationRecordRepository : CrudRepository<SelfExaminationRecord
     fun findAllByAccountAndTypeOrderByDueDateAsc(account: Account, type: SelfExaminationTypeDto): List<SelfExaminationRecord>
     fun deleteAllByAccount(account: Account)
     fun findFirstByAccountAndTypeOrderByDueDateDesc(account: Account, type: SelfExaminationTypeDto): SelfExaminationRecord
+    fun getSelfExaminationByAccountAndTypeAndDueDate(account: Account, type: SelfExaminationTypeDto, dueDate: LocalDate): SelfExaminationRecord?
 }
