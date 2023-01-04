@@ -25,16 +25,15 @@ class ExaminationCancellationTask(
                 .filter { it.status == ExaminationStatusDto.NEW && it.plannedDate != null }
 
             val now = LocalDateTime.now()
-            exams.forEach { exam ->
-                // TODO - custom exam 
-                if (exam.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY) {
-                    val interval = preventionService.getExaminationRequests(exam.account)
-                        .first { exam.type == it.examinationType }.intervalYears
-                    val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
-                    if (now.isAfter(deadline)) {
-                        exam.uuid?.let {
-                            examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
-                        }
+            val mandatoryExams = exams.filter { it.examinationCategoryType == ExaminationCategoryTypeDto.MANDATORY }
+            mandatoryExams.forEach { exam ->
+                // TODO - custom exam
+                val interval = preventionService.getExaminationRequests(exam.account)
+                    .first { exam.type == it.examinationType }.intervalYears
+                val deadline = exam.plannedDate?.plusMonths((interval * 12L) - 2)
+                if (now.isAfter(deadline)) {
+                    exam.uuid?.let {
+                        examinationRecordService.cancelExam(exam.uuid, exam.account.uid)
                     }
                 }
             }
