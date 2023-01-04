@@ -22,8 +22,7 @@ class ComingAndPassedExamNotificationTask(
         try {
             val now = LocalDateTime.now()
             val plannedExams = examinationRecordRepository.findAllByStatus(ExaminationStatusDto.NEW)
-            val plannedPeriodicExams = plannedExams.filter { it.periodicExam != false }
-            plannedPeriodicExams.forEach { record ->
+            plannedExams.forEach { record ->
                 record.plannedDate?.let {
                     val hours = ChronoUnit.HOURS.between(record.plannedDate, now)
                     if (hours in -47..-24) {
