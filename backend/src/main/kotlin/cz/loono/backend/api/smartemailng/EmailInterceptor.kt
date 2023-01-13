@@ -1,4 +1,4 @@
-package cz.loono.backend.api.email
+package cz.loono.backend.api.smartemailng
 
 import okhttp3.Credentials.basic
 import okhttp3.Interceptor

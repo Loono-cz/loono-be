@@ -1,4 +1,4 @@
-package cz.loono.backend.api.email
+package cz.loono.backend.api.smartemailng
 
 import com.google.gson.annotations.SerializedName
 
