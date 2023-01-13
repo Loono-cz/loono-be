@@ -15,7 +15,6 @@ import cz.loono.backend.api.smartemailng.EmailTasks
 import cz.loono.backend.api.smartemailng.SendEmailModel
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
-import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -24,6 +23,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.io.IOException
 
 @Service
 class ConsultancyFormService(private val accountRepository: AccountRepository) {
