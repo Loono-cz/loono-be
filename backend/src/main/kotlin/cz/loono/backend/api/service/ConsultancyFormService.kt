@@ -13,22 +13,19 @@ import org.springframework.stereotype.Service
 import java.io.IOException
 
 @Service
-class ConsultancyFormService (private val accountRepository: AccountRepository) {
+class ConsultancyFormService(private val accountRepository: AccountRepository) {
     // .addInterceptor(EmailInterceptor("stepan.drozdek@cgi.com", "t5n8lc97atwg3qno129nsvsgnju0fp4mg2ejsd2x"))
     //  .addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o"))
     val gson = Gson()
-    val client = OkHttpClient()
-                    .newBuilder()
-                        .addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o"))
-                        .build()
+    val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o")).build()
 
-    fun testApi(){
+    fun testApi() {
         val request = Request.Builder()
             .url("https://app.smartemailing.cz/api/v3/ping")
             .addHeader("Content-Type", "application/json")
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
@@ -46,7 +43,7 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
             .addHeader("Content-Type", "application/json")
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
@@ -64,14 +61,14 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
             .addHeader("Content-Type", "application/json")
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     println(response.body)
                 } else {
                     println(response.body)
@@ -99,14 +96,14 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
             .post(gson.toJson(emailBody).toRequestBody())
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     val res = response
                     val resBody = response.body
                     println(response.body)
@@ -118,10 +115,10 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
     }
 
 
-    fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto){
+    fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto) {
         val user = accountRepository.findByUid(accountUuid)
         user?.let { userAccount ->
-            content.message?.let {message ->
+            content.message?.let { message ->
                 sendEmailToUser(message, userAccount)
                 content.tag?.let { tag ->
                     sendEmailToDoctor(message, tag, userAccount)
@@ -155,14 +152,14 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
             .post(gson.toJson(email).toRequestBody())
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     val res = response
                     val resBody = response.body
                     println(response.body)
@@ -203,14 +200,14 @@ class ConsultancyFormService (private val accountRepository: AccountRepository) 
             .post(gson.toJson(email).toRequestBody())
             .build()
 
-        client.newCall(request).enqueue(object : Callback{
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 println(e)
                 throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     val res = response
                     val resBody = response.body
                     println(response.body)
