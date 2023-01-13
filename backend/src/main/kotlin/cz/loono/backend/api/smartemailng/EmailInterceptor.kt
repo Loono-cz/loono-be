@@ -1,11 +1,11 @@
 package cz.loono.backend.api.smartemailng
 
+import java.io.IOException
 import okhttp3.Credentials.basic
 import okhttp3.Interceptor
+import okhttp3.Interceptor.Chain
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.Interceptor.Chain
-import java.io.IOException
 
 class EmailInterceptor(user: String?, password: String?) : Interceptor {
     private val credentials: String

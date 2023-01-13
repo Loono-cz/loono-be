@@ -2,7 +2,7 @@ package cz.loono.backend.api.smartemailng
 
 import com.google.gson.annotations.SerializedName
 
-data class SendEmailModel (
+data class SendEmailModel(
     @SerializedName("sender_credentials") var senderCredentials: EmailSenderCredentials,
     @SerializedName("email_id") var emailId: Int,
     @SerializedName("tag") var tag: String,
@@ -20,11 +20,11 @@ data class EmailTasks(
     @SerializedName("replace") var replace: List<EmailReplace>
 )
 
-data class EmailRecipient (
+data class EmailRecipient(
     @SerializedName("emailaddress") val emailAddress: String
 )
 
-data class EmailReplace (
+data class EmailReplace(
     @SerializedName("key") val key: String,
     @SerializedName("content") val content: String,
 )

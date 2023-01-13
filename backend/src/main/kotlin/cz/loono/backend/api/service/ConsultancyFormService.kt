@@ -2,15 +2,28 @@ package cz.loono.backend.api.service
 
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.ConsultancyFormContentDto
-import cz.loono.backend.api.smartemailng.*
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.api.smartemailng.AddUserEmailModel
+import cz.loono.backend.api.smartemailng.EmailContactInfoModel
+import cz.loono.backend.api.smartemailng.EmailContactListModel
+import cz.loono.backend.api.smartemailng.EmailInterceptor
+import cz.loono.backend.api.smartemailng.EmailRecipient
+import cz.loono.backend.api.smartemailng.EmailReplace
+import cz.loono.backend.api.smartemailng.EmailSenderCredentials
+import cz.loono.backend.api.smartemailng.EmailSettingsModel
+import cz.loono.backend.api.smartemailng.EmailTasks
+import cz.loono.backend.api.smartemailng.SendEmailModel
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.repository.AccountRepository
-import okhttp3.*
+import java.io.IOException
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.io.IOException
 
 @Service
 class ConsultancyFormService(private val accountRepository: AccountRepository) {
@@ -86,7 +99,8 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
                 EmailContactInfoModel(
                     emailAddress = "testAddEmail@test.com",
                     name = "Test Testovaci",
-                    contactLists = emailContactListModel)
+                    contactLists = emailContactListModel
+                )
             )
         )
 
@@ -113,7 +127,6 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
             }
         })
     }
-
 
     fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto) {
         val user = accountRepository.findByUid(accountUuid)
