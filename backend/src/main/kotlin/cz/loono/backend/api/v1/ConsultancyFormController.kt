@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 class ConsultancyFormController(
     private val consultancyFormService: ConsultancyFormService,
 ) {
-    
     @PostMapping
     @ManagedOperation
     fun updateOrCreate(
