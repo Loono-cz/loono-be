@@ -143,8 +143,8 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
         val email = SendEmailModel(
             senderCredentials = EmailSenderCredentials(
                 senderName = "Poradna Preventivka",
-                from = "poradna@loono.cz",
-                replyTo = "poradna@loono.cz"
+                from = "odbornaporadna@loono.cz",
+                replyTo = "odbornaporadna@loono.cz"
             ),
             emailId = 302,
             tag = "BE_PORADNA_USER",
@@ -187,14 +187,14 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
         val email = SendEmailModel(
             senderCredentials = EmailSenderCredentials(
                 senderName = "Poradna Preventivka",
-                from = "poradna@loono.cz",
-                replyTo = "poradna@loono.cz"
+                from = "odbornaporadna@loono.cz",
+                replyTo = "odbornaporadna@loono.cz"
             ),
             emailId = 305,
             tag = "BE_PORADNA_DOCTOR",
             tasks = listOf(
                 EmailTasks(
-                    recipient = EmailRecipient(emailAddress = "s.drozdek@centrum.cz"),
+                    recipient = EmailRecipient(emailAddress = "odbornaporadna@loono.cz"),
                     replace = listOf(
                         EmailReplace(key = "question_tag", content = tag),
                         EmailReplace(key = "user_name", content = userAccount.nickname),
