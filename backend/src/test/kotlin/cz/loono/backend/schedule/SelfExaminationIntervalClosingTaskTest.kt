@@ -4,6 +4,7 @@ import cz.loono.backend.api.dto.SelfExaminationStatusDto
 import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.SelfExaminationRecord
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -16,10 +17,11 @@ import java.time.LocalDate
 class SelfExaminationIntervalClosingTaskTest {
 
     private var selfExaminationRecordRepository: SelfExaminationRecordRepository = mock()
+    private val cronLogRepository: CronLogRepository = mock()
 
     @Test
     fun `closing because time left`() {
-        val selfExaminationIntervalClosingTask = SelfExaminationIntervalClosingTask(selfExaminationRecordRepository)
+        val selfExaminationIntervalClosingTask = SelfExaminationIntervalClosingTask(selfExaminationRecordRepository, cronLogRepository)
         `when`(selfExaminationRecordRepository.findAllByStatus(any()))
             .thenReturn(
                 setOf(
@@ -39,7 +41,7 @@ class SelfExaminationIntervalClosingTaskTest {
 
     @Test
     fun `no closing of self-exam`() {
-        val selfExaminationIntervalClosingTask = SelfExaminationIntervalClosingTask(selfExaminationRecordRepository)
+        val selfExaminationIntervalClosingTask = SelfExaminationIntervalClosingTask(selfExaminationRecordRepository, cronLogRepository)
         `when`(selfExaminationRecordRepository.findAllByStatus(any()))
             .thenReturn(
                 setOf(

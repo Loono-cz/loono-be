@@ -20,10 +20,6 @@ spring:
   web:
     resources:
       add-mappings: false
-  jmx:
-    enabled: true
-    unique-names: true
-    domain: 'cz.loono.backend'
 # Logger configuration
 logging:
   pattern:
@@ -44,13 +40,6 @@ management.endpoint.health.show-details: always
 management.health:
   db.enabled: true
   diskspace.enabled: false
-# JMX
-management.endpoint.web.exposure.include: '*'
-management.endpoint.jmx:
-  domain: 'cz.loono.backend'
-  enabled: true
-  unique-names: true
-
 # Cron
 scheduler.cron:
   daily-task: "0 0 3 * * ?"

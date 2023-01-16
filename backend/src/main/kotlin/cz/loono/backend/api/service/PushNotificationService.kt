@@ -15,6 +15,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class PushNotificationService(
@@ -32,7 +33,7 @@ class PushNotificationService(
         }
     }
 
-    fun sendPreventionNotification(accounts: Set<Account>): String =
+    fun sendPreventionNotification(accounts: Set<Account>) =
         sendPushNotification(NotificationDefinition.getPreventionNotification(accounts))
 
     fun sendCompletionNotification(
@@ -40,7 +41,7 @@ class PushNotificationService(
         time: String,
         examinationTypeDto: ExaminationTypeDto,
         examinationUuid: String?
-    ): String =
+    ) =
         sendPushNotification(NotificationDefinition.getCompletionNotification(accounts, time, examinationTypeDto, examinationUuid))
 
     fun sendNewExamMonthAheadNotificationToOrder(
@@ -49,7 +50,7 @@ class PushNotificationService(
         interval: Int,
         examinationCategoryTypeDto: ExaminationCategoryTypeDto,
         examinationUuid: String?
-    ): String = sendPushNotification(
+    ) = sendPushNotification(
         NotificationDefinition.getOrderNewExamMonthAheadNotification(
             accounts,
             examinationTypeDto,
@@ -65,7 +66,7 @@ class PushNotificationService(
         interval: Int,
         examinationCategoryTypeDto: ExaminationCategoryTypeDto,
         examinationUuid: String?
-    ): String = sendPushNotification(
+    ) = sendPushNotification(
         NotificationDefinition.getOrderNewExam2MonthsAheadNotification(
             accounts,
             examinationTypeDto,
@@ -80,7 +81,7 @@ class PushNotificationService(
         examinationTypeDto: ExaminationTypeDto,
         time: String,
         examinationUuid: String?
-    ): String = sendPushNotification(
+    ) = sendPushNotification(
         NotificationDefinition.getComingVisitNotification(
             accounts,
             examinationTypeDto,
@@ -89,56 +90,16 @@ class PushNotificationService(
         )
     )
 
-    fun sendFirstSelfExamNotification(accounts: Set<Account>): String =
+    fun sendFirstSelfExamNotification(accounts: Set<Account>) =
         sendPushNotification(NotificationDefinition.getFirstSelfExamNotification(accounts))
 
-    fun sendSelfExamNotification(accounts: Set<Account>): String =
+    fun sendSelfExamNotification(accounts: Set<Account>) =
         sendPushNotification(NotificationDefinition.getSelfExamNotification(accounts))
 
-    fun sendSelfExamIssueResultNotification(accounts: Set<Account>): String =
+    fun sendSelfExamIssueResultNotification(accounts: Set<Account>) =
         sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotification(accounts))
 
-    // TODO - remove after testing
-    fun sendFirstSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getFirstSelfExamNotificationTestEndpoint(accounts))
-    fun sendSelfExamNotificationTestEndpoint(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getSelfExamNotificationTestEndpoint(accounts))
-    fun sendSelfExamIssueResultNotificationTestEndpoint(accounts: Set<Account>): String =
-        sendPushNotification(NotificationDefinition.getSelfExamIssueResultNotificationTestEndpoint(accounts))
-
-    fun sendNewExam2MonthsAheadNotificationToOrderTestEndpoint(
-        accounts: Set<Account>,
-        examinationTypeDto: ExaminationTypeDto,
-        interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
-        examinationUuid: String?
-    ): String = sendPushNotification(
-        NotificationDefinition.getOrderNewExam2MonthsAheadNotificationTestEndpoint(
-            accounts,
-            examinationTypeDto,
-            interval,
-            examinationCategoryTypeDto,
-            examinationUuid
-        )
-    )
-    fun sendNewExamMonthAheadNotificationToOrderTestEndpoint(
-        accounts: Set<Account>,
-        examinationTypeDto: ExaminationTypeDto,
-        interval: Int,
-        examinationCategoryTypeDto: ExaminationCategoryTypeDto,
-        examinationUuid: String?
-    ): String = sendPushNotification(
-        NotificationDefinition.getOrderNewExamMonthAheadNotificationTestEndpoint(
-            accounts,
-            examinationTypeDto,
-            interval,
-            examinationCategoryTypeDto,
-            examinationUuid
-        )
-    )
-    // TODO - end of testing endpoint
-
-    private fun sendPushNotification(notification: PushNotification): String {
+    private fun sendPushNotification(notification: PushNotification) {
         val body = Gson().toJson(notification).toRequestBody()
         val request = Request.Builder()
             .addAuthenticationHeader()
@@ -147,21 +108,27 @@ class PushNotificationService(
             .post(body)
             .build()
 
-        notificationLogRepository.save(
-            NotificationLog(
-                name = notification.name,
-                heading = notification.headings.cs,
-                content = notification.contents.cs,
-                includeExternalUserIds = notification.includeExternalUserIds.toString(),
-                scheduleTimeOfDay = notification.scheduleTimeOfDay,
-                delayedOption = notification.delayedOption,
-                largeImage = notification.largeImage,
-                iosAttachments = notification.iosAttachments.toString()
-            )
+        val notificationLog = NotificationLog(
+            name = notification.name,
+            heading = notification.headings.cs,
+            content = notification.contents.cs,
+            includeExternalUserIds = notification.includeExternalUserIds.toString(),
+            scheduleTimeOfDay = notification.scheduleTimeOfDay,
+            delayedOption = notification.delayedOption,
+            largeImage = notification.largeImage,
+            iosAttachments = notification.iosAttachments.toString(),
+            createdAt = LocalDate.now().toString()
         )
-
-        val call: Call = OkHttpClient().newCall(request)
-        return Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+        notificationLog.heading?.let { nameNotNull ->
+            notificationLog.includeExternalUserIds?.let { userIds ->
+                val notificationLogFound = notificationLogRepository.findByHeadingAndIncludeExternalUserIdsAndCreatedAt(heading = nameNotNull, includeExternalUserIds = userIds, createdAt = LocalDate.now().toString())
+                if (notificationLogFound.isEmpty()) {
+                    notificationLogRepository.save(notificationLog)
+                    val call: Call = OkHttpClient().newCall(request)
+                    Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+                }
+            }
+        }
     }
 
     private fun Request.Builder.addAuthenticationHeader(): Request.Builder =

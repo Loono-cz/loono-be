@@ -11,8 +11,6 @@ import cz.loono.backend.db.repository.AccountRepository
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.jmx.export.annotation.ManagedOperation
-import org.springframework.jmx.export.annotation.ManagedResource
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/account", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
-@ManagedResource(objectName = "LoonoMBean:category=MBeans,name=accountBean")
 class AccountController(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository
@@ -31,7 +28,6 @@ class AccountController(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/onboard")
-    @ManagedOperation
     fun onboardAccount(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -41,7 +37,6 @@ class AccountController(
     ): AccountDto = accountService.onboardAccount(basicUser.uid, account)
 
     @GetMapping
-    @ManagedOperation
     fun getAccount(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
@@ -73,7 +68,6 @@ class AccountController(
     }
 
     @PostMapping
-    @ManagedOperation
     fun updateAccount(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
@@ -92,21 +86,18 @@ class AccountController(
     }
 
     @DeleteMapping
-    @ManagedOperation
     fun deleteAccount(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ) = accountService.deleteAccount(basicUser.uid)
 
     @GetMapping("/login")
-    @ManagedOperation
     fun login(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser
     ) = accountService.login(basicUser.uid)
 
     @GetMapping("/logout")
-    @ManagedOperation
     fun logout(
         @RequestAttribute(name = Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser

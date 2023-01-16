@@ -9,6 +9,7 @@ import cz.loono.backend.api.service.PreventionService
 import cz.loono.backend.createAccount
 import cz.loono.backend.db.model.Account
 import cz.loono.backend.db.model.ExaminationRecord
+import cz.loono.backend.db.repository.CronLogRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -27,12 +28,15 @@ class ExaminationCancellationTaskTest {
 
     private var examinationRecordRepository: ExaminationRecordRepository = mock()
 
+    private val cronLogRepository: CronLogRepository = mock()
+
     @Test
     fun `examination cancellation`() {
         val examinationCancellationTask = ExaminationCancellationTask(
             preventionService,
             examinationRecordService,
-            examinationRecordRepository
+            examinationRecordRepository,
+            cronLogRepository
         )
         `when`(preventionService.getExaminationRequests(any())).thenReturn(definitionList())
         `when`(examinationRecordRepository.findAll())
@@ -58,7 +62,8 @@ class ExaminationCancellationTaskTest {
         val examinationCancellationTask = ExaminationCancellationTask(
             preventionService,
             examinationRecordService,
-            examinationRecordRepository
+            examinationRecordRepository,
+            cronLogRepository
         )
         `when`(preventionService.getExaminationRequests(any())).thenReturn(definitionList())
         `when`(examinationRecordRepository.findAll())
@@ -92,7 +97,8 @@ class ExaminationCancellationTaskTest {
         val examinationCancellationTask = ExaminationCancellationTask(
             preventionService,
             examinationRecordService,
-            examinationRecordRepository
+            examinationRecordRepository,
+            cronLogRepository
         )
         `when`(preventionService.getExaminationRequests(any())).thenReturn(definitionList())
         `when`(examinationRecordRepository.findAll())
