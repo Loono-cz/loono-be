@@ -146,7 +146,7 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
                 from = "odbornaporadna@loono.cz",
                 replyTo = "odbornaporadna@loono.cz"
             ),
-            emailId = 302,
+            emailId = 314,
             tag = "BE_PORADNA_USER",
             tasks = listOf(
                 EmailTasks(
@@ -190,7 +190,7 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
                 from = "odbornaporadna@loono.cz",
                 replyTo = "odbornaporadna@loono.cz"
             ),
-            emailId = 305,
+            emailId = 317,
             tag = "BE_PORADNA_DOCTOR",
             tasks = listOf(
                 EmailTasks(
