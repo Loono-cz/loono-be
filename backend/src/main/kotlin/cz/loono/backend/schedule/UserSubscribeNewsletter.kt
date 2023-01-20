@@ -38,7 +38,7 @@ class UserSubscribeNewsletter(
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
             for (i in 0..allNewsletterAccounts.size) {
-                if (emailContactInfoModelList.size % 400 == 0){
+                if (emailContactInfoModelList.size % 400 == 0) {
                     val emailBody = AddUserEmailModel(
                         settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
                         data = emailContactInfoModelList

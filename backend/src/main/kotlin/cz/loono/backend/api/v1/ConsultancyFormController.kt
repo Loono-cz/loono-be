@@ -28,7 +28,6 @@ class ConsultancyFormController(
     ) = consultancyFormService.sendEmailQuestion(basicUser.uid, content)
 }
 
-
 @RestController
 @RequestMapping("/v1/addEmailUser", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
 class EmailController(
