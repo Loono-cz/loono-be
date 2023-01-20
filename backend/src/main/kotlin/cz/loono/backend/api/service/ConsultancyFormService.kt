@@ -92,40 +92,48 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
 
     fun addContactToContactList() {
         val emailContactListModel = listOf(EmailContactListModel(id = 73))
+        val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
+        val allAccounts = accountRepository.findAll()
+        val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn }
 
-        val emailBody = AddUserEmailModel(
-            settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
-            data = listOf(
+        for (i in 0..allNewsletterAccounts.size) {
+            if (emailContactInfoModelList.size % 400 == 0){
+                val emailBody = AddUserEmailModel(
+                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    data = emailContactInfoModelList
+                )
+
+                val request = Request.Builder()
+                    .url("https://app.smartemailing.cz/api/v3/import")
+                    .addHeader("Content-Type", "application/json")
+                    .post(gson.toJson(emailBody).toRequestBody())
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        println(e)
+                        throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            println(response.body)
+                        } else {
+                            println(response.body)
+                        }
+                    }
+                })
+                emailContactInfoModelList.clear()
+            }
+
+            emailContactInfoModelList.add(
                 EmailContactInfoModel(
-                    emailAddress = "testAddEmail@test.com",
-                    name = "Test Testovaci",
+                    emailAddress = allNewsletterAccounts[i].preferredEmail,
+                    name = allNewsletterAccounts[i].nickname,
                     contactLists = emailContactListModel
                 )
             )
-        )
-
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/import")
-            .addHeader("Content-Type", "application/json")
-            .post(gson.toJson(emailBody).toRequestBody())
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val res = response
-                    val resBody = response.body
-                    println(response.body)
-                } else {
-                    println(response.body)
-                }
-            }
-        })
+        }
     }
 
     fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto) {
