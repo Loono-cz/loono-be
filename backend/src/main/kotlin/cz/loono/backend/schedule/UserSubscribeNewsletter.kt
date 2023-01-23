@@ -37,43 +37,45 @@ class UserSubscribeNewsletter(
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
-            for (i in 0..allNewsletterAccounts.size) {
-                if (emailContactInfoModelList.size % 400 == 0) {
-                    val emailBody = AddUserEmailModel(
-                        settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
-                        data = emailContactInfoModelList
-                    )
+            if (allNewsletterAccounts.isNotEmpty()) {
+                for (i in allNewsletterAccounts.indices) {
+                    if (emailContactInfoModelList.size % 400 == 0) {
+                        val emailBody = AddUserEmailModel(
+                            settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                            data = emailContactInfoModelList
+                        )
 
-                    val request = Request.Builder()
-                        .url("https://app.smartemailing.cz/api/v3/import")
-                        .addHeader("Content-Type", "application/json")
-                        .post(gson.toJson(emailBody).toRequestBody())
-                        .build()
+                        val request = Request.Builder()
+                            .url("https://app.smartemailing.cz/api/v3/import")
+                            .addHeader("Content-Type", "application/json")
+                            .post(gson.toJson(emailBody).toRequestBody())
+                            .build()
 
-                    client.newCall(request).enqueue(object : Callback {
-                        override fun onFailure(call: Call, e: IOException) {
-                            println(e)
-                            throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-                        }
-
-                        override fun onResponse(call: Call, response: Response) {
-                            if (response.isSuccessful) {
-                                println(response.body)
-                            } else {
-                                println(response.body)
+                        client.newCall(request).enqueue(object : Callback {
+                            override fun onFailure(call: Call, e: IOException) {
+                                println(e)
+                                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
                             }
-                        }
-                    })
-                    emailContactInfoModelList.clear()
-                }
 
-                emailContactInfoModelList.add(
-                    EmailContactInfoModel(
-                        emailAddress = allNewsletterAccounts[i].preferredEmail,
-                        name = allNewsletterAccounts[i].nickname,
-                        contactLists = emailContactListModel
+                            override fun onResponse(call: Call, response: Response) {
+                                if (response.isSuccessful) {
+                                    println(response.body)
+                                } else {
+                                    println(response.body)
+                                }
+                            }
+                        })
+                        emailContactInfoModelList.clear()
+                    }
+
+                    emailContactInfoModelList.add(
+                        EmailContactInfoModel(
+                            emailAddress = allNewsletterAccounts[i].preferredEmail,
+                            name = allNewsletterAccounts[i].nickname,
+                            contactLists = emailContactListModel
+                        )
                     )
-                )
+                }
             }
             cronLogRepository.save(
                 CronLog(
