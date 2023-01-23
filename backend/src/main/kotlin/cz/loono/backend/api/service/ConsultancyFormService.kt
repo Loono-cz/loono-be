@@ -98,7 +98,7 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
 
         if (allNewsletterAccounts.isNotEmpty()) {
             try {
-                for (i in allNewsletterAccounts.indices) {
+                allNewsletterAccounts.forEach { account ->
                     if (emailContactInfoModelList.size % 400 == 0) {
                         val emailBody = AddUserEmailModel(
                             settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
@@ -130,8 +130,8 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
 
                     emailContactInfoModelList.add(
                         EmailContactInfoModel(
-                            emailAddress = allNewsletterAccounts[i].preferredEmail,
-                            name = allNewsletterAccounts[i].nickname,
+                            emailAddress = account.preferredEmail,
+                            name = account.nickname,
                             contactLists = emailContactListModel
                         )
                     )
