@@ -95,47 +95,54 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
         val allAccounts = accountRepository.findAll()
         val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn }
-        try {
-            for (i in 0..allNewsletterAccounts.size) {
-                if (emailContactInfoModelList.size % 400 == 0) {
-                    val emailBody = AddUserEmailModel(
-                        settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
-                        data = emailContactInfoModelList
-                    )
 
-                    val request = Request.Builder()
-                        .url("https://app.smartemailing.cz/api/v3/import")
-                        .addHeader("Content-Type", "application/json")
-                        .post(gson.toJson(emailBody).toRequestBody())
-                        .build()
+        if (allNewsletterAccounts.isNotEmpty()) {
+            try {
+                for (i in allNewsletterAccounts.indices) {
+                    if (emailContactInfoModelList.size % 400 == 0) {
+                        val emailBody = AddUserEmailModel(
+                            settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                            data = emailContactInfoModelList
+                        )
 
-                    client.newCall(request).enqueue(object : Callback {
-                        override fun onFailure(call: Call, e: IOException) {
-                            println(e)
-                            throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-                        }
+                        val request = Request.Builder()
+                            .url("https://app.smartemailing.cz/api/v3/import")
+                            .addHeader("Content-Type", "application/json")
+                            .post(gson.toJson(emailBody).toRequestBody())
+                            .build()
 
-                        override fun onResponse(call: Call, response: Response) {
-                            if (response.isSuccessful) {
-                                println(response.body)
-                            } else {
-                                println(response.body)
+                        client.newCall(request).enqueue(object : Callback {
+                            override fun onFailure(call: Call, e: IOException) {
+                                println(e)
+                                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
                             }
-                        }
-                    })
-                    emailContactInfoModelList.clear()
-                }
 
-                emailContactInfoModelList.add(
-                    EmailContactInfoModel(
-                        emailAddress = allNewsletterAccounts[i].preferredEmail,
-                        name = allNewsletterAccounts[i].nickname,
-                        contactLists = emailContactListModel
+                            override fun onResponse(call: Call, response: Response) {
+                                if (response.isSuccessful) {
+                                    println(response.body)
+                                } else {
+                                    println(response.body)
+                                }
+                            }
+                        })
+                        emailContactInfoModelList.clear()
+                    }
+
+                    emailContactInfoModelList.add(
+                        EmailContactInfoModel(
+                            emailAddress = allNewsletterAccounts[i].preferredEmail,
+                            name = allNewsletterAccounts[i].nickname,
+                            contactLists = emailContactListModel
+                        )
                     )
+                }
+            } catch (e: Exception) {
+                throw LoonoBackendException(
+                    status = HttpStatus.SERVICE_UNAVAILABLE,
+                    errorMessage = e.toString(),
+                    errorCode = e.localizedMessage
                 )
             }
-        } catch (e: Exception) {
-            throw LoonoBackendException(status = HttpStatus.SERVICE_UNAVAILABLE, errorMessage = e.toString(), errorCode = e.localizedMessage)
         }
     }
 
