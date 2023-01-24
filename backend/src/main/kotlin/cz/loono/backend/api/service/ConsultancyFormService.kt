@@ -14,7 +14,9 @@ import cz.loono.backend.api.smartemailng.EmailSettingsModel
 import cz.loono.backend.api.smartemailng.EmailTasks
 import cz.loono.backend.api.smartemailng.SendEmailModel
 import cz.loono.backend.db.model.Account
+import cz.loono.backend.db.model.ConsultancyLog
 import cz.loono.backend.db.repository.AccountRepository
+import cz.loono.backend.db.repository.ConsultancyLogRepository
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -24,9 +26,13 @@ import okhttp3.Response
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.IOException
+import java.time.LocalDateTime
 
 @Service
-class ConsultancyFormService(private val accountRepository: AccountRepository) {
+class ConsultancyFormService(
+    private val accountRepository: AccountRepository,
+    private val consultancyLogRepository: ConsultancyLogRepository
+) {
     // .addInterceptor(EmailInterceptor("stepan.drozdek@cgi.com", "t5n8lc97atwg3qno129nsvsgnju0fp4mg2ejsd2x"))
     //  .addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o"))
     val gson = Gson()
@@ -91,7 +97,7 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
     }
 
     fun addContactToContactList() {
-        val emailContactListModel = listOf(EmailContactListModel(id = 73))
+        val emailContactListModel = listOf(EmailContactListModel(id = 73, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
         val allAccounts = accountRepository.findAll()
         val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn }
@@ -147,105 +153,206 @@ class ConsultancyFormService(private val accountRepository: AccountRepository) {
     }
 
     fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto) {
-        val user = accountRepository.findByUid(accountUuid)
-        user?.let { userAccount ->
-            content.message?.let { message ->
-                sendEmailToUser(message, userAccount)
-                content.tag?.let { tag ->
-                    sendEmailToDoctor(message, tag, userAccount)
+        try {
+            val user = accountRepository.findByUid(accountUuid)
+            user?.let { userAccount ->
+                content.message?.let { message ->
+                    content.tag?.let { tag ->
+                        sendEmailToUser(message, tag, userAccount)
+                        sendEmailToDoctor(message, tag, userAccount)
+                        consultancyLogRepository.save(
+                            ConsultancyLog(
+                                accountUid = accountUuid,
+                                message = message,
+                                tag = tag,
+                                passed = true,
+                                caughtException = null,
+                                createdAt = LocalDateTime.now().toString()
+                            )
+                        )
+                    }
                 }
             }
+        }catch (e: Exception) {
+            throw LoonoBackendException(
+                status = HttpStatus.SERVICE_UNAVAILABLE,
+                errorMessage = e.toString(),
+                errorCode = e.localizedMessage
+            )
         }
     }
-    fun sendEmailToUser(text: String, userAccount: Account) {
-        val email = SendEmailModel(
-            senderCredentials = EmailSenderCredentials(
-                senderName = "Poradna Preventivka",
-                from = "poradna@loono.cz",
-                replyTo = "poradna@loono.cz"
-            ),
-            emailId = 314,
-            tag = "BE_PORADNA_USER",
-            tasks = listOf(
-                EmailTasks(
-                    recipient = EmailRecipient(emailAddress = userAccount.preferredEmail),
-                    replace = listOf(
-                        EmailReplace(key = "user_name", content = userAccount.nickname),
-                        EmailReplace(key = "email_body_text", content = text)
+
+    fun sendEmailToUser(message: String, tag: String, userAccount: Account) {
+        try {
+            val email = SendEmailModel(
+                senderCredentials = EmailSenderCredentials(
+                    senderName = "Poradna Preventivka",
+                    from = "poradna@loono.cz",
+                    replyTo = "poradna@loono.cz"
+                ),
+                emailId = 314,
+                tag = "BE_PORADNA_USER",
+                tasks = listOf(
+                    EmailTasks(
+                        recipient = EmailRecipient(emailAddress = userAccount.preferredEmail),
+                        replace = listOf(
+                            EmailReplace(key = "user_name", content = userAccount.nickname),
+                            EmailReplace(key = "email_body_text", content = message)
+                        )
                     )
                 )
             )
-        )
 
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/send/custom-emails-bulk")
-            .addHeader("Content-Type", "application/json")
-            .post(gson.toJson(email).toRequestBody())
-            .build()
+            val request = Request.Builder()
+                .url("https://app.smartemailing.cz/api/v3/send/custom-emails-bulk")
+                .addHeader("Content-Type", "application/json")
+                .post(gson.toJson(email).toRequestBody())
+                .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val res = response
-                    val resBody = response.body
-                    println(response.body)
-                } else {
-                    println(response.body)
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    consultancyLogRepository.save(
+                        ConsultancyLog(
+                            accountUid = userAccount.uid,
+                            message = message,
+                            tag = tag,
+                            passed = false,
+                            caughtException = e.toString(),
+                            createdAt = LocalDateTime.now().toString()
+                        )
+                    )
+                    throw LoonoBackendException(
+                        status = HttpStatus.SERVICE_UNAVAILABLE,
+                        errorMessage = e.toString(),
+                        errorCode = e.localizedMessage
+                    )
                 }
-            }
-        })
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        consultancyLogRepository.save(
+                            ConsultancyLog(
+                                accountUid = userAccount.uid,
+                                message = message,
+                                tag = tag,
+                                passed = false,
+                                caughtException = response.body.toString(),
+                                createdAt = LocalDateTime.now().toString()
+                            )
+                        )
+                        throw LoonoBackendException(
+                            status = HttpStatus.SERVICE_UNAVAILABLE,
+                            errorMessage = response.body.toString(),
+                            errorCode = response.code.toString()
+                        )
+                    }
+                }
+            })
+        } catch (e: Exception) {
+            consultancyLogRepository.save(
+                ConsultancyLog(
+                    accountUid = userAccount.uid,
+                    message = message,
+                    tag = tag,
+                    passed = false,
+                    caughtException = e.toString(),
+                    createdAt = LocalDateTime.now().toString()
+                )
+            )
+            throw LoonoBackendException(
+                status = HttpStatus.SERVICE_UNAVAILABLE,
+                errorMessage = e.toString(),
+                errorCode = e.localizedMessage
+            )
+        }
     }
 
-    fun sendEmailToDoctor(text: String, tag: String, userAccount: Account) {
-        val email = SendEmailModel(
-            senderCredentials = EmailSenderCredentials(
-                senderName = "Poradna Preventivka",
-                from = "poradna@loono.cz",
-                replyTo = "poradna@loono.cz"
-            ),
-            emailId = 317,
-            tag = "BE_PORADNA_DOCTOR",
-            tasks = listOf(
-                EmailTasks(
-                    recipient = EmailRecipient(emailAddress = "poradna@loono.cz"),
-                    replace = listOf(
-                        EmailReplace(key = "question_tag", content = tag),
-                        EmailReplace(key = "user_name", content = userAccount.nickname),
-                        EmailReplace(key = "user_age", content = "${userAccount.birthdate}"),
-                        EmailReplace(key = "user_gender", content = userAccount.sex),
-                        EmailReplace(key = "user_email", content = userAccount.preferredEmail),
-                        EmailReplace(key = "email_body_text", content = text)
+    fun sendEmailToDoctor(message: String, tag: String, userAccount: Account) {
+        try {
+            val email = SendEmailModel(
+                senderCredentials = EmailSenderCredentials(
+                    senderName = "Poradna Preventivka",
+                    from = "poradna@loono.cz",
+                    replyTo = "poradna@loono.cz"
+                ),
+                emailId = 317,
+                tag = "BE_PORADNA_DOCTOR",
+                tasks = listOf(
+                    EmailTasks(
+                        recipient = EmailRecipient(emailAddress = "poradna@loono.cz"),
+                        replace = listOf(
+                            EmailReplace(key = "question_tag", content = tag),
+                            EmailReplace(key = "user_name", content = userAccount.nickname),
+                            EmailReplace(key = "user_age", content = "${userAccount.birthdate}"),
+                            EmailReplace(key = "user_gender", content = userAccount.sex),
+                            EmailReplace(key = "user_email", content = userAccount.preferredEmail),
+                            EmailReplace(key = "email_body_text", content = message)
+                        )
                     )
                 )
             )
-        )
 
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/send/custom-emails-bulk")
-            .addHeader("Content-Type", "application/json")
-            .post(gson.toJson(email).toRequestBody())
-            .build()
+            val request = Request.Builder()
+                .url("https://app.smartemailing.cz/api/v3/send/custom-emails-bulk")
+                .addHeader("Content-Type", "application/json")
+                .post(gson.toJson(email).toRequestBody())
+                .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    val res = response
-                    val resBody = response.body
-                    println(response.body)
-                } else {
-                    println(response.body)
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    consultancyLogRepository.save(
+                        ConsultancyLog(
+                            accountUid = userAccount.uid,
+                            message = message,
+                            tag = tag,
+                            passed = false,
+                            caughtException = e.toString(),
+                            createdAt = LocalDateTime.now().toString()
+                        )
+                    )
+                    throw LoonoBackendException(
+                        status = HttpStatus.SERVICE_UNAVAILABLE,
+                        errorMessage = e.toString(),
+                        errorCode = e.localizedMessage
+                    )
                 }
-            }
-        })
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                        consultancyLogRepository.save(
+                            ConsultancyLog(
+                                accountUid = userAccount.uid,
+                                message = message,
+                                tag = tag,
+                                passed = false,
+                                caughtException = response.body.toString(),
+                                createdAt = LocalDateTime.now().toString()
+                            )
+                        )
+                        throw LoonoBackendException(
+                            status = HttpStatus.SERVICE_UNAVAILABLE,
+                            errorMessage = response.body.toString(),
+                            errorCode = response.code.toString()
+                        )
+                    }
+                }
+            })
+        } catch (e: Exception) {
+            consultancyLogRepository.save(
+                ConsultancyLog(
+                    accountUid = userAccount.uid,
+                    message = message,
+                    tag = tag,
+                    passed = false,
+                    caughtException = e.toString(),
+                    createdAt = LocalDateTime.now().toString()
+                )
+            )
+            throw LoonoBackendException(
+                status = HttpStatus.SERVICE_UNAVAILABLE,
+                errorMessage = e.toString(),
+                errorCode = e.localizedMessage
+            )
+        }
     }
 }
