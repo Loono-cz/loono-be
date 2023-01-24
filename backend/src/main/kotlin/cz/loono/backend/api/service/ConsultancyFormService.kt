@@ -173,7 +173,7 @@ class ConsultancyFormService(
                     }
                 }
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             throw LoonoBackendException(
                 status = HttpStatus.SERVICE_UNAVAILABLE,
                 errorMessage = e.toString(),
