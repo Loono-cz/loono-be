@@ -124,6 +124,8 @@ resource "aws_ecs_task_definition" "backend" {
     google-app-credentials = var.google-app-credentials,
     onesignal-api-key      = var.onesignal-api-key,
     onesignal-app-id      = var.onesignal-app-id,
+    smartemailing-user     = var.smartemailing-user,
+    smartemailing-psw      = var.smartemailing-psw,
     container-name         = "${var.codename}-backend",
   })
   network_mode          = "awsvpc"

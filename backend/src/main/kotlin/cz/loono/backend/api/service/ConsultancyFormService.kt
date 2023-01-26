@@ -33,11 +33,12 @@ class ConsultancyFormService(
     private val accountRepository: AccountRepository,
     private val consultancyLogRepository: ConsultancyLogRepository
 ) {
-    // .addInterceptor(EmailInterceptor("stepan.drozdek@cgi.com", "t5n8lc97atwg3qno129nsvsgnju0fp4mg2ejsd2x"))
-    //  .addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o"))
+    companion object {
+        val SMARTEMAILING_USER: String = System.getenv().getOrDefault("SMARTEMAILING_USER", "")
+        val SMARTEMAILING_PSW: String = System.getenv().getOrDefault("SMARTEMAILING_PSW", "")
+    }
     val gson = Gson()
-    val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o")).build()
-
+    val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(SMARTEMAILING_USER, SMARTEMAILING_PSW)).build()
     fun testApi() {
         val request = Request.Builder()
             .url("https://app.smartemailing.cz/api/v3/ping")
