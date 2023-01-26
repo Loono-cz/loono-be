@@ -19,6 +19,8 @@ jobs:
         env:
           ONESIGNAL_API_KEY: ${{ secrets.DEVEL_ONESIGNAL_API_KEY}}
           ONESIGNAL_APP_ID: ${{ secrets.DEVEL_ONESIGNAL_APP_ID}}
+          SMARTEMAILNG_USER: ${{ secrets.DEVEL_SMARTEMAILING_USER}}
+          SMARTEMAILING_PSW: ${{ secrets.DEVEL_SMARTEMAILING_PSW}}
         run: |
           ./gradlew build -x ktlintMainSourceSetCheck 
 
