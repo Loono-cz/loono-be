@@ -79,8 +79,7 @@ class AccountControllerTest(
             appointmentReminderEmailsOptIn = existingAccount.appointmentReminderEmailsOptIn,
             newsletterOptIn = existingAccount.newsletterOptIn,
             points = existingAccount.points,
-            badges = emptyList(),
-            createdAt = existingAccount.created.toString()
+            badges = emptyList()
         )
         assertEquals(expectedDto, actualDto)
     }
