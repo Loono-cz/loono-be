@@ -3,14 +3,10 @@ package cz.loono.backend.api.service
 import com.google.gson.Gson
 import cz.loono.backend.api.dto.ConsultancyFormContentDto
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.api.smartemailng.AddUserEmailModel
-import cz.loono.backend.api.smartemailng.EmailContactInfoModel
-import cz.loono.backend.api.smartemailng.EmailContactListModel
 import cz.loono.backend.api.smartemailng.EmailInterceptor
 import cz.loono.backend.api.smartemailng.EmailRecipient
 import cz.loono.backend.api.smartemailng.EmailReplace
 import cz.loono.backend.api.smartemailng.EmailSenderCredentials
-import cz.loono.backend.api.smartemailng.EmailSettingsModel
 import cz.loono.backend.api.smartemailng.EmailTasks
 import cz.loono.backend.api.smartemailng.SendEmailModel
 import cz.loono.backend.db.model.Account
@@ -39,7 +35,6 @@ class ConsultancyFormService(
     }
     val gson = Gson()
     val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(SMARTEMAILING_USER, SMARTEMAILING_PSW)).build()
-    
     fun sendEmailQuestion(accountUuid: String, content: ConsultancyFormContentDto) {
         try {
             val user = accountRepository.findByUid(accountUuid)
