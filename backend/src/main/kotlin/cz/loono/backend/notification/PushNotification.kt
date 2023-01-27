@@ -36,6 +36,6 @@ data class MultipleLangString(
 data class NotificationData(
     val screen: String,
     val examinationType: ExaminationTypeDto? = null
-    //TODO uncomment after FE fixes notification routing
-    //val examinationUuid: String? = null
+    // TODO uncomment after FE fixes notification routing
+    // val examinationUuid: String? = null
 )
