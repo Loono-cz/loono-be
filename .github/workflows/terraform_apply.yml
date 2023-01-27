@@ -8,6 +8,8 @@ on:
 env:
   tf_version: '1.1.6'
   tf_working_dir: 'infrastructure/aws'
+  TF_VAR_smartemailing-user: ${{ secrets.PROD_SMARTEMAILING_USER }}
+  TF_VAR_smartemailing-psw: ${{ secrets.PROD_SMARTEMAILING_PSW }}
   TF_VAR_database-password: ${{ secrets.PROD_DATABASE_PASSWORD }}
   TF_VAR_certificate-arn: ${{ secrets.PROD_CERTIFICATE_ARN }}
   TF_VAR_google-app-credentials: ${{ secrets.PROD_GOOGLE_APPLICATION_CREDENTIALS }}
