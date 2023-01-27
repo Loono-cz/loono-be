@@ -44,7 +44,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time, // time of the past exam - reminder after 24h
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 
@@ -65,7 +65,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = MORNING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 
@@ -86,7 +86,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = MORNING_TIME_TO_NOTIFY,
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 
@@ -106,7 +106,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time, // time of the coming exam - reminder 24h ahead
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 
@@ -222,7 +222,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time.toString(),
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 
@@ -245,7 +245,7 @@ object NotificationDefinition {
             contents = MultipleLangString(cs = text, en = text),
             includeExternalUserIds = accounts.map { it.uid },
             scheduleTimeOfDay = time.toString(),
-            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto, examinationUuid = examinationUuid)
+            data = NotificationData(screen = "checkup", examinationType = examinationTypeDto)
         )
     }
 }
