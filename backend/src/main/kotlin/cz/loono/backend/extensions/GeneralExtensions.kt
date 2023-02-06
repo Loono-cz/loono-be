@@ -10,3 +10,20 @@ import java.time.ZoneOffset
 fun Instant.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this, Clock.systemUTC().zone)
 
 fun LocalDateTime.atUTCOffset(): OffsetDateTime = this.atOffset(ZoneOffset.UTC)
+
+fun String?.trimProviderImport(): String? {
+    return if (this.isNullOrEmpty()){
+        null
+    } else {
+        this.trim()
+    }
+}
+
+fun String.trimProviderNumber(): String {
+    return if(this.contains('.')){
+        val splited = this.split('.')
+        splited[0]
+    }else{
+        this
+    }
+}

@@ -18,6 +18,10 @@ import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import cz.loono.backend.extensions.trimProviderImport
+import cz.loono.backend.extensions.trimProviderNumber
+import org.apache.poi.xssf.usermodel.XSSFCell
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -26,14 +30,10 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStreamWriter
+import java.io.*
 import java.net.ConnectException
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
@@ -105,6 +105,8 @@ class HealthcareProvidersService(
         if (providers.isNotEmpty()) {
             updating = true
             try {
+                // findDifferenceProviders(providers)
+                searchUpdatedProviders()
                 saveCategories()
                 saveProviders(providers)
                 setLastUpdate()
@@ -124,6 +126,141 @@ class HealthcareProvidersService(
         return UpdateStatusMessageDto("Data successfully updated.")
     }
 
+    @Synchronized
+    fun searchUpdatedProviders() {
+        var skip = true
+        val providersToUpdate = mutableListOf<HealthcareProvider>()
+        val categoryToUpdate = mutableListOf<HealthcareProvider>()
+        val inputStream = FileInputStream("/Users/emtech36/Documents/GitHub/loono-be/backend/src/main/resources/static/notification/missing_data_-_healthcare_providers.xlsx")
+        val xlWb = XSSFWorkbook(inputStream)
+        val xlWsProviders = xlWb.getSheetAt(2)
+        val xlWsCategories = xlWb.getSheetAt(1)
+
+        xlWsProviders.forEach { row ->
+            if (skip){
+                skip = false
+            } else {
+                val provider = HealthcareProvider(
+                    locationId = row.getCell(0).toString().toDouble().toLong(),
+                    institutionId = row.getCell(1).toString().toDouble().toLong(),
+                    title = row.getCell(2).toString(),
+                    institutionType = row.getCell(3).toString(),
+                    city = row.getCell(4).toString(),
+                    postalCode = row.getCell(5).toString().trimProviderNumber(),
+                    street = row.getCell(6)?.toString().trimProviderImport(),
+                    houseNumber = row.getCell(7).toString(),
+                    region = row.getCell(8).toString(),
+                    district = row.getCell(9).toString(),
+                    correctedPhoneNumber = (row.getCell(10) as XSSFCell).rawValue?.toString()?.trimProviderNumber(),
+                    email = row.getCell(11)?.toString().trimProviderImport(),
+                    correctedWebsite = row.getCell(12)?.toString().trimProviderImport(),
+                    ico = (row.getCell(13) as XSSFCell).rawValue.toString().trimProviderNumber(),
+                    hqCity = row.getCell(14)?.toString().trimProviderImport(),
+                    hqDistrict = row.getCell(15)?.toString().trimProviderImport(),
+                    hqHouseNumber = row.getCell(16)?.toString().trimProviderImport(),
+                    hqPostalCode = row.getCell(17)?.toString().trimProviderImport()?.trimProviderNumber(),
+                    hqRegion = row.getCell(18)?.toString().trimProviderImport(),
+                    hqStreet = row.getCell(19)?.toString().trimProviderImport(),
+                    specialization = row.getCell(20)?.toString().trimProviderImport(),
+                    careForm = row.getCell(21)?.toString().trimProviderImport(),
+                    correctedLat = row.getCell(22)?.toString().trimProviderImport()?.toDouble(),
+                    correctedLng = row.getCell(23)?.toString().trimProviderImport()?.toDouble(),
+                    correctedCategory = setOf(HealthcareCategory(value = row.getCell(24).toString()))
+                )
+                providersToUpdate.add(provider)
+            }
+        }
+
+        skip = true
+
+        xlWsCategories.forEach { row ->
+            if (skip){
+                  skip = false
+            } else {
+                println(row.rowNum)
+                val provider = HealthcareProvider(
+                    locationId = row.getCell(0).toString().toDouble().toLong(),
+                    institutionId = row.getCell(1).toString().toDouble().toLong(),
+                    code = (row.getCell(2) as XSSFCell).rawValue.toString().trimProviderNumber(),
+                    title = row.getCell(3).toString(),
+                    institutionType = row.getCell(4).toString(),
+                    city = row.getCell(5).toString(),
+                    postalCode = row.getCell(6).toString().trimProviderNumber(),
+                    street = row.getCell(7)?.toString().trimProviderImport(),
+                    houseNumber = row.getCell(8).toString(),
+                    region = row.getCell(9).toString(),
+                    regionCode = row.getCell(10).toString(),
+                    district = row.getCell(11).toString(),
+                    districtCode = row.getCell(12).toString(),
+                    administrativeDistrict = row.getCell(13).toString(),
+                    correctedPhoneNumber = (row.getCell(14) as XSSFCell).rawValue?.toString().trimProviderImport()?.trimProviderNumber(),
+                    fax = (row.getCell(15) as XSSFCell).rawValue?.toString().trimProviderImport()?.trimProviderNumber(),
+                    email = row.getCell(16)?.toString().trimProviderImport(),
+                    correctedWebsite = row.getCell(17)?.toString().trimProviderImport(),
+                    ico = (row.getCell(18) as XSSFCell).rawValue.toString().trimProviderNumber(),
+                    personTypeCode = row.getCell(19).toString().trimProviderNumber(),
+                    lawyerFormCode = row.getCell(20).toString().trimProviderNumber(),
+                    hqRegionCode = row.getCell(21)?.toString().trimProviderImport(),
+                    hqDistrictCode = row.getCell(22)?.toString().trimProviderImport(),
+                    hqDistrict = row.getCell(23)?.toString().trimProviderImport(),
+                    hqPostalCode = row.getCell(24)?.toString().trimProviderImport()?.trimProviderNumber(),
+                    hqStreet = row.getCell(25)?.toString().trimProviderImport(),
+                    hqHouseNumber = row.getCell(26)?.toString().trimProviderImport(),
+                    specialization = row.getCell(3)?.toString().trimProviderImport(), //TODO specialization is missing, and collumn 27 is unclear
+                    careForm = row.getCell(28)?.toString().trimProviderImport(),
+                    careType = row.getCell(29)?.toString().trimProviderImport(),
+                    substitute = row.getCell(30)?.toString().trimProviderImport(),
+                    correctedLat = row.getCell(31)?.toString().trimProviderImport()?.toDouble(),
+                    correctedLng = row.getCell(32)?.toString().trimProviderImport()?.toDouble(),
+                )
+                categoryToUpdate.add(provider)
+            }
+        }
+
+        providersToUpdate.forEach {
+            healthcareProviderRepository.save(it)
+        }
+        categoryToUpdate.forEach {
+            healthcareProviderRepository.save(it)
+        }
+    }
+    @Synchronized
+    fun findDifferenceProviders(providers: List<HealthcareProvider>) {
+        if (providers.isEmpty()) {
+            return
+        }
+        val foundList = mutableListOf<HealthcareProvider?>()
+        val notfoundList = mutableListOf<String>()
+        val csvFile = File("/Users/emtech36/Documents/GitHub/loono-be/backend/src/main/resources/static/notification/data-1675259453877.csv").inputStream()
+        csvFile.use { inputStream ->
+            val reader = BufferedReader(inputStream.reader(Charsets.UTF_8))
+            reader.forEachLine { line ->
+                val lineParts = line.split(',')
+                val partInstId = lineParts[0].replace("\"","")
+                val partLocID = lineParts[1].replace("\"","")
+
+                val find = providers.find { it.institutionId == partInstId.toLong() && it.locationId == partLocID.toLong() }
+                if (find != null){
+                    foundList.add(find)
+                } else {
+                    notfoundList.add(line)
+                }
+
+            }
+        }
+        val fs = foundList.size
+        val nfs = notfoundList.size
+
+        val fos = FileOutputStream("/Users/emtech36/Documents/GitHub/loono-be/backend/src/main/resources/static/notification/data-missing.csv")
+        val osw = OutputStreamWriter(fos, StandardCharsets.UTF_8)
+        val writer = BufferedWriter(osw)
+        notfoundList.forEach {
+            writer.write(it)
+            writer.newLine()
+        }
+        writer.flush()
+        println("found size  $fs and ntfs = $nfs")
+    }
     @Synchronized
     fun saveProviders(providers: List<HealthcareProvider>) {
         if (providers.isEmpty()) {
@@ -270,6 +407,7 @@ class HealthcareProvidersService(
             lng = lng ?: correctedLng!!
         )
 
+    //TODO tady se vybira zda corrected data nebo puvodni
     @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto =
         HealthcareProviderDetailDto(
