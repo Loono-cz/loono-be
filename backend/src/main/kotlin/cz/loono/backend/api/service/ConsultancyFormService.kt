@@ -144,10 +144,58 @@ class ConsultancyFormService(
                     )
                 }
             } catch (e: Exception) {
+                consultancyLogRepository.save(
+                    ConsultancyLog(
+                        accountUid = "USER_IMPORT",
+                        message = "$e",
+                        tag = "${e.cause}",
+                        passed = false,
+                        caughtException = "${e.message}",
+                        createdAt = LocalDateTime.now().toString()
+                    )
+                )
                 throw LoonoBackendException(
                     status = HttpStatus.SERVICE_UNAVAILABLE,
                     errorMessage = e.toString(),
                     errorCode = e.localizedMessage
+                )
+            } finally {
+                val emailBody = AddUserEmailModel(
+                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    data = emailContactInfoModelList
+                )
+
+                val request = Request.Builder()
+                    .url("https://app.smartemailing.cz/api/v3/import")
+                    .addHeader("Content-Type", "application/json")
+                    .post(gson.toJson(emailBody).toRequestBody())
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        println(e)
+                        throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            println(response.body)
+                        } else {
+                            println(response.body)
+                        }
+                    }
+                })
+                emailContactInfoModelList.clear()
+
+                consultancyLogRepository.save(
+                    ConsultancyLog(
+                        accountUid = "USER_IMPORT",
+                        message = "IMPORTED",
+                        tag = "",
+                        passed = true,
+                        caughtException = null,
+                        createdAt = LocalDateTime.now().toString()
+                    )
                 )
             }
         }
