@@ -131,7 +131,7 @@ class HealthcareProvidersService(
         var skip = true
         val providersToUpdate = mutableListOf<HealthcareProvider>()
         val categoryToUpdate = mutableListOf<HealthcareProvider>()
-        val inputStream = FileInputStream("/Users/emtech36/Documents/GitHub/loono-be/backend/src/main/resources/static/notification/missing_data_-_healthcare_providers.xlsx")
+        val inputStream = this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
         val xlWb = XSSFWorkbook(inputStream)
         val xlWsProviders = xlWb.getSheetAt(2)
         val xlWsCategories = xlWb.getSheetAt(1)
