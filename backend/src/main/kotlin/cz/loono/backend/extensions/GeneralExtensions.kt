@@ -12,7 +12,7 @@ fun Instant.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(this, Clo
 fun LocalDateTime.atUTCOffset(): OffsetDateTime = this.atOffset(ZoneOffset.UTC)
 
 fun String?.trimProviderImport(): String? {
-    return if (this.isNullOrEmpty()){
+    return if (this.isNullOrEmpty()) {
         null
     } else {
         this.trim()
@@ -20,10 +20,10 @@ fun String?.trimProviderImport(): String? {
 }
 
 fun String.trimProviderNumber(): String {
-    return if(this.contains('.')){
+    return if(this.contains('.')) {
         val splited = this.split('.')
         splited[0]
-    }else{
+    } else {
         this
     }
 }

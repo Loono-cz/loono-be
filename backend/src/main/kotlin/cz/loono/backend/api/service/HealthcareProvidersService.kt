@@ -137,7 +137,7 @@ class HealthcareProvidersService(
         val xlWsCategories = xlWb.getSheetAt(1)
 
         xlWsProviders.forEach { row ->
-            if (skip){
+            if (skip) {
                 skip = false
             } else {
                 val provider = HealthcareProvider(
@@ -174,8 +174,8 @@ class HealthcareProvidersService(
         skip = true
 
         xlWsCategories.forEach { row ->
-            if (skip){
-                  skip = false
+            if (skip) {
+                skip = false
             } else {
                 println(row.rowNum)
                 val provider = HealthcareProvider(
@@ -206,12 +206,13 @@ class HealthcareProvidersService(
                     hqPostalCode = row.getCell(24)?.toString().trimProviderImport()?.trimProviderNumber(),
                     hqStreet = row.getCell(25)?.toString().trimProviderImport(),
                     hqHouseNumber = row.getCell(26)?.toString().trimProviderImport(),
-                    specialization = row.getCell(3)?.toString().trimProviderImport(), //TODO specialization is missing, and collumn 27 is unclear
+                    specialization = row.getCell(3)?.toString().trimProviderImport(),
+                    // TODO specialization is missing, and collumn 27 is unclear
                     careForm = row.getCell(28)?.toString().trimProviderImport(),
                     careType = row.getCell(29)?.toString().trimProviderImport(),
                     substitute = row.getCell(30)?.toString().trimProviderImport(),
                     correctedLat = row.getCell(31)?.toString().trimProviderImport()?.toDouble(),
-                    correctedLng = row.getCell(32)?.toString().trimProviderImport()?.toDouble(),
+                    correctedLng = row.getCell(32)?.toString().trimProviderImport()?.toDouble()
                 )
                 categoryToUpdate.add(provider)
             }
@@ -240,12 +241,11 @@ class HealthcareProvidersService(
                 val partLocID = lineParts[1].replace("\"","")
 
                 val find = providers.find { it.institutionId == partInstId.toLong() && it.locationId == partLocID.toLong() }
-                if (find != null){
+                if (find != null) {
                     foundList.add(find)
                 } else {
                     notfoundList.add(line)
                 }
-
             }
         }
         val fs = foundList.size
