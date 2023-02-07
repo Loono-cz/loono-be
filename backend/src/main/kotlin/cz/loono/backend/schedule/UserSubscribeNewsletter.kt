@@ -7,7 +7,6 @@ import cz.loono.backend.api.smartemailng.EmailContactInfoModel
 import cz.loono.backend.api.smartemailng.EmailContactListModel
 import cz.loono.backend.api.smartemailng.EmailInterceptor
 import cz.loono.backend.api.smartemailng.EmailSettingsModel
-import cz.loono.backend.db.model.ConsultancyLog
 import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.CronLogRepository
@@ -21,7 +20,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Component
 class UserSubscribeNewsletter(
@@ -96,7 +94,7 @@ class UserSubscribeNewsletter(
                     createdAt = LocalDate.now().toString()
                 )
             )
-        }finally {
+        } finally {
             val emailBody = AddUserEmailModel(
                 settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
                 data = emailContactInfoModelList
