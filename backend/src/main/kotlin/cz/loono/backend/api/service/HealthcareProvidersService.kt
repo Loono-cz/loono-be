@@ -30,7 +30,14 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.io.*
+import java.io.BufferedOutputStream
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStreamWriter
 import java.net.ConnectException
 import java.net.URL
 import java.nio.charset.StandardCharsets
@@ -237,8 +244,8 @@ class HealthcareProvidersService(
             val reader = BufferedReader(inputStream.reader(Charsets.UTF_8))
             reader.forEachLine { line ->
                 val lineParts = line.split(',')
-                val partInstId = lineParts[0].replace("\"","")
-                val partLocID = lineParts[1].replace("\"","")
+                val partInstId = lineParts[0].replace("\"", "")
+                val partLocID = lineParts[1].replace("\"", "")
 
                 val find = providers.find { it.institutionId == partInstId.toLong() && it.locationId == partLocID.toLong() }
                 if (find != null) {
@@ -407,7 +414,7 @@ class HealthcareProvidersService(
             lng = lng ?: correctedLng!!
         )
 
-    //TODO tady se vybira zda corrected data nebo puvodni
+    // TODO tady se vybira zda corrected data nebo puvodni
     @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto =
         HealthcareProviderDetailDto(

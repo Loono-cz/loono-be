@@ -20,7 +20,7 @@ fun String?.trimProviderImport(): String? {
 }
 
 fun String.trimProviderNumber(): String {
-    return if(this.contains('.')) {
+    return if (this.contains('.')) {
         val splited = this.split('.')
         splited[0]
     } else {
