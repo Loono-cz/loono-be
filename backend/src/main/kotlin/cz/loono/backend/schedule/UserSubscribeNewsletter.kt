@@ -7,6 +7,7 @@ import cz.loono.backend.api.smartemailng.EmailContactInfoModel
 import cz.loono.backend.api.smartemailng.EmailContactListModel
 import cz.loono.backend.api.smartemailng.EmailInterceptor
 import cz.loono.backend.api.smartemailng.EmailSettingsModel
+import cz.loono.backend.db.model.ConsultancyLog
 import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.CronLogRepository
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Component
 class UserSubscribeNewsletter(
@@ -29,11 +31,11 @@ class UserSubscribeNewsletter(
     override fun run() {
         val gson = Gson()
         val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o")).build()
+        val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
 
         try {
             val now = LocalDate.now()
             val emailContactListModel = listOf(EmailContactListModel(id = 73))
-            val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
@@ -94,6 +96,33 @@ class UserSubscribeNewsletter(
                     createdAt = LocalDate.now().toString()
                 )
             )
+        }finally {
+            val emailBody = AddUserEmailModel(
+                settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                data = emailContactInfoModelList
+            )
+
+            val request = Request.Builder()
+                .url("https://app.smartemailing.cz/api/v3/import")
+                .addHeader("Content-Type", "application/json")
+                .post(gson.toJson(emailBody).toRequestBody())
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    println(e)
+                    throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        println(response.body)
+                    } else {
+                        println(response.body)
+                    }
+                }
+            })
+            emailContactInfoModelList.clear()
         }
     }
 }
