@@ -170,7 +170,6 @@ class ConsultancyFormService(
                     }
                 })
                 emailContactInfoModelList.clear()
-
             } catch (e: Exception) {
                 consultancyLogRepository.save(
                     ConsultancyLog(
