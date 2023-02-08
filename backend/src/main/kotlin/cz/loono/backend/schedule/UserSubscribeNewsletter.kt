@@ -76,6 +76,32 @@ class UserSubscribeNewsletter(
                         )
                     )
                 }
+                val emailBody = AddUserEmailModel(
+                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    data = emailContactInfoModelList
+                )
+
+                val request = Request.Builder()
+                    .url("https://app.smartemailing.cz/api/v3/import")
+                    .addHeader("Content-Type", "application/json")
+                    .post(gson.toJson(emailBody).toRequestBody())
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        println(e)
+                        throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            println(response.body)
+                        } else {
+                            println(response.body)
+                        }
+                    }
+                })
+                emailContactInfoModelList.clear()
             }
             cronLogRepository.save(
                 CronLog(
@@ -94,33 +120,6 @@ class UserSubscribeNewsletter(
                     createdAt = LocalDate.now().toString()
                 )
             )
-        } finally {
-            val emailBody = AddUserEmailModel(
-                settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
-                data = emailContactInfoModelList
-            )
-
-            val request = Request.Builder()
-                .url("https://app.smartemailing.cz/api/v3/import")
-                .addHeader("Content-Type", "application/json")
-                .post(gson.toJson(emailBody).toRequestBody())
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    println(e)
-                    throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        println(response.body)
-                    } else {
-                        println(response.body)
-                    }
-                }
-            })
-            emailContactInfoModelList.clear()
         }
     }
 }

@@ -143,23 +143,7 @@ class ConsultancyFormService(
                         )
                     )
                 }
-            } catch (e: Exception) {
-                consultancyLogRepository.save(
-                    ConsultancyLog(
-                        accountUid = "USER_IMPORT",
-                        message = "$e",
-                        tag = "${e.cause}",
-                        passed = false,
-                        caughtException = "${e.message}",
-                        createdAt = LocalDateTime.now().toString()
-                    )
-                )
-                throw LoonoBackendException(
-                    status = HttpStatus.SERVICE_UNAVAILABLE,
-                    errorMessage = e.toString(),
-                    errorCode = e.localizedMessage
-                )
-            } finally {
+
                 val emailBody = AddUserEmailModel(
                     settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
                     data = emailContactInfoModelList
@@ -187,15 +171,21 @@ class ConsultancyFormService(
                 })
                 emailContactInfoModelList.clear()
 
+            } catch (e: Exception) {
                 consultancyLogRepository.save(
                     ConsultancyLog(
                         accountUid = "USER_IMPORT",
-                        message = "IMPORTED",
-                        tag = "",
-                        passed = true,
-                        caughtException = null,
+                        message = "$e",
+                        tag = "${e.cause}",
+                        passed = false,
+                        caughtException = "${e.message}",
                         createdAt = LocalDateTime.now().toString()
                     )
+                )
+                throw LoonoBackendException(
+                    status = HttpStatus.SERVICE_UNAVAILABLE,
+                    errorMessage = e.toString(),
+                    errorCode = e.localizedMessage
                 )
             }
         }
