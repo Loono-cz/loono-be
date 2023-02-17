@@ -201,7 +201,7 @@ class HealthcareProvidersService(
                     correctedLng = it.correctedLng,
                     categories = it.categories,
                     locationId = it.locationId,
-                    institutionId =  it.institutionId
+                    institutionId = it.institutionId
                 )
             }
         }
@@ -254,8 +254,8 @@ class HealthcareProvidersService(
             .toSet()
             .map { it.simplify() }
             .filter { it.category.isNotEmpty() }
-            providers.addAll(allFilteredProviders)
 
+        providers.addAll(allFilteredProviders)
         zipProviders(providers)
     }
 
@@ -271,8 +271,6 @@ class HealthcareProvidersService(
             .toSet()
             .map { it.simplify() }
             .filter { it.category.isNotEmpty() }
-
-
 
     @Synchronized
     private fun zipProviders(providers: LinkedHashSet<SimpleHealthcareProviderDto>) {
@@ -339,25 +337,25 @@ class HealthcareProvidersService(
         if (value.contains(",")) {
             val findFullText = CategoryValues.values().firstOrNull { it.value == value }
             if (findFullText == null) {
-                if(value.contains("Anesteziologie, ARO, intenzivní péče"))
+                if (value.contains("Anesteziologie, ARO, intenzivní péče"))
                     categories.add(HealthcareCategoryTypeDto.ANESTHESIOLOGY_ARO.value)
-                if(value.contains("Angiologie, cévní"))
+                if (value.contains("Angiologie, cévní"))
                     categories.add(HealthcareCategoryTypeDto.ANGIOLOGY.value)
-                if(value.contains("Endokrinologie, hormony"))
+                if (value.contains("Endokrinologie, hormony"))
                     categories.add(HealthcareCategoryTypeDto.ENDOCRINOLOGY.value)
-                if(value.contains("Dermatovenerologie, kožní"))
+                if (value.contains("Dermatovenerologie, kožní"))
                     categories.add(HealthcareCategoryTypeDto.DERMATOVENEROLOGY.value)
-                if(value.contains("Geriatrie, medicína stáří, senioři"))
+                if (value.contains("Geriatrie, medicína stáří, senioři"))
                     categories.add(HealthcareCategoryTypeDto.GERIATRICS.value)
-                if(value.contains("Hematologie, krevní"))
+                if (value.contains("Hematologie, krevní"))
                     categories.add(HealthcareCategoryTypeDto.HEMATOLOGY.value)
-                if(value.contains("Interna, vnitřní lékařství"))
+                if (value.contains("Interna, vnitřní lékařství"))
                     categories.add(HealthcareCategoryTypeDto.INTERNAL_MEDICINE.value)
-                if(value.contains("Nefrologie, ledviny"))
+                if (value.contains("Nefrologie, ledviny"))
                     categories.add(HealthcareCategoryTypeDto.NEPHROLOGY.value)
-                if(value.contains("Pneumologie, plicní"))
+                if (value.contains("Pneumologie, plicní"))
                     categories.add(HealthcareCategoryTypeDto.PNEUMOLOGY.value)
-                if(value.contains("Výživa, nutriční"))
+                if (value.contains("Výživa, nutriční"))
                     categories.add(HealthcareCategoryTypeDto.NUTRITION.value)
 
                 val categoriesValues = value.split(", ")
