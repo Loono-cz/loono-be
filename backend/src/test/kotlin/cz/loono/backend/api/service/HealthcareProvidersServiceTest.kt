@@ -4,9 +4,7 @@ import cz.loono.backend.api.dto.HealthcareProviderDetailDto
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
 import cz.loono.backend.api.dto.HealthcareProviderIdListDto
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.data.constants.CategoryValues
 import cz.loono.backend.db.model.HealthcareProvider
-import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +24,6 @@ import kotlin.io.path.getLastModifiedTime
 @Transactional
 class HealthcareProvidersServiceTest(
     private val healthcareProviderRepository: HealthcareProviderRepository,
-    private val healthcareCategoryRepository: HealthcareCategoryRepository,
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) {
 
@@ -37,17 +34,10 @@ class HealthcareProvidersServiceTest(
         healthcareProvidersService =
             HealthcareProvidersService(
                 healthcareProviderRepository,
-                healthcareCategoryRepository,
                 serverPropertiesRepository
             )
     }
 
-    @Test
-    fun `save categories`() {
-        healthcareProvidersService.saveCategories()
-
-        assert(healthcareCategoryRepository.count() == CategoryValues.values().count().toLong())
-    }
 
     // Working but long test
     @Test

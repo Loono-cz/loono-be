@@ -1,10 +1,9 @@
 package cz.loono.backend.api.service
 
+import com.google.gson.Gson
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
 import cz.loono.backend.data.constants.CategoryValues
-import cz.loono.backend.db.model.HealthcareCategory
 import cz.loono.backend.db.model.HealthcareProvider
-import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -20,21 +19,22 @@ class HealthcareProvidersServiceFilteringTest {
 
     private var healthcareProviderRepository: HealthcareProviderRepository = mock()
 
-    private var healthcareCategoryRepository: HealthcareCategoryRepository = mock()
-
     private var serverPropertiesRepository: ServerPropertiesRepository = mock()
 
     @Test
     fun `happy case returning identical object`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
             lat = 42.0,
             lng = 50.6,
-            category = setOf(HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value))
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name
+                )
+            )
         )
 
         `when`(healthcareProviderRepository.findAll(any<PageRequest>()))
@@ -55,11 +55,14 @@ class HealthcareProvidersServiceFilteringTest {
     fun `missing coordinates`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
-            category = setOf(HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value))
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name
+                )
+            )
         )
 
         `when`(healthcareProviderRepository.findAll(any<PageRequest>()))
@@ -76,11 +79,14 @@ class HealthcareProvidersServiceFilteringTest {
     fun `missing imported coordinates`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
-            category = setOf(HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value)),
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name
+                )
+            ),
             correctedLat = 22.22,
             correctedLng = 11.11
         )
@@ -99,11 +105,14 @@ class HealthcareProvidersServiceFilteringTest {
     fun `missing corrected coordinates`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
-            category = setOf(HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value)),
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name
+                )
+            ),
             lat = 22.22,
             lng = 11.11
         )
@@ -122,13 +131,12 @@ class HealthcareProvidersServiceFilteringTest {
     fun `missing category`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
             lat = 42.0,
             lng = 50.6,
-            category = emptySet()
+            categories = null
         )
 
         `when`(healthcareProviderRepository.findAll(any<PageRequest>()))
@@ -145,14 +153,16 @@ class HealthcareProvidersServiceFilteringTest {
     fun `corrected category`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
             lat = 42.0,
             lng = 50.6,
-            category = emptySet(),
-            correctedCategory = setOf(HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value))
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name
+                )
+            )
         )
 
         `when`(healthcareProviderRepository.findAll(any<PageRequest>()))
@@ -169,15 +179,16 @@ class HealthcareProvidersServiceFilteringTest {
     fun `removing unwanted categories`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
             lat = 42.0,
             lng = 50.6,
-            category = setOf(
-                HealthcareCategory(value = CategoryValues.GENERAL_PRACTICAL_MEDICINE.value),
-                HealthcareCategory(value = CategoryValues.PHARMACOLOGY.value)
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.GENERAL_PRACTICAL_MEDICINE.name,
+                    CategoryValues.PHARMACOLOGY.name
+                )
             )
         )
 
@@ -199,13 +210,16 @@ class HealthcareProvidersServiceFilteringTest {
     fun `detail correction`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val healthcareProvider = HealthcareProvider(
             correctedLng = 42.0,
             correctedLat = 50.6,
-            correctedCategory = setOf(HealthcareCategory(value = CategoryValues.DENTIST.value)),
+            categories = Gson().toJson(
+                listOf(
+                    CategoryValues.DENTIST.name
+                )
+            ),
             correctedWebsite = "website",
             correctedPhoneNumber = "phone"
         )
