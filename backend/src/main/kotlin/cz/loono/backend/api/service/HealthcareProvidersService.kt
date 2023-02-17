@@ -108,7 +108,7 @@ class HealthcareProvidersService(
             updating = true
             try {
                 saveProviders(providers)
-                searchUpdatedProviders()
+                // searchUpdatedProviders()
                 setLastUpdate()
                 prepareAllProviders()
             } finally {
