@@ -67,7 +67,7 @@ class HealthcareProvidersServiceTest(
         healthcareProvidersService.updateData()
         val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
 
-       // healthcareProvidersService.prepareAllProviders()
+        // healthcareProvidersService.prepareAllProviders()
 
         try {
             assert(path.exists())
