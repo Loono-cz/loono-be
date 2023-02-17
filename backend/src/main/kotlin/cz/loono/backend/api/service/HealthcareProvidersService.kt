@@ -130,6 +130,7 @@ class HealthcareProvidersService(
     fun searchUpdatedProviders() {
         var skip = true
         val providersToUpdate = mutableListOf<HealthcareProvider>()
+        val inputUrl = URL("Neni pristup zvenci")
         val inputStream = this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
         val xlWb = XSSFWorkbook(inputStream)
         val xlWsProviders = xlWb.getSheetAt(2)
