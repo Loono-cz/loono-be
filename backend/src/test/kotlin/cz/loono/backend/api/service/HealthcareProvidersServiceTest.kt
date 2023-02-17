@@ -38,7 +38,6 @@ class HealthcareProvidersServiceTest(
             )
     }
 
-
     // Working but long test
     @Test
     @Disabled

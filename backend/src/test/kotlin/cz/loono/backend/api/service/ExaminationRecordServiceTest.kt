@@ -33,7 +33,6 @@ class ExaminationRecordServiceTest(
     private val selfExaminationRecordRepository: SelfExaminationRecordRepository,
     private val examinationRecordService: ExaminationRecordService
 ) {
-
     @Test
     fun `changing state for a non-existing user`() {
         assertThrows<LoonoBackendException>("Account not found") {
