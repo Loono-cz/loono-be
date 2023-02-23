@@ -2,7 +2,6 @@ package cz.loono.backend.schedule
 
 import com.google.gson.Gson
 import cz.loono.backend.api.exception.LoonoBackendException
-import cz.loono.backend.api.service.ConsultancyFormService
 import cz.loono.backend.api.smartemailng.AddUserEmailModel
 import cz.loono.backend.api.smartemailng.EmailContactInfoModel
 import cz.loono.backend.api.smartemailng.EmailContactListModel
