@@ -12,8 +12,8 @@ class EmailInterceptor(user: String?, password: String?) : Interceptor {
         val SMARTEMAILING_USER: String = System.getenv().getOrDefault("SMARTEMAILING_USER", "")
         val SMARTEMAILING_PSW: String = System.getenv().getOrDefault("SMARTEMAILING_PSW", "")
     }
-    private val credentials: String
 
+    private val credentials: String
     init {
         credentials = basic(user!!, password!!)
     }

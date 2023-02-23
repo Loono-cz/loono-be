@@ -41,6 +41,7 @@ class ConsultancyFormService(
             EmailInterceptor.SMARTEMAILING_PSW
         )
     ).build()
+
     fun testApi() {
         val request = Request.Builder()
             .url("https://app.smartemailing.cz/api/v3/ping")
@@ -58,7 +59,6 @@ class ConsultancyFormService(
             }
         })
     }
-
     fun testLogin() {
         val request = Request.Builder()
             .url("https://app.smartemailing.cz/api/v3/check-credentials")
