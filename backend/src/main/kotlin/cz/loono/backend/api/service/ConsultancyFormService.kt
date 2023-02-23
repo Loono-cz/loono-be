@@ -100,7 +100,7 @@ class ConsultancyFormService(
     }
 
     fun addContactToContactList() {
-        val emailContactListModel = listOf(EmailContactListModel(id = 73, status = "confirmed"))
+        val emailContactListModel = listOf(EmailContactListModel(id = 92, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
         val allAccounts = accountRepository.findAll()
         val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn }
