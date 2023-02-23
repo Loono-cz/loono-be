@@ -28,10 +28,12 @@ class UserSubscribeNewsletter(
 ) : DailySchedulerTask {
     override fun run() {
         val gson = Gson()
-        val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(
-            EmailInterceptor.SMARTEMAILING_USER,
-            EmailInterceptor.SMARTEMAILING_PSW
-        )).build()
+        val client = OkHttpClient().newBuilder().addInterceptor(
+            EmailInterceptor(
+                EmailInterceptor.SMARTEMAILING_USER,
+                EmailInterceptor.SMARTEMAILING_PSW
+            )
+        ).build()
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
 
         try {

@@ -33,11 +33,15 @@ class ConsultancyFormService(
     private val accountRepository: AccountRepository,
     private val consultancyLogRepository: ConsultancyLogRepository
 ) {
+
     val gson = Gson()
-    val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(
-        EmailInterceptor.SMARTEMAILING_USER,
-        EmailInterceptor.SMARTEMAILING_PSW
-    )).build()
+    val client = OkHttpClient().newBuilder().addInterceptor(
+        EmailInterceptor(
+            EmailInterceptor.SMARTEMAILING_USER,
+            EmailInterceptor.SMARTEMAILING_PSW
+        )
+    ).build()
+
     fun testApi() {
         val request = Request.Builder()
             .url("https://app.smartemailing.cz/api/v3/ping")
