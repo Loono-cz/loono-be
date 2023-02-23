@@ -8,6 +8,10 @@ import okhttp3.Response
 import java.io.IOException
 
 class EmailInterceptor(user: String?, password: String?) : Interceptor {
+    companion object {
+        val SMARTEMAILING_USER: String = System.getenv().getOrDefault("SMARTEMAILING_USER", "")
+        val SMARTEMAILING_PSW: String = System.getenv().getOrDefault("SMARTEMAILING_PSW", "")
+    }
     private val credentials: String
 
     init {

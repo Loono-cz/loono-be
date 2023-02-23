@@ -266,8 +266,8 @@ class HealthcareProvidersService(
                 .ifEmpty { correctedCategory.map(HealthcareCategory::value) }
                 .filterNot(removedCategories::contains),
             specialization = specialization,
-            lat = lat ?: correctedLat?: 0.0,
-            lng = lng ?: correctedLng?: 0.0
+            lat = lat ?: correctedLat ?: 0.0,
+            lng = lng ?: correctedLng ?: 0.0
         )
 
     @Suppress("UNCHECKED_CAST")
@@ -293,7 +293,7 @@ class HealthcareProvidersService(
             careForm = careForm,
             careType = careType,
             substitute = substitute,
-            lat = lat ?: correctedLat!!,
-            lng = lng ?: correctedLng!!
+            lat = lat ?: correctedLat ?: 0.0,
+            lng = lng ?: correctedLng ?: 0.0
         )
 }
