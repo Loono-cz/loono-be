@@ -2,6 +2,7 @@ package cz.loono.backend.schedule
 
 import com.google.gson.Gson
 import cz.loono.backend.api.exception.LoonoBackendException
+import cz.loono.backend.api.service.ConsultancyFormService
 import cz.loono.backend.api.smartemailng.AddUserEmailModel
 import cz.loono.backend.api.smartemailng.EmailContactInfoModel
 import cz.loono.backend.api.smartemailng.EmailContactListModel
@@ -28,12 +29,15 @@ class UserSubscribeNewsletter(
 ) : DailySchedulerTask {
     override fun run() {
         val gson = Gson()
-        val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o")).build()
+        val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(
+            EmailInterceptor.SMARTEMAILING_USER,
+            EmailInterceptor.SMARTEMAILING_PSW
+        )).build()
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
 
         try {
             val now = LocalDate.now()
-            val emailContactListModel = listOf(EmailContactListModel(id = 73))
+            val emailContactListModel = listOf(EmailContactListModel(id = 89))
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
