@@ -88,7 +88,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = true,
                 leaderboardAnonymizationOptIn = true,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -192,7 +192,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = true,
                 leaderboardAnonymizationOptIn = true,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         ).isEqualTo(accountDto)
         assert(exams.size == 3)
@@ -232,7 +232,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = false,
                 leaderboardAnonymizationOptIn = false,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -269,7 +269,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = false,
                 leaderboardAnonymizationOptIn = false,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -312,7 +312,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = false,
                 leaderboardAnonymizationOptIn = false,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -358,7 +358,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = false,
                 leaderboardAnonymizationOptIn = false,
                 profileImageUrl = "image",
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -396,7 +396,7 @@ class AccountServiceTest(
                 appointmentReminderEmailsOptIn = false,
                 leaderboardAnonymizationOptIn = false,
                 profileImageUrl = null,
-                createdAt = account.created.toString()
+                createdAt = account.created
             )
         )
     }
@@ -522,7 +522,7 @@ class AccountServiceTest(
             appointmentReminderEmailsOptIn = true,
             leaderboardAnonymizationOptIn = true,
             profileImageUrl = null,
-            createdAt = account.created.toString()
+            createdAt = account.created
         )
         assertThat(actual).isEqualTo(expected)
     }
@@ -609,7 +609,7 @@ class AccountServiceTest(
             appointmentReminderEmailsOptIn = true,
             leaderboardAnonymizationOptIn = true,
             profileImageUrl = null,
-            createdAt = account.created.toString()
+            createdAt = account.created
         )
         assertThat(actual).isEqualTo(expected)
     }
