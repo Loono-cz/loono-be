@@ -152,7 +152,8 @@ class AccountService(
             newsletterOptIn = account.newsletterOptIn,
             badges = account.badges
                 .map { BadgeDto(type = it.getBadgeAsEnum(), level = it.level) }
-                .sortedBy(BadgeDto::type)
+                .sortedBy(BadgeDto::type),
+            createdAt = account.created
         )
 
     fun paginateOverAccounts(transformPage: (List<Account>) -> Unit) {
