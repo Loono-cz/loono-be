@@ -80,7 +80,7 @@ class AccountControllerTest(
             newsletterOptIn = existingAccount.newsletterOptIn,
             points = existingAccount.points,
             badges = emptyList(),
-            createdAt = existingAccount.created.toString()
+            createdAt = existingAccount.created
         )
         assertEquals(expectedDto, actualDto)
     }

@@ -153,7 +153,7 @@ class AccountService(
             badges = account.badges
                 .map { BadgeDto(type = it.getBadgeAsEnum(), level = it.level) }
                 .sortedBy(BadgeDto::type),
-            createdAt = account.created.toString()
+            createdAt = account.created
         )
 
     fun paginateOverAccounts(transformPage: (List<Account>) -> Unit) {

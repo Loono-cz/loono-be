@@ -33,70 +33,15 @@ class ConsultancyFormService(
     private val accountRepository: AccountRepository,
     private val consultancyLogRepository: ConsultancyLogRepository
 ) {
-    companion object {
-        val SMARTEMAILING_USER: String = System.getenv().getOrDefault("SMARTEMAILING_USER", "")
-        val SMARTEMAILING_PSW: String = System.getenv().getOrDefault("SMARTEMAILING_PSW", "")
-    }
+
     val gson = Gson()
-    val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor(SMARTEMAILING_USER, SMARTEMAILING_PSW)).build()
-    fun testApi() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/ping")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                println(response.body)
-            }
-        })
-    }
-
-    fun testLogin() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/check-credentials")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                println(response.body)
-            }
-        })
-    }
-
-    fun getContactList() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/contactlists/73")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    println(response.body)
-                } else {
-                    println(response.body)
-                }
-            }
-        })
-    }
-
+    val client = OkHttpClient().newBuilder().addInterceptor(
+        EmailInterceptor(
+            EmailInterceptor.SMARTEMAILING_USER,
+            EmailInterceptor.SMARTEMAILING_PSW
+        )
+    ).build()
+    
     fun addContactToContactList() {
         val emailContactListModel = listOf(EmailContactListModel(id = 73, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
@@ -143,7 +88,44 @@ class ConsultancyFormService(
                         )
                     )
                 }
+
+                val emailBody = AddUserEmailModel(
+                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    data = emailContactInfoModelList
+                )
+
+                val request = Request.Builder()
+                    .url("https://app.smartemailing.cz/api/v3/import")
+                    .addHeader("Content-Type", "application/json")
+                    .post(gson.toJson(emailBody).toRequestBody())
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        println(e)
+                        throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            println(response.body)
+                        } else {
+                            println(response.body)
+                        }
+                    }
+                })
+                emailContactInfoModelList.clear()
             } catch (e: Exception) {
+                consultancyLogRepository.save(
+                    ConsultancyLog(
+                        accountUid = "USER_IMPORT",
+                        message = "$e",
+                        tag = "${e.cause}",
+                        passed = false,
+                        caughtException = "${e.message}",
+                        createdAt = LocalDateTime.now().toString()
+                    )
+                )
                 throw LoonoBackendException(
                     status = HttpStatus.SERVICE_UNAVAILABLE,
                     errorMessage = e.toString(),

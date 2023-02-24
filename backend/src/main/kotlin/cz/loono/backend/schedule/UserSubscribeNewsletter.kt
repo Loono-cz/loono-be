@@ -28,12 +28,17 @@ class UserSubscribeNewsletter(
 ) : DailySchedulerTask {
     override fun run() {
         val gson = Gson()
-        val client = OkHttpClient().newBuilder().addInterceptor(EmailInterceptor("poradna@loono.cz", "pceabbaif4utnwjefhb1galhg638qrys8u2w622o")).build()
+        val client = OkHttpClient().newBuilder().addInterceptor(
+            EmailInterceptor(
+                EmailInterceptor.SMARTEMAILING_USER,
+                EmailInterceptor.SMARTEMAILING_PSW
+            )
+        ).build()
+        val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
 
         try {
             val now = LocalDate.now()
-            val emailContactListModel = listOf(EmailContactListModel(id = 73))
-            val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
+            val emailContactListModel = listOf(EmailContactListModel(id = 89))
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
@@ -76,6 +81,32 @@ class UserSubscribeNewsletter(
                         )
                     )
                 }
+                val emailBody = AddUserEmailModel(
+                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    data = emailContactInfoModelList
+                )
+
+                val request = Request.Builder()
+                    .url("https://app.smartemailing.cz/api/v3/import")
+                    .addHeader("Content-Type", "application/json")
+                    .post(gson.toJson(emailBody).toRequestBody())
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        println(e)
+                        throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            println(response.body)
+                        } else {
+                            println(response.body)
+                        }
+                    }
+                })
+                emailContactInfoModelList.clear()
             }
             cronLogRepository.save(
                 CronLog(
