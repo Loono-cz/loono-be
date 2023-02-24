@@ -47,4 +47,6 @@ class HealthcareProvidersController(
         providerIdListDto: HealthcareProviderIdListDto
     ): HealthcareProviderDetailListDto =
         healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
+    @PostMapping(value = ["/updateCorrectedProviders"])
+    fun updateCorrectedData() = healthCareProvidersService.searchUpdatedProviders()
 }

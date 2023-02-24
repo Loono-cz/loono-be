@@ -1,7 +1,6 @@
 package cz.loono.backend.api.service
 
 import cz.loono.backend.db.model.HealthcareProvider
-import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import org.junit.jupiter.api.Test
@@ -14,15 +13,12 @@ class HealthcareProvidersServiceBatchTest {
 
     private var healthcareProviderRepository: HealthcareProviderRepository = mock()
 
-    private var healthcareCategoryRepository: HealthcareCategoryRepository = mock()
-
     private var serverPropertiesRepository: ServerPropertiesRepository = mock()
 
     @Test
     fun `save empty providers list`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
 
@@ -35,7 +31,6 @@ class HealthcareProvidersServiceBatchTest {
     fun `save bellow 100 count`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val list = generateProviderList(98)
@@ -49,7 +44,6 @@ class HealthcareProvidersServiceBatchTest {
     fun `save almost 40k records`() {
         val healthcareProvidersService = HealthcareProvidersService(
             healthcareProviderRepository,
-            healthcareCategoryRepository,
             serverPropertiesRepository
         )
         val list = generateProviderList(39920)

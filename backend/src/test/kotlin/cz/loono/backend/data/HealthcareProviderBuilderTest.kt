@@ -1,8 +1,8 @@
 package cz.loono.backend.data
 
+import com.google.gson.Gson
 import cz.loono.backend.data.constants.CategoryValues
 import cz.loono.backend.data.constants.PersonType
-import cz.loono.backend.db.model.HealthcareCategory
 import cz.loono.backend.db.model.HealthcareProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -25,7 +25,8 @@ class HealthcareProviderBuilderTest {
         val healthcareProvider = healthcareProviderBuilder.build()
 
         assert(healthcareProvider.title == "")
-        assert(healthcareProvider.category.isEmpty())
+
+        assert(healthcareProvider.categories == null)
     }
 
     @Test
@@ -112,15 +113,8 @@ class HealthcareProviderBuilderTest {
         healthcareProviderBuilder.withCategories()
         val healthcareProvider = healthcareProviderBuilder.build()
 
-        assert(healthcareProvider.category.isNotEmpty())
-        assert(
-            healthcareProvider.category == setOf(
-                HealthcareCategory(
-                    value = CategoryValues.PHYSIOTHERAPY.value,
-                    healthcareProviders = emptySet()
-                )
-            )
-        )
+        assert(healthcareProvider.categories != null)
+        assert(healthcareProvider.categories == Gson().toJson(listOf(CategoryValues.PHYSIOTHERAPY.name)))
     }
 
     @Test
@@ -131,8 +125,7 @@ class HealthcareProviderBuilderTest {
 
         healthcareProviderBuilder.withCategories()
         val healthcareProvider = healthcareProviderBuilder.build()
-
-        assert(healthcareProvider.category.isEmpty())
+        assert(healthcareProvider.categories == null)
     }
 
     @Test
@@ -144,17 +137,13 @@ class HealthcareProviderBuilderTest {
         healthcareProviderBuilder.withCategories()
         val healthcareProvider = healthcareProviderBuilder.build()
 
-        assert(healthcareProvider.category.isNotEmpty())
+        assert(healthcareProvider.categories != null)
         assert(
-            healthcareProvider.category == setOf(
-                HealthcareCategory(
-                    value = CategoryValues.PHYSIOTHERAPY.value
-                ),
-                HealthcareCategory(
-                    value = CategoryValues.REHABILITATION.value
-                ),
-                HealthcareCategory(
-                    value = CategoryValues.NUTRITION.value
+            healthcareProvider.categories == Gson().toJson(
+                listOf(
+                    CategoryValues.REHABILITATION.name,
+                    CategoryValues.NUTRITION.name,
+                    CategoryValues.PHYSIOTHERAPY.name
                 )
             )
         )

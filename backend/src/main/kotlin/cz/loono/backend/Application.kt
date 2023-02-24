@@ -53,6 +53,7 @@ class Config(
         "$apiVersion/providers/all",
         "$apiVersion/providers/details",
         "$apiVersion/providers/lastupdate",
+        "$apiVersion/providers/updateCorrectedProviders",
         "$apiVersion/feedback",
         "$apiVersion/testCall",
         "$apiVersion/addEmailUser",

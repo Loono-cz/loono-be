@@ -1,6 +1,7 @@
 package cz.loono.backend.api.service
 
 import com.google.gson.Gson
+import cz.loono.backend.api.dto.HealthcareCategoryTypeDto
 import cz.loono.backend.api.dto.HealthcareProviderDetailDto
 import cz.loono.backend.api.dto.HealthcareProviderDetailListDto
 import cz.loono.backend.api.dto.HealthcareProviderIdDto
@@ -11,13 +12,15 @@ import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.data.HealthcareCSVParser
 import cz.loono.backend.data.constants.CategoryValues
 import cz.loono.backend.data.constants.Constants.OPEN_DATA_URL
-import cz.loono.backend.db.model.HealthcareCategory
 import cz.loono.backend.db.model.HealthcareProvider
 import cz.loono.backend.db.model.HealthcareProviderId
 import cz.loono.backend.db.model.ServerProperties
-import cz.loono.backend.db.repository.HealthcareCategoryRepository
 import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
+import cz.loono.backend.extensions.trimProviderImport
+import cz.loono.backend.extensions.trimProviderNumber
+import org.apache.poi.xssf.usermodel.XSSFCell
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -44,7 +47,6 @@ import kotlin.io.path.exists
 @Service
 class HealthcareProvidersService(
     private val healthcareProviderRepository: HealthcareProviderRepository,
-    private val healthcareCategoryRepository: HealthcareCategoryRepository,
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -105,8 +107,8 @@ class HealthcareProvidersService(
         if (providers.isNotEmpty()) {
             updating = true
             try {
-                saveCategories()
                 saveProviders(providers)
+                // searchUpdatedProviders()
                 setLastUpdate()
                 prepareAllProviders()
             } finally {
@@ -122,6 +124,87 @@ class HealthcareProvidersService(
         }
         logger.info("Update finished.")
         return UpdateStatusMessageDto("Data successfully updated.")
+    }
+
+    @Synchronized
+    fun searchUpdatedProviders() {
+        var skip = true
+        val providersToUpdate = mutableListOf<HealthcareProvider>()
+        val inputStream = this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
+        val xlWb = XSSFWorkbook(inputStream)
+        val xlWsProviders = xlWb.getSheetAt(2)
+
+        xlWsProviders.forEach { row ->
+            if (skip) {
+                skip = false
+            } else {
+                val provider = HealthcareProvider(
+                    locationId = row.getCell(0).toString().toDouble().toLong(),
+                    institutionId = row.getCell(1).toString().toDouble().toLong(),
+                    title = row.getCell(2).toString(),
+                    institutionType = row.getCell(3).toString(),
+                    city = row.getCell(4).toString(),
+                    postalCode = row.getCell(5).toString().trimProviderNumber(),
+                    street = row.getCell(6)?.toString().trimProviderImport(),
+                    houseNumber = row.getCell(7).toString(),
+                    region = row.getCell(8).toString(),
+                    district = row.getCell(9).toString(),
+                    correctedPhoneNumber = (row.getCell(10) as XSSFCell).rawValue?.toString()?.trimProviderNumber(),
+                    email = row.getCell(11)?.toString().trimProviderImport(),
+                    correctedWebsite = row.getCell(12)?.toString().trimProviderImport(),
+                    ico = (row.getCell(13) as XSSFCell).rawValue.toString().trimProviderNumber(),
+                    hqCity = row.getCell(14)?.toString().trimProviderImport(),
+                    hqDistrict = row.getCell(15)?.toString().trimProviderImport(),
+                    hqHouseNumber = row.getCell(16)?.toString().trimProviderImport(),
+                    hqPostalCode = row.getCell(17)?.toString().trimProviderImport()?.trimProviderNumber(),
+                    hqRegion = row.getCell(18)?.toString().trimProviderImport(),
+                    hqStreet = row.getCell(19)?.toString().trimProviderImport(),
+                    specialization = row.getCell(20)?.toString().trimProviderImport(),
+                    careForm = row.getCell(21)?.toString().trimProviderImport(),
+                    correctedLat = row.getCell(22)?.toString().trimProviderImport()?.toDouble(),
+                    correctedLng = row.getCell(23)?.toString().trimProviderImport()?.toDouble(),
+                    categories = Gson().toJson(setCategoriesValueToEnum(row.getCell(24).toString()))
+
+                )
+                providersToUpdate.add(provider)
+            }
+        }
+        skip = true
+
+        providersToUpdate.forEach {
+            val findProvider = healthcareProviderRepository.findById(HealthcareProviderId(locationId = it.locationId, institutionId = it.institutionId))
+            if (findProvider.isEmpty) {
+                healthcareProviderRepository.save(it)
+            } else {
+                healthcareProviderRepository.updateProvider(
+                    title = it.title,
+                    institutionType = it.institutionType,
+                    city = it.city,
+                    postalCode = it.postalCode,
+                    street = it.street,
+                    houseNumber = it.houseNumber,
+                    region = it.region,
+                    district = it.district,
+                    correctedPhoneNumber = it.correctedPhoneNumber,
+                    email = it.email,
+                    correctedWebsite = it.correctedWebsite,
+                    ico = it.ico,
+                    hqCity = it.hqCity,
+                    hqDistrict = it.hqDistrict,
+                    hqHouseNumber = it.hqHouseNumber,
+                    hqPostalCode = it.hqPostalCode,
+                    hqRegion = it.hqRegion,
+                    hqStreet = it.hqStreet,
+                    specialization = it.specialization,
+                    careForm = it.careForm,
+                    correctedLat = it.correctedLat,
+                    correctedLng = it.correctedLng,
+                    categories = it.categories,
+                    locationId = it.locationId,
+                    institutionId = it.institutionId
+                )
+            }
+        }
     }
 
     @Synchronized
@@ -148,13 +231,6 @@ class HealthcareProvidersService(
     }
 
     @Synchronized
-    @Transactional
-    fun saveCategories() {
-        val categoryValues = CategoryValues.values().map { HealthcareCategory(value = it.value) }
-        healthcareCategoryRepository.saveAll(categoryValues)
-    }
-
-    @Synchronized
     @Transactional(rollbackFor = [Exception::class])
     fun setLastUpdate() {
         val serverProperties = serverPropertiesRepository.findAll()
@@ -172,10 +248,19 @@ class HealthcareProvidersService(
     fun prepareAllProviders() {
         val count = storedProvidersCount()
         val providers = LinkedHashSet<SimpleHealthcareProviderDto>(count)
+
         val cycles = count.div(batchSize)
         for (i in 0..cycles) {
             providers.addAll(findPage(i))
         }
+
+//        val allFilteredProviders = healthcareProviderRepository.findAll()
+//            .filter { (it.lat != null && it.lng != null) || (it.correctedLat != null && it.correctedLng != null) }
+//            .toSet()
+//            .map { it.simplify() }
+//            .filter { it.category.isNotEmpty() }
+//
+//        providers.addAll(allFilteredProviders)
         zipProviders(providers)
     }
 
@@ -252,6 +337,59 @@ class HealthcareProvidersService(
             )
         )
 
+    fun setCategoriesValueToEnum(value: String): List<String> {
+        val categories = mutableListOf<String>()
+        if (value.contains(",")) {
+            val findFullText = CategoryValues.values().firstOrNull { it.value == value }
+            if (findFullText == null) {
+                if (value.contains("Anesteziologie, ARO, intenzivní péče"))
+                    categories.add(HealthcareCategoryTypeDto.ANESTHESIOLOGY_ARO.value)
+                if (value.contains("Angiologie, cévní"))
+                    categories.add(HealthcareCategoryTypeDto.ANGIOLOGY.value)
+                if (value.contains("Endokrinologie, hormony"))
+                    categories.add(HealthcareCategoryTypeDto.ENDOCRINOLOGY.value)
+                if (value.contains("Dermatovenerologie, kožní"))
+                    categories.add(HealthcareCategoryTypeDto.DERMATOVENEROLOGY.value)
+                if (value.contains("Geriatrie, medicína stáří, senioři"))
+                    categories.add(HealthcareCategoryTypeDto.GERIATRICS.value)
+                if (value.contains("Hematologie, krevní"))
+                    categories.add(HealthcareCategoryTypeDto.HEMATOLOGY.value)
+                if (value.contains("Interna, vnitřní lékařství"))
+                    categories.add(HealthcareCategoryTypeDto.INTERNAL_MEDICINE.value)
+                if (value.contains("Nefrologie, ledviny"))
+                    categories.add(HealthcareCategoryTypeDto.NEPHROLOGY.value)
+                if (value.contains("Pneumologie, plicní"))
+                    categories.add(HealthcareCategoryTypeDto.PNEUMOLOGY.value)
+                if (value.contains("Výživa, nutriční"))
+                    categories.add(HealthcareCategoryTypeDto.NUTRITION.value)
+
+                val categoriesValues = value.split(", ")
+                categoriesValues.forEach { categoryValue ->
+                    CategoryValues.values().firstOrNull { it.value == categoryValue }?.let { it1 ->
+                        categories.add(it1.name)
+                    }
+                }
+            } else {
+                categories.add(findFullText.name)
+            }
+        } else {
+            CategoryValues.values().firstOrNull { it.value == value }?.let { it1 ->
+                categories.add(it1.name)
+            }
+        }
+        return categories
+    }
+
+    fun castCategoriesJsonToCorrectList(json: String?): List<String> {
+        val resultList = mutableListOf<String>()
+        if (!json.isNullOrEmpty()) {
+            val listOfEnum = Gson().fromJson(json, Array<String>::class.java).asList()
+            listOfEnum.forEach {
+                resultList.add(CategoryValues.valueOf(it).value)
+            }
+        }
+        return resultList
+    }
     @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.simplify(): SimpleHealthcareProviderDto =
         SimpleHealthcareProviderDto(
@@ -262,14 +400,13 @@ class HealthcareProvidersService(
             houseNumber = houseNumber,
             city = city,
             postalCode = postalCode,
-            category = category.map(HealthcareCategory::value)
-                .ifEmpty { correctedCategory.map(HealthcareCategory::value) }
-                .filterNot(removedCategories::contains),
+            category = castCategoriesJsonToCorrectList(categories),
             specialization = specialization,
-            lat = lat ?: correctedLat ?: 0.0,
-            lng = lng ?: correctedLng ?: 0.0
+            lat = correctedLat ?: lat ?: 0.0,
+            lng = correctedLng ?: lng ?: 0.0
         )
 
+    // TODO tady se vybira zda corrected data nebo puvodni
     @Suppress("UNCHECKED_CAST")
     fun HealthcareProvider.getDetails(): HealthcareProviderDetailDto =
         HealthcareProviderDetailDto(
@@ -286,14 +423,12 @@ class HealthcareProvidersService(
             email = email,
             website = website ?: correctedWebsite,
             ico = ico,
-            category = category.map(HealthcareCategory::value)
-                .ifEmpty { correctedCategory.map(HealthcareCategory::value) }
-                .filterNot(removedCategories::contains),
+            category = castCategoriesJsonToCorrectList(categories),
             specialization = specialization,
             careForm = careForm,
             careType = careType,
             substitute = substitute,
-            lat = lat ?: correctedLat ?: 0.0,
-            lng = lng ?: correctedLng ?: 0.0
+            lat = correctedLat ?: lat ?: 0.0,
+            lng = correctedLng ?: lng ?: 0.0
         )
 }

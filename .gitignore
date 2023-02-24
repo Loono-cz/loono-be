@@ -17,3 +17,4 @@ out/
 .terraform.lock.hcl
 *.tfvars
 backend/src/main/resources/doc/openapi.json
+*.zip

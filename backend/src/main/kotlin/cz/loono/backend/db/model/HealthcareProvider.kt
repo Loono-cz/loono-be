@@ -1,17 +1,11 @@
 package cz.loono.backend.db.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.envers.Audited
 import java.time.LocalDateTime
-import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
 import javax.persistence.Id
 import javax.persistence.IdClass
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
 import javax.persistence.Table
 
 @Entity
@@ -118,17 +112,8 @@ data class HealthcareProvider(
     @Column(nullable = false, columnDefinition = "TEXT")
     val specialization: String? = null,
 
-    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinTable(
-        name = "healthcare_provider_category",
-        joinColumns = [
-            JoinColumn(name = "location_id", referencedColumnName = "location_id"),
-            JoinColumn(name = "institution_id", referencedColumnName = "institution_id")
-        ],
-        inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "id")]
-    )
-    val category: Set<HealthcareCategory> = mutableSetOf(),
+    @Column(nullable = false, columnDefinition = "TEXT")
+    val categories: String? = null,
 
     @Column(columnDefinition = "TEXT")
     val careForm: String? = null,
@@ -147,19 +132,6 @@ data class HealthcareProvider(
 
     @Column(nullable = false)
     val lastUpdated: LocalDateTime = LocalDateTime.now(),
-
-    // Data correction fields
-    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinTable(
-        name = "corrected_healthcare_provider_category",
-        joinColumns = [
-            JoinColumn(name = "location_id", referencedColumnName = "location_id"),
-            JoinColumn(name = "institution_id", referencedColumnName = "institution_id")
-        ],
-        inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "id")]
-    )
-    val correctedCategory: Set<HealthcareCategory> = mutableSetOf(),
 
     @Column(columnDefinition = "TEXT")
     val correctedPhoneNumber: String? = null,
@@ -195,6 +167,6 @@ data class HealthcareProvider(
         "$locationId,$institutionId,$code,$title,$institutionType,$city,$postalCode,$street,$houseNumber,$region," +
             "$regionCode,$district,$districtCode,$administrativeDistrict,$phoneNumber,$fax,$email,$website,$ico," +
             "$personTypeCode,$lawyerFormCode,$layerForm,$personType,$hqRegion,$hqRegionCode,$hqDistrict,$hqDistrictCode," +
-            "$hqCity,$hqPostalCode,$hqStreet,$hqHouseNumber,$specialization,$category,$careForm,$careType,$substitute," +
+            "$hqCity,$hqPostalCode,$hqStreet,$hqHouseNumber,$specialization,$categories,$careForm,$careType,$substitute," +
             "$lat,$lng"
 }
