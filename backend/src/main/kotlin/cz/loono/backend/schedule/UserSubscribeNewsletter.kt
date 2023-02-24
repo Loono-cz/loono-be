@@ -38,7 +38,7 @@ class UserSubscribeNewsletter(
 
         try {
             val now = LocalDate.now()
-            val emailContactListModel = listOf(EmailContactListModel(id = 89))
+            val emailContactListModel = listOf(EmailContactListModel(id = 92))
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
 
