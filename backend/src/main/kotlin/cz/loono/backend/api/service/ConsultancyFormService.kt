@@ -42,63 +42,6 @@ class ConsultancyFormService(
         )
     ).build()
 
-    fun testApi() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/ping")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                println(response.body)
-            }
-        })
-    }
-    fun testLogin() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/check-credentials")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                println(response.body)
-            }
-        })
-    }
-
-    fun getContactList() {
-        val request = Request.Builder()
-            .url("https://app.smartemailing.cz/api/v3/contactlists/73")
-            .addHeader("Content-Type", "application/json")
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println(e)
-                throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    println(response.body)
-                } else {
-                    println(response.body)
-                }
-            }
-        })
-    }
-
     fun addContactToContactList() {
         val emailContactListModel = listOf(EmailContactListModel(id = 73, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()

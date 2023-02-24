@@ -19,11 +19,21 @@ class ConsultancyFormController(
 ) {
     @PostMapping
     @ManagedOperation
-    fun updateOrCreate(
+    fun sendConsultancyEmail(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
         @RequestBody
         content: ConsultancyFormContentDto
     ) = consultancyFormService.sendEmailQuestion(basicUser.uid, content)
+}
+
+@RestController
+@RequestMapping("/v1/addEmailUser", produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["app-version"])
+class EmailController(
+    private val consultancyFormService: ConsultancyFormService,
+) {
+    @PostMapping
+    @ManagedOperation
+    fun addContactToList() = consultancyFormService.addContactToContactList()
 }
