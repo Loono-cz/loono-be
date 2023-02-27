@@ -212,7 +212,7 @@ class HealthcareProvidersService(
                     )
                 }
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE, e.message, e.localizedMessage)
         }
     }
