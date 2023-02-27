@@ -304,7 +304,8 @@ class ExaminationRecordService(
                 customInterval = examinationRecordDto.customInterval,
                 periodicExam = examinationRecordDto.periodicExam,
                 examinationCategoryType = examinationRecordDto.examinationCategoryType ?: ExaminationCategoryTypeDto.MANDATORY,
-                examinationActionType = examinationRecordDto.examinationActionType ?: ExaminationActionTypeDto.EXAMINATION
+                examinationActionType = examinationRecordDto.examinationActionType ?: ExaminationActionTypeDto.EXAMINATION,
+                createdAt = examinationRecordDto.createdAt
             )
         ).toExaminationRecordDto()
     }
@@ -522,6 +523,7 @@ class ExaminationRecordService(
             customInterval = customInterval,
             examinationCategoryType = examinationCategoryType,
             status = status,
-            examinationActionType = examinationActionType
+            examinationActionType = examinationActionType,
+            createdAt = createdAt
         )
 }
