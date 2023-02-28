@@ -217,7 +217,6 @@ class HealthcareProvidersService(
         }
     }
 
-
     @Synchronized
     fun saveProviders(providers: List<HealthcareProvider>) {
         if (providers.isEmpty()) {
