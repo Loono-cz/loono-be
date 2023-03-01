@@ -135,7 +135,8 @@ class PreventionService(
             periodicExam = sortedExamsOfType[0].periodicExam,
             customInterval = sortedExamsOfType[0].customInterval,
             examinationActionType = sortedExamsOfType[0].examinationActionType,
-            note = sortedExamsOfType[0].note
+            note = sortedExamsOfType[0].note,
+            createdAt = sortedExamsOfType[0].createdAt
         )
     }
 
@@ -160,7 +161,8 @@ class PreventionService(
                     periodicExam = customExam.periodicExam,
                     customInterval = customExam.customInterval,
                     examinationActionType = customExam.examinationActionType,
-                    note = customExam.note
+                    note = customExam.note,
+                    createdAt = customExam.createdAt
                 )
             }
         } catch (e: Exception) {

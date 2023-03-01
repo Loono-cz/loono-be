@@ -6,6 +6,7 @@ import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
 import org.hibernate.Hibernate
 import org.hibernate.envers.Audited
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -62,6 +63,9 @@ data class ExaminationRecord(
     @Enumerated(EnumType.STRING)
     @Column(nullable = true, columnDefinition = "TEXT")
     var examinationActionType: ExaminationActionTypeDto = ExaminationActionTypeDto.EXAMINATION,
+
+    @Column
+    val createdAt: LocalDate? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
