@@ -125,9 +125,8 @@ class HealthcareProvidersService(
         logger.info("Update finished.")
         return UpdateStatusMessageDto("Data successfully updated.")
     }
-
     @Synchronized
-    fun searchUpdatedProviders() {
+    fun searchUpdatedProviders(): UpdateStatusMessageDto {
         try {
             var skip = true
             val providersToUpdate = mutableListOf<HealthcareProvider>()
@@ -212,6 +211,7 @@ class HealthcareProvidersService(
                     )
                 }
             }
+            return UpdateStatusMessageDto("Corrected data successfully updated.")
         } catch (e: Exception) {
             throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE, e.message, e.localizedMessage)
         }
