@@ -19,6 +19,10 @@ import cz.loono.backend.db.repository.HealthcareProviderRepository
 import cz.loono.backend.db.repository.ServerPropertiesRepository
 import cz.loono.backend.extensions.trimProviderImport
 import cz.loono.backend.extensions.trimProviderNumber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
@@ -50,7 +54,7 @@ class HealthcareProvidersService(
     private val serverPropertiesRepository: ServerPropertiesRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
-
+    private var scopeUpdateCorrectedData: Job? = null
     private val batchSize = 500
     private var updating = false
     private var zipFilePath = Path.of("init")
@@ -88,7 +92,8 @@ class HealthcareProvidersService(
         CategoryValues.BIOMEDICAL_TECHNICIAN.value
     )
 
-    @Scheduled(cron = "\${scheduler.cron.data-update}") // each the 2nd day of month at 2AM
+    // Scheduled is commented as Loono does not want automatic update
+    // @Scheduled(cron = "\${scheduler.cron.data-update}") // each the 2nd day of month at 2AM
     @Synchronized
     fun updateData(): UpdateStatusMessageDto {
         updating = true
@@ -108,7 +113,6 @@ class HealthcareProvidersService(
             updating = true
             try {
                 saveProviders(providers)
-                // searchUpdatedProviders()
                 setLastUpdate()
                 prepareAllProviders()
             } finally {
@@ -127,93 +131,107 @@ class HealthcareProvidersService(
     }
     @Synchronized
     fun searchUpdatedProviders(): UpdateStatusMessageDto {
-        try {
-            var skip = true
-            val providersToUpdate = mutableListOf<HealthcareProvider>()
-            val inputStream =
-                this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
-            val xlWb = XSSFWorkbook(inputStream)
-            val xlWsProviders = xlWb.getSheetAt(2)
+        if (scopeUpdateCorrectedData == null) {
+            scopeUpdateCorrectedData = CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    var skip = true
+                    val providersToUpdate = mutableListOf<HealthcareProvider>()
+                    val inputStream =
+                        this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
+                    val xlWb = XSSFWorkbook(inputStream)
+                    val xlWsProviders = xlWb.getSheetAt(2)
 
-            xlWsProviders.forEach { row ->
-                if (skip) {
-                    skip = false
-                } else {
-                    val provider = HealthcareProvider(
-                        locationId = row.getCell(0).toString().toDouble().toLong(),
-                        institutionId = row.getCell(1).toString().toDouble().toLong(),
-                        title = row.getCell(2).toString(),
-                        institutionType = row.getCell(3).toString(),
-                        city = row.getCell(4).toString(),
-                        postalCode = row.getCell(5).toString().trimProviderNumber(),
-                        street = row.getCell(6)?.toString().trimProviderImport(),
-                        houseNumber = row.getCell(7).toString(),
-                        region = row.getCell(8).toString(),
-                        district = row.getCell(9).toString(),
-                        correctedPhoneNumber = (row.getCell(10) as XSSFCell).rawValue?.toString()?.trimProviderNumber(),
-                        email = row.getCell(11)?.toString().trimProviderImport(),
-                        correctedWebsite = row.getCell(12)?.toString().trimProviderImport(),
-                        ico = (row.getCell(13) as XSSFCell).rawValue.toString().trimProviderNumber(),
-                        hqCity = row.getCell(14)?.toString().trimProviderImport(),
-                        hqDistrict = row.getCell(15)?.toString().trimProviderImport(),
-                        hqHouseNumber = row.getCell(16)?.toString().trimProviderImport(),
-                        hqPostalCode = row.getCell(17)?.toString().trimProviderImport()?.trimProviderNumber(),
-                        hqRegion = row.getCell(18)?.toString().trimProviderImport(),
-                        hqStreet = row.getCell(19)?.toString().trimProviderImport(),
-                        specialization = row.getCell(20)?.toString().trimProviderImport(),
-                        careForm = row.getCell(21)?.toString().trimProviderImport(),
-                        correctedLat = row.getCell(22)?.toString().trimProviderImport()?.toDouble(),
-                        correctedLng = row.getCell(23)?.toString().trimProviderImport()?.toDouble(),
-                        categories = Gson().toJson(setCategoriesValueToEnum(row.getCell(24).toString()))
+                    xlWsProviders.forEach { row ->
+                        if (skip) {
+                            skip = false
+                        } else {
+                            val provider = HealthcareProvider(
+                                locationId = row.getCell(0).toString().toDouble().toLong(),
+                                institutionId = row.getCell(1).toString().toDouble().toLong(),
+                                title = row.getCell(2).toString(),
+                                institutionType = row.getCell(3).toString(),
+                                city = row.getCell(4).toString(),
+                                postalCode = row.getCell(5).toString().trimProviderNumber(),
+                                street = row.getCell(6)?.toString().trimProviderImport(),
+                                houseNumber = row.getCell(7).toString(),
+                                region = row.getCell(8).toString(),
+                                district = row.getCell(9).toString(),
+                                correctedPhoneNumber = (row.getCell(10) as XSSFCell).rawValue?.toString()?.trimProviderNumber(),
+                                email = row.getCell(11)?.toString().trimProviderImport(),
+                                correctedWebsite = row.getCell(12)?.toString().trimProviderImport(),
+                                ico = (row.getCell(13) as XSSFCell).rawValue.toString().trimProviderNumber(),
+                                hqCity = row.getCell(14)?.toString().trimProviderImport(),
+                                hqDistrict = row.getCell(15)?.toString().trimProviderImport(),
+                                hqHouseNumber = row.getCell(16)?.toString().trimProviderImport(),
+                                hqPostalCode = row.getCell(17)?.toString().trimProviderImport()?.trimProviderNumber(),
+                                hqRegion = row.getCell(18)?.toString().trimProviderImport(),
+                                hqStreet = row.getCell(19)?.toString().trimProviderImport(),
+                                specialization = row.getCell(20)?.toString().trimProviderImport(),
+                                careForm = row.getCell(21)?.toString().trimProviderImport(),
+                                correctedLat = row.getCell(22)?.toString().trimProviderImport()?.toDouble(),
+                                correctedLng = row.getCell(23)?.toString().trimProviderImport()?.toDouble(),
+                                categories = Gson().toJson(setCategoriesValueToEnum(row.getCell(24).toString()))
 
-                    )
-                    providersToUpdate.add(provider)
+                            )
+                            providersToUpdate.add(provider)
+                        }
+                    }
+                    skip = true
+
+                    providersToUpdate.forEach {
+                        val findProvider = healthcareProviderRepository.findById(
+                            HealthcareProviderId(
+                                locationId = it.locationId,
+                                institutionId = it.institutionId
+                            )
+                        )
+                        if (findProvider.isEmpty) {
+                            healthcareProviderRepository.save(it)
+                        } else {
+                            healthcareProviderRepository.updateProvider(
+                                title = it.title,
+                                institutionType = it.institutionType,
+                                city = it.city,
+                                postalCode = it.postalCode,
+                                street = it.street,
+                                houseNumber = it.houseNumber,
+                                region = it.region,
+                                district = it.district,
+                                correctedPhoneNumber = it.correctedPhoneNumber,
+                                email = it.email,
+                                correctedWebsite = it.correctedWebsite,
+                                ico = it.ico,
+                                hqCity = it.hqCity,
+                                hqDistrict = it.hqDistrict,
+                                hqHouseNumber = it.hqHouseNumber,
+                                hqPostalCode = it.hqPostalCode,
+                                hqRegion = it.hqRegion,
+                                hqStreet = it.hqStreet,
+                                specialization = it.specialization,
+                                careForm = it.careForm,
+                                correctedLat = it.correctedLat,
+                                correctedLng = it.correctedLng,
+                                categories = it.categories,
+                                locationId = it.locationId,
+                                institutionId = it.institutionId
+                            )
+                        }
+                    }
+                    prepareAllProviders()
+                } catch (e: Exception) {
+                    throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE, e.message, e.localizedMessage)
                 }
             }
-            skip = true
-
-            providersToUpdate.forEach {
-                val findProvider = healthcareProviderRepository.findById(
-                    HealthcareProviderId(
-                        locationId = it.locationId,
-                        institutionId = it.institutionId
-                    )
-                )
-                if (findProvider.isEmpty) {
-                    healthcareProviderRepository.save(it)
-                } else {
-                    healthcareProviderRepository.updateProvider(
-                        title = it.title,
-                        institutionType = it.institutionType,
-                        city = it.city,
-                        postalCode = it.postalCode,
-                        street = it.street,
-                        houseNumber = it.houseNumber,
-                        region = it.region,
-                        district = it.district,
-                        correctedPhoneNumber = it.correctedPhoneNumber,
-                        email = it.email,
-                        correctedWebsite = it.correctedWebsite,
-                        ico = it.ico,
-                        hqCity = it.hqCity,
-                        hqDistrict = it.hqDistrict,
-                        hqHouseNumber = it.hqHouseNumber,
-                        hqPostalCode = it.hqPostalCode,
-                        hqRegion = it.hqRegion,
-                        hqStreet = it.hqStreet,
-                        specialization = it.specialization,
-                        careForm = it.careForm,
-                        correctedLat = it.correctedLat,
-                        correctedLng = it.correctedLng,
-                        categories = it.categories,
-                        locationId = it.locationId,
-                        institutionId = it.institutionId
-                    )
-                }
+            return UpdateStatusMessageDto("Corrected data update is running in coroutine.")
+        } else {
+            if (scopeUpdateCorrectedData?.isActive == true) {
+                return UpdateStatusMessageDto("Corrected data update is running active.")
             }
-            return UpdateStatusMessageDto("Corrected data successfully updated.")
-        } catch (e: Exception) {
-            throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE, e.message, e.localizedMessage)
+            if (scopeUpdateCorrectedData?.isCompleted == true) {
+                scopeUpdateCorrectedData = null
+                return UpdateStatusMessageDto("Corrected data update is completed.")
+            }
+            return UpdateStatusMessageDto("Corrected data update is in unknown state.")
         }
     }
 
