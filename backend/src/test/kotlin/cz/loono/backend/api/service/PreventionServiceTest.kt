@@ -142,7 +142,7 @@ class PreventionServiceTest {
                     uuid = examsUUIDs[3].toString(),
                     examinationType = ExaminationTypeDto.DENTIST,
                     intervalYears = 1,
-                    plannedDate = now?.atUTCOffset(),
+                    plannedDate = now.atUTCOffset(),
                     firstExam = true,
                     priority = 8,
                     state = ExaminationStatusDto.NEW,
