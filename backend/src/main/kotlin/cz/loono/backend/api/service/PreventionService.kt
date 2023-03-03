@@ -96,7 +96,7 @@ class PreventionService(
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
         val sortedExamsOfType = examsOfType?.filter {
             it.plannedDate != null || it.status != ExaminationStatusDto.CONFIRMED || it.status != ExaminationStatusDto.CANCELED
-        }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
+        }?.sortedByDescending(ExaminationRecord::plannedDate) ?: listOf(
             ExaminationRecord(
                 account = account,
                 uuid = null,
