@@ -77,7 +77,7 @@ class PreventionServiceTest {
                 ), // is not required
                 ExaminationRecord(
                     id = 4,
-                    plannedDate= now,
+                    plannedDate = now,
                     type = ExaminationTypeDto.DENTIST,
                     uuid = examsUUIDs[3]!!,
                     account = account
