@@ -54,7 +54,8 @@ class Config(
         "$apiVersion/providers/details",
         "$apiVersion/providers/lastupdate",
         "$apiVersion/feedback",
-        "$apiVersion/addEmailUser"
+        "$apiVersion/addEmailUser",
+        "$apiVersion/FBandDBDiff"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {

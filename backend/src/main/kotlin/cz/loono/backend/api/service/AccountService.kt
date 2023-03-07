@@ -1,5 +1,6 @@
 package cz.loono.backend.api.service
 
+import com.google.firebase.auth.FirebaseAuth
 import cz.loono.backend.api.dto.AccountDto
 import cz.loono.backend.api.dto.AccountOnboardingDto
 import cz.loono.backend.api.dto.AccountUpdateDto
@@ -183,5 +184,14 @@ class AccountService(
             errorCode = "404",
             errorMessage = "The account not found."
         )
+    }
+
+    fun checkDifferenceFBandDB() {
+        val allAccounts = accountRepository.findAll()
+        allAccounts.forEach { account ->
+            if (firebaseAuthService.checkUidInFB(account.uid) == null) {
+                println("${account.uid} not found")
+            }
+        }
     }
 }
