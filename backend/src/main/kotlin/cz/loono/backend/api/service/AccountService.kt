@@ -184,4 +184,16 @@ class AccountService(
             errorMessage = "The account not found."
         )
     }
+
+    fun checkDifferenceFBandDB(): List<Account> {
+        val listOfMissingAccounts = mutableListOf<Account>()
+        val allAccounts = accountRepository.findAll()
+        allAccounts.forEach { account ->
+            if (firebaseAuthService.checkUidInFB(account.uid) == null) {
+                listOfMissingAccounts.add(account)
+                println("${account.uid} not found")
+            }
+        }
+        return listOfMissingAccounts
+    }
 }

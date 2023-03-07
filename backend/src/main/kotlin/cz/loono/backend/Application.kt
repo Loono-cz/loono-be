@@ -58,6 +58,7 @@ class Config(
         "$apiVersion/feedback",
         "$apiVersion/testCall",
         "$apiVersion/addEmailUser",
+        "$apiVersion/FBandDBDiff"
     )
 
     override fun addInterceptors(registry: InterceptorRegistry) {
