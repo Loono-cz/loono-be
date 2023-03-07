@@ -1,7 +1,6 @@
 package cz.loono.backend.api.v1
 
 import cz.loono.backend.api.service.AccountService
-import cz.loono.backend.db.model.Account
 import cz.loono.backend.schedule.ComingAndPassedExamNotificationTask
 import cz.loono.backend.schedule.PlanNewExamReminderTask
 import cz.loono.backend.schedule.PreventionReminderTask
@@ -29,7 +28,7 @@ class TriggerController(
     }
 
     @GetMapping("v1/FBandDBDiff")
-    fun checkDifferenceFBandDB(): List<Account> {
+    fun checkDifferenceFBandDB(): List<String> {
         return accountService.checkDifferenceFBandDB()
     }
 }
