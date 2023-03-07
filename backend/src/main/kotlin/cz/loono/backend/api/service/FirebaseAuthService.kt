@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseToken
+import com.google.firebase.auth.UserRecord
 import cz.loono.backend.api.BasicUser
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -59,5 +60,17 @@ class FirebaseAuthService : JwtAuthService {
         return FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(stream))
             .build()
+    }
+
+    fun checkUidInFB(uid: String): UserRecord? {
+        if (FirebaseApp.getApps().size == 0) {
+            val firebaseOptions = loadFirebaseCredentials()
+            FirebaseApp.initializeApp(firebaseOptions)
+        }
+        return try {
+            FirebaseAuth.getInstance().getUser(uid)
+        } catch (e: Exception) {
+            null
+        }
     }
 }
