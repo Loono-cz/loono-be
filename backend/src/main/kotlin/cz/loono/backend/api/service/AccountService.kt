@@ -42,7 +42,7 @@ class AccountService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private var runningJobDifference: Job? = null
-    private val listOfMissingAccounts = mutableListOf<Account>()
+    private val listOfMissingAccounts = mutableListOf<String>()
     companion object {
         private val FIELDS_TO_SORT_BY = arrayOf("id")
     }
@@ -190,19 +190,19 @@ class AccountService(
         )
     }
 
-    fun checkDifferenceFBandDB(): List<Account> {
+    fun checkDifferenceFBandDB(): List<String> {
         if (runningJobDifference == null) {
             runningJobDifference = CoroutineScope(Dispatchers.IO).launch {
                 val allAccounts = accountRepository.findAll()
                 allAccounts.forEach { account ->
                     if (firebaseAuthService.checkUidInFB(account.uid) == null) {
-                        listOfMissingAccounts.add(account)
+                        listOfMissingAccounts.add(account.uid)
                     }
                 }
             }
         } else {
             if (runningJobDifference?.isActive == true) {
-                return emptyList()
+                return listOf("job is active")
             }
             if (runningJobDifference?.isCompleted == true) {
                 runningJobDifference = null

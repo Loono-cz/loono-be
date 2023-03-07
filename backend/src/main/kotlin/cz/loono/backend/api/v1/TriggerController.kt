@@ -29,7 +29,7 @@ class TriggerController(
     }
 
     @GetMapping("v1/FBandDBDiff")
-    fun checkDifferenceFBandDB(): List<Account> {
+    fun checkDifferenceFBandDB(): List<String> {
         return accountService.checkDifferenceFBandDB()
     }
 }
