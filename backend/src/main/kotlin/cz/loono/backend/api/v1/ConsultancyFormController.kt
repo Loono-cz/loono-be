@@ -19,7 +19,7 @@ class ConsultancyFormController(
 ) {
     @PostMapping
     @ManagedOperation
-    fun updateOrCreate(
+    fun sendConsultancyEmail(
         @RequestAttribute(Attributes.ATTR_BASIC_USER)
         basicUser: BasicUser,
 
@@ -35,5 +35,5 @@ class EmailController(
 ) {
     @PostMapping
     @ManagedOperation
-    fun updateOrCreate() = consultancyFormService.addContactToContactList()
+    fun addContactToList() = consultancyFormService.addContactToContactList()
 }
