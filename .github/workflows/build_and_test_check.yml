@@ -17,11 +17,11 @@ jobs:
 
       - name: Build with Gradle
         env:
-          SMARTEMAILNG_USER: ${{ secrets.PROD_SMARTEMAILING_USER}}
-          SMARTEMAILING_PSW: ${{ secrets.PROD_SMARTEMAILING_PSW}}
-          ONESIGNAL_API_KEY: ${{ secrets.PROD_ONESIGNAL_API_KEY}}
-          ONESIGNAL_APP_ID: ${{ secrets.PROD_ONESIGNAL_APP_ID}}
-          ENABLE_SWAGGER: ${{ secrets.PROD_ENABLE_SWAGGER}}
+          SMARTEMAILNG_USER: ${{ secrets.DEVEL_SMARTEMAILING_USER}}
+          SMARTEMAILING_PSW: ${{ secrets.DEVEL_SMARTEMAILING_PSW}}
+          ONESIGNAL_API_KEY: ${{ secrets.DEVEL_ONESIGNAL_API_KEY}}
+          ONESIGNAL_APP_ID: ${{ secrets.DEVEL_ONESIGNAL_APP_ID}}
+          ENABLE_SWAGGER: ${{ secrets.DEVEL_ENABLE_SWAGGER}}
         run: |
           ./gradlew build -x ktlintMainSourceSetCheck 
 

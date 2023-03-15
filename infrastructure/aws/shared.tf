@@ -8,7 +8,7 @@ terraform {
   backend "s3" {
     # For every new deployment this bucket needs to be changed, because AWS bucket names are
     # globally unique.
-    bucket = "loono-cz-terraform-backend-production"
+    bucket = "loono-cz-terraform-backend-devel"
     key    = "terraform.tfstate"
     region = "eu-central-1"
   }
