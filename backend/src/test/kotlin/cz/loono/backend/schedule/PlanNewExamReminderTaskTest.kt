@@ -204,7 +204,7 @@ class PlanNewExamReminderTaskTest {
 
     @Test
     fun `coming and passed notification`() {
-        val comingAndPassedExamNotificationTask = ComingAndPassedExamNotificationTask(examinationRecordRepository = examinationRecordRepository,notificationService = notificationService, cronLogRepository = cronLogRepository)
+        val comingAndPassedExamNotificationTask = ComingAndPassedExamNotificationTask(examinationRecordRepository = examinationRecordRepository, notificationService = notificationService, cronLogRepository = cronLogRepository)
         val user = createAccount()
         val now = LocalDateTime.now().plusHours(30).withNano(0)
 
