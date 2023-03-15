@@ -40,6 +40,7 @@ class ConsultancyFormService(
             EmailInterceptor.SMARTEMAILING_PSW
         )
     ).build()
+
     fun addContactToContactList() {
         val emailContactListModel = listOf(EmailContactListModel(id = 89, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()

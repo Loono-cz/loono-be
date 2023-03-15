@@ -8,13 +8,13 @@ on:
 env:
   tf_version: '1.1.6'
   tf_working_dir: 'infrastructure/aws'
+  TF_VAR_smartemailing-user: ${{ secrets.DEVEL_SMARTEMAILING_USER }}
+  TF_VAR_smartemailing-psw: ${{ secrets.DEVEL_SMARTEMAILING_PSW }}
   TF_VAR_database-password: ${{ secrets.DEVEL_DATABASE_PASSWORD }}
   TF_VAR_certificate-arn: ${{ secrets.DEVEL_CERTIFICATE_ARN }}
   TF_VAR_google-app-credentials: ${{ secrets.DEVEL_GOOGLE_APPLICATION_CREDENTIALS }}
   TF_VAR_onesignal-api-key: ${{ secrets.DEVEL_ONESIGNAL_API_KEY }}
   TF_VAR_onesignal-app-id: ${{ secrets.DEVEL_ONESIGNAL_APP_ID }}
-  TF_VAR_smartemailing-user: ${{ secrets.DEVEL_SMARTEMAILING_USER }}
-  TF_VAR_smartemailing-psw: ${{ secrets.DEVEL_SMARTEMAILING_PSW }}
 jobs:
   terraform:
     name: 'Terraform'
