@@ -52,6 +52,9 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
 
+    implementation("org.apache.poi:poi-ooxml:5.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
     testRuntimeOnly("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

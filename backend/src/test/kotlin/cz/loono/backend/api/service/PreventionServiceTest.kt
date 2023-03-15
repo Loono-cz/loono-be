@@ -77,6 +77,7 @@ class PreventionServiceTest {
                 ), // is not required
                 ExaminationRecord(
                     id = 4,
+                    plannedDate = now,
                     type = ExaminationTypeDto.DENTIST,
                     uuid = examsUUIDs[3]!!,
                     account = account
@@ -101,6 +102,7 @@ class PreventionServiceTest {
         )
 
         val result = preventionService.getPreventionStatus(uuid)
+        val test = result.examinations
         assertThat(
             /* actual = */ listOf(
                 ExaminationPreventionStatusDto(
@@ -141,7 +143,7 @@ class PreventionServiceTest {
                     uuid = examsUUIDs[3].toString(),
                     examinationType = ExaminationTypeDto.DENTIST,
                     intervalYears = 1,
-                    plannedDate = null,
+                    plannedDate = now.atUTCOffset(),
                     firstExam = true,
                     priority = 8,
                     state = ExaminationStatusDto.NEW,
@@ -155,11 +157,11 @@ class PreventionServiceTest {
                     examinationActionType = ExaminationActionTypeDto.EXAMINATION
                 ),
                 ExaminationPreventionStatusDto(
-                    uuid = examsUUIDs[1].toString(),
+                    uuid = null,
                     examinationType = ExaminationTypeDto.OPHTHALMOLOGIST,
                     intervalYears = 4,
                     plannedDate = null,
-                    firstExam = true,
+                    firstExam = false,
                     priority = 9,
                     state = ExaminationStatusDto.NEW,
                     count = 0,
@@ -178,6 +180,7 @@ class PreventionServiceTest {
     @Test
     fun `get examinations without first record`() {
         val uuid = UUID.randomUUID().toString()
+        val now = LocalDateTime.now()
         val examsUUIDs: MutableMap<Int, String> = mutableMapOf()
         repeat(2) {
             examsUUIDs[it] = UUID.randomUUID().toString()
@@ -195,18 +198,21 @@ class PreventionServiceTest {
                     id = 1,
                     type = ExaminationTypeDto.GENERAL_PRACTITIONER,
                     uuid = examsUUIDs[0]!!,
-                    account = account
+                    account = account,
+                    plannedDate = now
                 ),
                 ExaminationRecord(
                     id = 4,
                     type = ExaminationTypeDto.DENTIST,
                     uuid = examsUUIDs[1]!!,
-                    account = account
+                    account = account,
+                    plannedDate = now
                 )
             )
         )
 
         val result = preventionService.getPreventionStatus(uuid)
+        val test = result.examinations
         assertEquals(
             /* expected = */ listOf(
                 ExaminationPreventionStatusDto(
@@ -217,7 +223,7 @@ class PreventionServiceTest {
                     priority = 1,
                     state = ExaminationStatusDto.NEW,
                     count = 0,
-                    plannedDate = null,
+                    plannedDate = now.atUTCOffset(),
                     points = 200,
                     badge = BadgeTypeDto.COAT,
                     customInterval = null,
@@ -247,7 +253,7 @@ class PreventionServiceTest {
                     uuid = examsUUIDs[1].toString(),
                     examinationType = ExaminationTypeDto.DENTIST,
                     intervalYears = 1,
-                    plannedDate = null,
+                    plannedDate = now.atUTCOffset(),
                     firstExam = true,
                     priority = 8,
                     state = ExaminationStatusDto.NEW,

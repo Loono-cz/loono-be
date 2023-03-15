@@ -13,6 +13,10 @@ import cz.loono.backend.db.repository.BadgeRepository
 import cz.loono.backend.db.repository.ExaminationRecordRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
 import cz.loono.backend.db.repository.UserFeedbackRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -37,7 +41,8 @@ class AccountService(
     private val pageSize: Int,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
-
+    private var runningJobDifference: Job? = null
+    private val listOfMissingAccounts = mutableListOf<String>()
     companion object {
         private val FIELDS_TO_SORT_BY = arrayOf("id")
     }
@@ -183,5 +188,27 @@ class AccountService(
             errorCode = "404",
             errorMessage = "The account not found."
         )
+    }
+
+    fun checkDifferenceFBandDB(): List<String> {
+        if (runningJobDifference == null) {
+            runningJobDifference = CoroutineScope(Dispatchers.IO).launch {
+                val allAccounts = accountRepository.findAll()
+                allAccounts.forEach { account ->
+                    if (firebaseAuthService.checkUidInFB(account.uid) == null) {
+                        listOfMissingAccounts.add(account.uid)
+                    }
+                }
+            }
+        } else {
+            if (runningJobDifference?.isActive == true) {
+                return listOf("job is active")
+            }
+            if (runningJobDifference?.isCompleted == true) {
+                runningJobDifference = null
+                return listOfMissingAccounts
+            }
+        }
+        return emptyList()
     }
 }

@@ -33,7 +33,6 @@ class ConsultancyFormService(
     private val accountRepository: AccountRepository,
     private val consultancyLogRepository: ConsultancyLogRepository
 ) {
-
     val gson = Gson()
     val client = OkHttpClient().newBuilder().addInterceptor(
         EmailInterceptor(
@@ -43,7 +42,7 @@ class ConsultancyFormService(
     ).build()
 
     fun addContactToContactList() {
-        val emailContactListModel = listOf(EmailContactListModel(id = 92, status = "confirmed"))
+        val emailContactListModel = listOf(EmailContactListModel(id = 89, status = "confirmed"))
         val emailContactInfoModelList = mutableListOf<EmailContactInfoModel>()
         val allAccounts = accountRepository.findAll()
         val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn }

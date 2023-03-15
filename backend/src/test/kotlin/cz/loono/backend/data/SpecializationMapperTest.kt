@@ -1,7 +1,6 @@
 package cz.loono.backend.data
 
 import cz.loono.backend.data.constants.CategoryValues
-import cz.loono.backend.db.model.HealthcareCategory
 import org.junit.jupiter.api.Test
 
 class SpecializationMapperTest {
@@ -11,8 +10,7 @@ class SpecializationMapperTest {
     @Test
     fun `simple case with single category`() {
         val category = specializationMapper.defineCategory("Diabetologie")
-
-        assert(category == setOf(HealthcareCategory(value = CategoryValues.DIABETOLOGY.value)))
+        assert(category == listOf(CategoryValues.DIABETOLOGY.name))
     }
 
     @Test
@@ -32,11 +30,10 @@ class SpecializationMapperTest {
     @Test
     fun `specialization with more categories`() {
         val category = specializationMapper.defineCategory("Onkogynekologie")
-
         assert(
-            category == setOf(
-                HealthcareCategory(value = CategoryValues.ONCOLOGY.value),
-                HealthcareCategory(value = CategoryValues.GYNECOLOGY.value)
+            category == listOf(
+                CategoryValues.GYNECOLOGY.name,
+                CategoryValues.ONCOLOGY.name
             )
         )
     }
@@ -47,10 +44,10 @@ class SpecializationMapperTest {
             specializationMapper.defineCategory("rehabilitační a fyzikální medicína, Nutriční terapeut, Fyzioterapeut")
 
         assert(
-            category == setOf(
-                HealthcareCategory(value = CategoryValues.REHABILITATION.value),
-                HealthcareCategory(value = CategoryValues.NUTRITION.value),
-                HealthcareCategory(value = CategoryValues.PHYSIOTHERAPY.value)
+            category == listOf(
+                CategoryValues.REHABILITATION.name,
+                CategoryValues.NUTRITION.name,
+                CategoryValues.PHYSIOTHERAPY.name
             )
         )
     }

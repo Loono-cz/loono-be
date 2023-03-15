@@ -94,17 +94,21 @@ class PreventionService(
         account: Account
     ): List<ExaminationPreventionStatusDto> = examinationRequests.map { examinationInterval ->
         val examsOfType = examinationTypesToRecords[examinationInterval.examinationType]
-        val sortedExamsOfType = examsOfType?.filter {
-            it.plannedDate != null || it.status != ExaminationStatusDto.CONFIRMED || it.status != ExaminationStatusDto.CANCELED
-        }?.sortedBy(ExaminationRecord::plannedDate) ?: listOf(
-            ExaminationRecord(
-                account = account,
-                uuid = null,
-                firstExam = false,
-                note = null,
-                status = ExaminationStatusDto.NEW
+        val examsOfTypeNotNull = examsOfType?.filter { it.plannedDate != null }
+        val examsOfTypeNotCanceled = examsOfTypeNotNull?.filter { it.status != ExaminationStatusDto.CANCELED }
+        var sortedExamsOfType = examsOfTypeNotCanceled?.sortedByDescending(ExaminationRecord::plannedDate)
+        if (sortedExamsOfType.isNullOrEmpty()) {
+            sortedExamsOfType = listOf(
+                ExaminationRecord(
+                    account = account,
+                    type = examinationInterval.examinationType,
+                    uuid = null,
+                    firstExam = false,
+                    note = null,
+                    status = ExaminationStatusDto.NEW
+                )
             )
-        )
+        }
 
         val confirmedExamsOfCurrentType = examsOfType?.filter {
             it.status == ExaminationStatusDto.CONFIRMED || (it.status == ExaminationStatusDto.UNKNOWN && it.plannedDate != null)
@@ -135,7 +139,8 @@ class PreventionService(
             periodicExam = sortedExamsOfType[0].periodicExam,
             customInterval = sortedExamsOfType[0].customInterval,
             examinationActionType = sortedExamsOfType[0].examinationActionType,
-            note = sortedExamsOfType[0].note
+            note = sortedExamsOfType[0].note,
+            createdAt = sortedExamsOfType[0].createdAt
         )
     }
 
@@ -160,7 +165,8 @@ class PreventionService(
                     periodicExam = customExam.periodicExam,
                     customInterval = customExam.customInterval,
                     examinationActionType = customExam.examinationActionType,
-                    note = customExam.note
+                    note = customExam.note,
+                    createdAt = customExam.createdAt
                 )
             }
         } catch (e: Exception) {

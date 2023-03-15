@@ -76,7 +76,7 @@ MistoPoskytovaniId,ZdravotnickeZarizeniId,Kod,NazevZarizeni,DruhZarizeni,Obec,Ps
 
         assert(providers.size == 1)
         println(providers[0].toString())
-        assert(providers[0].toString() == "239519,161084,03685080000000,Mgr. DOMINIKA MACHTOVÁ,Samostatné zařízení fyzioterapeuta,Husinec,38421,Prokopovo náměstí,1,Jihočeský kraj,CZ031,Prachatice,CZ0315,,,,,,03685080,1,,,,Jihočeský kraj,CZ031,Prachatice,CZ0315,Husinec,38421,Prokopovo náměstí,1,Fyzioterapeut,[HealthcareCategory(id=0, value=Fyzioterapie, healthcareProviders=[])],ambulantní péče,,,49.053069339386,13.986452702303")
+        assert(providers[0].toString() == "239519,161084,03685080000000,Mgr. DOMINIKA MACHTOVÁ,Samostatné zařízení fyzioterapeuta,Husinec,38421,Prokopovo náměstí,1,Jihočeský kraj,CZ031,Prachatice,CZ0315,,,,,,03685080,1,,,,Jihočeský kraj,CZ031,Prachatice,CZ0315,Husinec,38421,Prokopovo náměstí,1,Fyzioterapeut,[\"PHYSIOTHERAPY\"],ambulantní péče,,,49.053069339386,13.986452702303")
     }
 
     @Test

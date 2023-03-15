@@ -1,10 +1,10 @@
 package cz.loono.backend.data
 
+import com.google.gson.Gson
 import cz.loono.backend.data.constants.Constants
 import cz.loono.backend.data.constants.District
 import cz.loono.backend.data.constants.LawyerForm
 import cz.loono.backend.data.constants.Region
-import cz.loono.backend.db.model.HealthcareCategory
 import cz.loono.backend.db.model.HealthcareProvider
 import org.slf4j.LoggerFactory
 
@@ -15,7 +15,7 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
     private var lawyerFormCode = ""
     private var lawyerFormName = ""
     private var lawyerPersonType = ""
-    private var categories = emptySet<HealthcareCategory>()
+    private var categories = emptyList<String>()
     private var hqDistrictName = ""
     private var hqRegionName = ""
 
@@ -58,7 +58,7 @@ class HealthcareProviderBuilder(private val columns: List<String>) {
             substitute = getColumnValue("OdbornyZastupce", columns),
             lat = getColumnValue("Lat", columns).toDoubleOrNull(),
             lng = getColumnValue("Lng", columns).toDoubleOrNull(),
-            category = categories
+            categories = if (categories.isEmpty()) { null } else { Gson().toJson(categories) }
         )
 
     fun withLawyerForm(): HealthcareProviderBuilder {

@@ -47,4 +47,6 @@ class HealthcareProvidersController(
         providerIdListDto: HealthcareProviderIdListDto
     ): HealthcareProviderDetailListDto =
         healthCareProvidersService.getMultipleHealthcareProviderDetails(providerIdListDto)
+    @GetMapping(value = ["/updateCorrectedProviders"])
+    fun updateCorrectedData(): UpdateStatusMessageDto = healthCareProvidersService.searchUpdatedProviders()
 }
