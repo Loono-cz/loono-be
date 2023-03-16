@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 interface HealthcareProviderRepository : PagingAndSortingRepository<HealthcareProvider, HealthcareProviderId> {
@@ -21,7 +22,8 @@ interface HealthcareProviderRepository : PagingAndSortingRepository<HealthcarePr
             "h.hqCity = :hqCity, h.hqDistrict = :hqDistrict, h.hqHouseNumber = :hqHouseNumber, " +
             "h.hqPostalCode = :hqPostalCode, h.hqRegion = :hqRegion, h.hqStreet = :hqStreet, " +
             "h.specialization = :specialization, h.careForm = :careForm, h.correctedLat = :correctedLat, " +
-            "h.correctedLng = :correctedLng, h.categories = :categories " +
+            "h.correctedLng = :correctedLng, h.categories = :categories, " +
+            "h.lastUpdated = :lastUpdated " +
             "where h.locationId = :locationId and h.institutionId = :institutionId "
     )
     fun updateProvider(
@@ -49,6 +51,7 @@ interface HealthcareProviderRepository : PagingAndSortingRepository<HealthcarePr
         correctedLng: Double?,
         categories: String?,
         locationId: Long,
-        institutionId: Long
+        institutionId: Long,
+        lastUpdated: LocalDateTime
     )
 }
