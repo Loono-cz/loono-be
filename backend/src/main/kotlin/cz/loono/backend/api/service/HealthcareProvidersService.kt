@@ -216,6 +216,7 @@ class HealthcareProvidersService(
                             )
                         }
                     }
+                    setLastUpdate()
                     prepareAllProviders()
                 } catch (e: Exception) {
                     throw LoonoBackendException(HttpStatus.SERVICE_UNAVAILABLE, e.message, e.localizedMessage)
