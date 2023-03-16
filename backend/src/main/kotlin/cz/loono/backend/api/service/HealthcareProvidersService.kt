@@ -43,6 +43,7 @@ import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.exists
@@ -170,7 +171,6 @@ class HealthcareProvidersService(
                                 correctedLat = row.getCell(22)?.toString().trimProviderImport()?.toDouble(),
                                 correctedLng = row.getCell(23)?.toString().trimProviderImport()?.toDouble(),
                                 categories = Gson().toJson(setCategoriesValueToEnum(row.getCell(24).toString()))
-
                             )
                             providersToUpdate.add(provider)
                         }
@@ -212,7 +212,8 @@ class HealthcareProvidersService(
                                 correctedLng = it.correctedLng,
                                 categories = it.categories,
                                 locationId = it.locationId,
-                                institutionId = it.institutionId
+                                institutionId = it.institutionId,
+                                lastUpdated = LocalDateTime.now()
                             )
                         }
                     }
