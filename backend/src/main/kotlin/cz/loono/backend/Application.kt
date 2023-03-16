@@ -56,8 +56,6 @@ class Config(
         "$apiVersion/providers/updateCorrectedProviders",
         "$apiVersion/providers/update",
         "$apiVersion/feedback",
-        "$apiVersion/testCall",
-        "$apiVersion/addEmailUser",
         "$apiVersion/FBandDBDiff"
     )
 
