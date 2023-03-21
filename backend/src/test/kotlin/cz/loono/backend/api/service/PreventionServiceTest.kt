@@ -102,7 +102,6 @@ class PreventionServiceTest {
         )
 
         val result = preventionService.getPreventionStatus(uuid)
-        val test = result.examinations
         assertThat(
             /* actual = */ listOf(
                 ExaminationPreventionStatusDto(

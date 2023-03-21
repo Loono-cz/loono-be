@@ -1,0 +1,1 @@
+ALTER TABLE notification_log ADD examination_uid text;
