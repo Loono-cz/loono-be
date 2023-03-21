@@ -117,11 +117,13 @@ class PushNotificationService(
             delayedOption = notification.delayedOption,
             largeImage = notification.largeImage,
             iosAttachments = notification.iosAttachments.toString(),
+            examinationUid = notification.data.examinationUuid,
             createdAt = LocalDate.now().toString()
         )
-        notificationLog.heading?.let { nameNotNull ->
-            notificationLog.includeExternalUserIds?.let { userIds ->
-                val notificationLogFound = notificationLogRepository.findByHeadingAndIncludeExternalUserIdsAndCreatedAt(heading = nameNotNull, includeExternalUserIds = userIds, createdAt = LocalDate.now().toString())
+
+        notificationLog.examinationUid?.let { examUid ->
+            notificationLog.createdAt?.let { created ->
+                val notificationLogFound = notificationLogRepository.findByExaminationUidAndCreatedAt(examinationUid = examUid, createdAt = created)
                 if (notificationLogFound.isEmpty()) {
                     notificationLogRepository.save(notificationLog)
                     val call: Call = OkHttpClient().newCall(request)

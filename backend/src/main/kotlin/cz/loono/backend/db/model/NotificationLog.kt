@@ -40,5 +40,8 @@ data class NotificationLog(
     val iosAttachments: String? = null,
 
     @Column(columnDefinition = "TEXT")
+    val examinationUid: String? = null,
+
+    @Column(columnDefinition = "TEXT")
     val createdAt: String? = null
 )
