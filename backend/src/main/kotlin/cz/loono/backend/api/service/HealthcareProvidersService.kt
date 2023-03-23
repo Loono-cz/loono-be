@@ -11,6 +11,7 @@ import cz.loono.backend.api.dto.UpdateStatusMessageDto
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.data.HealthcareCSVParser
 import cz.loono.backend.data.constants.CategoryValues
+import cz.loono.backend.data.constants.Constants.CORRECTED_DATA_URL
 import cz.loono.backend.data.constants.Constants.OPEN_DATA_URL
 import cz.loono.backend.db.model.HealthcareProvider
 import cz.loono.backend.db.model.HealthcareProviderId
@@ -23,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
@@ -134,12 +136,15 @@ class HealthcareProvidersService(
         if (scopeUpdateCorrectedData == null) {
             scopeUpdateCorrectedData = CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    val url = URL(CORRECTED_DATA_URL)
+                    val inputStream = withContext(Dispatchers.IO) {
+                        url.openStream()
+                    }
+
                     var skip = true
                     val providersToUpdate = mutableListOf<HealthcareProvider>()
-                    val inputStream =
-                        this::class.java.getResourceAsStream("/static/notification/missing_data_-_healthcare_providers.xlsx")
                     val xlWb = XSSFWorkbook(inputStream)
-                    val xlWsProviders = xlWb.getSheetAt(2)
+                    val xlWsProviders = xlWb.getSheetAt(0)
 
                     xlWsProviders.forEach { row ->
                         if (skip) {
