@@ -15,7 +15,7 @@ fun String?.trimProviderImport(): String? {
     return if (this.isNullOrEmpty()) {
         null
     } else {
-        if (this.uppercase() == "NULL"){
+        if (this.uppercase() == "NULL") {
             null
         } else {
             this.trim()
