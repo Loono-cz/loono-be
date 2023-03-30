@@ -121,7 +121,7 @@ class PushNotificationService(
             createdAt = LocalDate.now().toString()
         )
 
-        if (notification.data.screen == "checkup"){
+        if (notification.data.screen == "checkup") {
             notificationLog.examinationUid?.let { examUid ->
                 notificationLog.createdAt?.let { created ->
                     val notificationLogFound = notificationLogRepository.findByExaminationUidAndCreatedAt(examinationUid = examUid, createdAt = created)
