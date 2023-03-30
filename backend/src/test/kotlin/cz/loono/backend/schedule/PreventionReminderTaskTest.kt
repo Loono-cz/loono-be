@@ -51,7 +51,7 @@ class PreventionReminderTaskTest {
                         count = 1,
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,
-                        plannedDate = null,
+                        plannedDate = OffsetDateTime.now().minusYears(2),
                         lastConfirmedDate = OffsetDateTime.now().minusYears(2)
                     )
                 ),
@@ -117,7 +117,7 @@ class PreventionReminderTaskTest {
                         intervalYears = 2,
                         firstExam = false,
                         priority = 1,
-                        state = ExaminationStatusDto.UNKNOWN,
+                        state = ExaminationStatusDto.NEW,
                         count = 1,
                         points = 200,
                         badge = BadgeTypeDto.HEADBAND,

@@ -283,18 +283,18 @@ class HealthcareProvidersService(
         val count = storedProvidersCount()
         val providers = LinkedHashSet<SimpleHealthcareProviderDto>(count)
 
-        val cycles = count.div(batchSize)
-        for (i in 0..cycles) {
-            providers.addAll(findPage(i))
-        }
+//        val cycles = count.div(batchSize)
+//        for (i in 0..cycles) {
+//            providers.addAll(findPage(i))
+//        }
 
-//        val allFilteredProviders = healthcareProviderRepository.findAll()
-//            .filter { (it.lat != null && it.lng != null) || (it.correctedLat != null && it.correctedLng != null) }
-//            .toSet()
-//            .map { it.simplify() }
-//            .filter { it.category.isNotEmpty() }
-//
-//        providers.addAll(allFilteredProviders)
+        val allFilteredProviders = healthcareProviderRepository.findAll()
+            .filter { (it.lat != null && it.lng != null) || (it.correctedLat != null && it.correctedLng != null) }
+            .toSet()
+            .map { it.simplify() }
+            .filter { it.category.isNotEmpty() }
+
+        providers.addAll(allFilteredProviders)
         zipProviders(providers)
     }
 

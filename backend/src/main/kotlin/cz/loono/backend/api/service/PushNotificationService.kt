@@ -121,14 +121,22 @@ class PushNotificationService(
             createdAt = LocalDate.now().toString()
         )
 
-        notificationLog.examinationUid?.let { examUid ->
-            notificationLog.createdAt?.let { created ->
-                val notificationLogFound = notificationLogRepository.findByExaminationUidAndCreatedAt(examinationUid = examUid, createdAt = created)
-                if (notificationLogFound.isEmpty()) {
-                    notificationLogRepository.save(notificationLog)
-                    val call: Call = OkHttpClient().newCall(request)
-                    Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+        if (notification.data.screen == "checkup"){
+            notificationLog.examinationUid?.let { examUid ->
+                notificationLog.createdAt?.let { created ->
+                    val notificationLogFound = notificationLogRepository.findByExaminationUidAndCreatedAt(examinationUid = examUid, createdAt = created)
+                    if (notificationLogFound.isEmpty()) {
+                        notificationLogRepository.save(notificationLog)
+                        val call: Call = OkHttpClient().newCall(request)
+                        Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+                    }
                 }
+            }
+        } else {
+            notificationLog.createdAt?.let {
+                notificationLogRepository.save(notificationLog)
+                val call: Call = OkHttpClient().newCall(request)
+                Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
             }
         }
     }
