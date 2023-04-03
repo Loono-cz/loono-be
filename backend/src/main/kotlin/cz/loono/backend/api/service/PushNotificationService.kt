@@ -134,9 +134,16 @@ class PushNotificationService(
             }
         } else {
             notificationLog.createdAt?.let {
-                notificationLogRepository.save(notificationLog)
-                val call: Call = OkHttpClient().newCall(request)
-                Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+                notificationLog.name?.let {
+                    notificationLog.includeExternalUserIds?.let {
+                        val notificationLogFound = notificationLogRepository.findByNameAndIncludeExternalUserIdsAndCreatedAt(name = notificationLog.name, includeExternalUserIds = notificationLog.includeExternalUserIds, createdAt = notificationLog.createdAt)
+                        if (notificationLogFound.isEmpty()) {
+                            notificationLogRepository.save(notificationLog)
+                            val call: Call = OkHttpClient().newCall(request)
+                            Gson().fromJson(call.execute().body!!.string(), NotificationResponse::class.java).id
+                        }
+                    }
+                }
             }
         }
     }
