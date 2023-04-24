@@ -115,8 +115,7 @@ class HealthcareProvidersService(
             updating = true
             try {
                 saveProviders(providers)
-                setLastUpdate()
-                prepareAllProviders()
+                searchUpdatedProviders()
             } finally {
                 updating = false
             }
@@ -128,8 +127,7 @@ class HealthcareProvidersService(
                 errorMessage = "Data update failed."
             )
         }
-        logger.info("Update finished.")
-        return UpdateStatusMessageDto("Data successfully updated.")
+        return UpdateStatusMessageDto("Data are updating.")
     }
     @Synchronized
     fun searchUpdatedProviders(): UpdateStatusMessageDto {
@@ -332,6 +330,7 @@ class HealthcareProvidersService(
             )
         }
         zipFilePath = filePath
+        logger.info("Update finished.")
     }
 
     fun getAllSimpleData(): Path {
