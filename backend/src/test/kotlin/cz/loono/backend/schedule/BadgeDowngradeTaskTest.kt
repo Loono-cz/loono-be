@@ -3,8 +3,6 @@ package cz.loono.backend.schedule
 import cz.loono.backend.api.dto.BadgeTypeDto
 import cz.loono.backend.api.dto.ExaminationStatusDto
 import cz.loono.backend.api.dto.ExaminationTypeDto
-import cz.loono.backend.api.dto.SelfExaminationResultDto
-import cz.loono.backend.api.dto.SelfExaminationTypeDto
 import cz.loono.backend.api.service.AccountService
 import cz.loono.backend.api.service.ExaminationRecordService
 import cz.loono.backend.api.service.FirebaseAuthService
@@ -15,7 +13,6 @@ import cz.loono.backend.db.model.Badge
 import cz.loono.backend.db.model.ExaminationRecord
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.SelfExaminationRecordRepository
-import cz.loono.backend.extensions.toLocalDateTime
 import cz.loono.backend.utils.SequenceResetExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -31,7 +28,6 @@ import org.springframework.context.annotation.Primary
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
