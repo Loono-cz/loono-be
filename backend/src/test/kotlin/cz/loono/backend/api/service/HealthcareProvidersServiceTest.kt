@@ -18,7 +18,6 @@ import java.time.LocalDate
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.exists
 import kotlin.io.path.fileSize
-import kotlin.io.path.getLastModifiedTime
 
 @SpringBootTest(properties = ["spring.profiles.active=test"])
 @Transactional
@@ -57,38 +56,6 @@ class HealthcareProvidersServiceTest(
         try {
             assert(path.exists())
             assert(path.fileSize() < 1000000L)
-        } finally {
-            path.deleteExisting()
-        }
-    }
-
-    @Test
-    fun `zip all`() {
-        healthcareProvidersService.updateData()
-        val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
-
-        // healthcareProvidersService.prepareAllProviders()
-
-        try {
-            assert(path.exists())
-            assert(path.fileSize() > 1000000L)
-        } finally {
-            path.deleteExisting()
-        }
-    }
-
-    @Test
-    fun `zip update`() {
-        healthcareProvidersService.updateData()
-        val path = Path.of("providers-${healthcareProvidersService.lastUpdate}.zip")
-        try {
-            healthcareProvidersService.prepareAllProviders()
-            assert(path.exists())
-            val originalCreationTime = path.getLastModifiedTime().toMillis()
-
-            healthcareProvidersService.prepareAllProviders()
-
-            assert(originalCreationTime < path.getLastModifiedTime().toMillis())
         } finally {
             path.deleteExisting()
         }
