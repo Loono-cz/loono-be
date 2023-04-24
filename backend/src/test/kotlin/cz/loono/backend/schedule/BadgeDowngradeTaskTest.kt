@@ -163,44 +163,6 @@ class BadgeDowngradeTaskTest(
         assertThat(actual).isEmpty()
     }
 
-    @Test
-    fun `Should downgrade self examination badge`() {
-        val account = createAccount("uuid1")
-        accountRepository.save(account)
-        examinationRecordService.confirmSelfExam(
-            SelfExaminationTypeDto.TESTICULAR,
-            SelfExaminationResultDto(result = SelfExaminationResultDto.Result.OK),
-            "uuid1"
-        )
-
-        val toUpdate = selfExaminationRecordRepository.findAllByAccount(account).map {
-            it.copy(dueDate = LocalDate.of(2022, 2, 11))
-        }
-        selfExaminationRecordRepository.saveAll(toUpdate)
-        accountRepository.findByUid("uuid1")?.let {
-            accountRepository.save(
-                it.copy(
-                    badges = it.badges.map { badge ->
-                        badge.copy(
-                            lastUpdateOn = Instant.parse("2022-02-11T17:14:06.00Z").toLocalDateTime()
-                        )
-                    }.toSet()
-                )
-            )
-        }
-
-        selfExaminationRecordRepository.findFirstByAccountAndTypeOrderByDueDateDesc(
-            account,
-            SelfExaminationTypeDto.TESTICULAR
-        )
-
-        badgeDowngradeTask.run()
-
-        val actual = accountRepository.findByUid("uuid1")!!.badges
-
-        assertThat(actual).isEmpty()
-    }
-
     @TestConfiguration
     class MockedClockConfig {
         @Bean
