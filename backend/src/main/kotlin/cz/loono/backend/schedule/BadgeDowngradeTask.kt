@@ -56,7 +56,7 @@ class BadgeDowngradeTask(
 
                     val downgradedBadges = userBadges.map { badge ->
                         getSelfExaminationType(badge.getBadgeAsEnum(), account.getSexAsEnum())?.let {
-                            downgradeSelfExaminationBadge(account, badge, it)
+                            badge
                         } ?: downgradeGeneralBadge(account, badge, examsRequests, now)
                     }.toSet()
 

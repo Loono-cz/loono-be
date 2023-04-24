@@ -142,7 +142,6 @@ class ExaminationRecordService(
         selfExams.forEach exams@{
             when (it.status) {
                 SelfExaminationStatusDto.COMPLETED -> count++
-                SelfExaminationStatusDto.MISSED -> return@exams
                 else -> {
                     // Do nothing
                 }
