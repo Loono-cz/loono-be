@@ -3,10 +3,14 @@ package cz.loono.backend.schedule
 import com.google.gson.Gson
 import cz.loono.backend.api.exception.LoonoBackendException
 import cz.loono.backend.api.smartemailng.AddUserEmailModel
+import cz.loono.backend.api.smartemailng.Campaign
+import cz.loono.backend.api.smartemailng.DoubleOptInSettings
 import cz.loono.backend.api.smartemailng.EmailContactInfoModel
 import cz.loono.backend.api.smartemailng.EmailContactListModel
 import cz.loono.backend.api.smartemailng.EmailInterceptor
 import cz.loono.backend.api.smartemailng.EmailSettingsModel
+import cz.loono.backend.api.smartemailng.SenderCredentials
+import cz.loono.backend.api.smartemailng.SilencePeriod
 import cz.loono.backend.db.model.CronLog
 import cz.loono.backend.db.repository.AccountRepository
 import cz.loono.backend.db.repository.CronLogRepository
@@ -38,15 +42,32 @@ class UserSubscribeNewsletter(
 
         try {
             val now = LocalDate.now()
-            val emailContactListModel = listOf(EmailContactListModel(id = 92))
+            val emailContactListModel = listOf(EmailContactListModel(id = 73))
             val allAccounts = accountRepository.findAll()
             val allNewsletterAccounts = allAccounts.filter { it.newsletterOptIn && it.created == now.minusDays(1) }
+            val emailSettingModel = EmailSettingsModel(
+                update = true,
+                skipInvalidEmails = true,
+                doubleOptInSettings = DoubleOptInSettings(
+                    campaign = Campaign(
+                        emailId = 102,
+                        senderCredentials = SenderCredentials(
+                            senderName = "Newsletter Preventivka",
+                            from = "martina@loono.cz",
+                            replyTo = "martina@loono.cz"
+                        ),
+                        confirmationThankYouPageUrl = null
+                    ),
+                    sendToMode = "all",
+                    silencePeriod = SilencePeriod(unit = "days", value = 1)
+                )
+            )
 
             if (allNewsletterAccounts.isNotEmpty()) {
                 allNewsletterAccounts.forEach { account ->
                     if (emailContactInfoModelList.size % 400 == 0) {
                         val emailBody = AddUserEmailModel(
-                            settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                            settings = emailSettingModel,
                             data = emailContactInfoModelList
                         )
 
@@ -82,7 +103,7 @@ class UserSubscribeNewsletter(
                     )
                 }
                 val emailBody = AddUserEmailModel(
-                    settings = EmailSettingsModel(update = true, skipInvalidEmails = true),
+                    settings = emailSettingModel,
                     data = emailContactInfoModelList
                 )
 
