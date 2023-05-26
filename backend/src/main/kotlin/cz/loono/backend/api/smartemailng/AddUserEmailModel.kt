@@ -25,24 +25,24 @@ data class EmailContactListModel(
 )
 
 data class DoubleOptInSettings (
-    @SerializedName("campaign"       ) var campaign      : Campaign?      = Campaign(),
-    @SerializedName("send_to_mode"   ) var sendToMode    : String?        = null,
-    @SerializedName("silence_period" ) var silencePeriod : SilencePeriod? = SilencePeriod()
+    @SerializedName("campaign") var campaign: Campaign? = Campaign(),
+    @SerializedName("send_to_mode") var sendToMode: String? = null,
+    @SerializedName("silence_period") var silencePeriod: SilencePeriod? = SilencePeriod()
 )
 
 data class SenderCredentials (
-    @SerializedName("from"        ) var from       : String? = null,
-    @SerializedName("reply_to"    ) var replyTo    : String? = null,
-    @SerializedName("sender_name" ) var senderName : String? = null
+    @SerializedName("from") var from: String? = null,
+    @SerializedName("reply_to") var replyTo: String? = null,
+    @SerializedName("sender_name") var senderName: String? = null
 )
 
 data class Campaign (
-    @SerializedName("email_id"                        ) var emailId                     : Int?               = null,
-    @SerializedName("sender_credentials"              ) var senderCredentials           : SenderCredentials? = SenderCredentials(),
-    @SerializedName("confirmation_thank_you_page_url" ) var confirmationThankYouPageUrl : String?            = null
+    @SerializedName("email_id") var emailId: Int? = null,
+    @SerializedName("sender_credentials") var senderCredentials: SenderCredentials? = SenderCredentials(),
+    @SerializedName("confirmation_thank_you_page_url") var confirmationThankYouPageUrl: String? = null
 )
 
 data class SilencePeriod (
-    @SerializedName("unit"  ) var unit  : String? = null,
-    @SerializedName("value" ) var value : Int?    = null
+    @SerializedName("unit") var unit: String? = null,
+    @SerializedName("value") var value: Int? = null
 )
