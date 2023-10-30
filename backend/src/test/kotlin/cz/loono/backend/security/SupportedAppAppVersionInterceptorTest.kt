@@ -1,18 +1,13 @@
 package cz.loono.backend.security
 
-import cz.loono.backend.db.model.ServerProperties
 import cz.loono.backend.db.repository.ServerPropertiesRepository
-import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
  * all `interceptor.preHandle` call will return false with status code 410
  * to force old mobile apps to force-update
  */
-
 class SupportedAppAppVersionInterceptorTest {
 
     private val response: HttpServletResponse = mock()
